@@ -38,12 +38,12 @@ module.exports = async function handler(req, res) {
       .filter(item => {
         const lang = String(item.language || '').toLowerCase();
         const supported = lang.includes('arab') || lang === 'ara' || lang.includes('english') || lang === 'eng';
-        return supported && item.title && item.url && /^https?:\\/\\//i.test(item.url);
+        return supported && item.title && item.url && /^https?:\/\//i.test(item.url);
       })
       .map(item => ({
         title: String(item.title).slice(0, 240),
         url: item.url,
-        image: /^https?:\\/\\//i.test(String(item.socialimage || '')) ? String(item.socialimage) : '',
+        image: /^https?:\/\//i.test(String(item.socialimage || '')) ? String(item.socialimage) : '',
         source: String(item.domain || new URL(item.url).hostname).slice(0, 100),
         language: String(item.language || ''),
         publishedAt: item.seendate || null
