@@ -36,7 +36,7 @@ module.exports = async function handler(req, res) {
         return {
           title: String(item.title).slice(0, 240),
           url,
-          image: /^https?:\\/\\//i.test(String(item.socialimage || '')) ? String(item.socialimage) : '',
+          image: /^https?:\/\//i.test(String(item.socialimage || '')) ? String(item.socialimage) : '',
           source: String(item.domain || new URL(url).hostname).slice(0, 100),
           language: String(item.language || ''),
           publishedAt: item.seendate || null
