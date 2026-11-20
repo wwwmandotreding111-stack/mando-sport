@@ -63,20 +63,79 @@ footer{margin-top:34px}
  .news-icon{height:105px}
 }
 
+
+/* MANDO SPORT portal layout */
+body{background:#f2f3f5;color:#202630;font-family:Tahoma,Arial,sans-serif}
+body:before{display:none}
+header{background:#fff;border-bottom:1px solid #dce0e5;box-shadow:0 2px 9px #18202b0b;color:#202630}
+.top{padding:10px 0}
+.brand{color:#17202b}.tag{color:#77818d}
+.header-status{background:#edf8f2;border-color:#cce9d8;color:#167448}
+nav{color:#3e4957;padding:0 0 9px}
+nav a{border-radius:6px;padding:8px 12px}
+nav a:hover,nav a:focus{background:#f6edda;color:#8a641d}
+.brand-mark{border-radius:9px}
+main.wrap{padding-top:3px}
+.hero{display:none}
+.quick-links{display:none}
+.competition-strip{background:#fff;border:1px solid #dfe3e8;border-radius:8px;margin:12px 0 14px;padding:10px;box-shadow:0 1px 3px #1b27330a}
+.competition-strip strong{color:#9b722b}
+.competition-strip a{background:#f7f8fa;color:#344050;border:1px solid #e3e6eb;border-radius:5px}
+.competition-strip a:hover{background:#f8f0df;color:#8a641d;border-color:#d7bd85}
+.section{margin:17px 0}
+.section-head{border-bottom:1px solid #e1e4e8;padding:0 0 9px;margin-bottom:11px}
+.section-head h2{font-size:19px;color:#202a36}
+.section-head h2:before{height:19px;background:#c99a43}
+.section-head small{color:#788391}
+.card{background:#fff;border:1px solid #e0e4e9;border-radius:8px;color:#25303c;box-shadow:0 1px 3px #1b27330a}
+.card:hover{border-color:#cdb77e;transform:translateY(-1px)}
+#matches-list .card,#results-list .card{background:#fff;border-radius:7px;padding:12px}
+#matches-list .crest,#results-list .crest{background:#f0f2f5;border:1px solid #e3e6eb;color:#526070}
+#matches-list .score,#results-list .score{color:#202a36}
+#matches-list .meta,#results-list .meta{border-color:#edf0f3;color:#7c8794}
+.tag{color:#788391}
+.notice{background:#fff;border:1px dashed #cbd1d9;color:#687482;border-radius:7px}
+.news .card{background:#fff;border-radius:8px}
+.news .card h3{color:#202a36}
+.news .card p{color:#6d7886}
+.news-icon{background:linear-gradient(135deg,#edf0f4,#dfe5ec);color:#9b762f;border-radius:7px}
+#standings-container{background:#fff}
+table{color:#303a46}th{color:#89651f;background:#f5f6f8}td{color:#3e4854;border-color:#edf0f3}
+.ad{background:#f8f9fa;border-color:#d4d9e0;color:#929ba6}
+footer{background:#fff;color:#7b8591;border-color:#e0e4e9}
+#match-days{display:flex;align-items:center;gap:6px;overflow-x:auto;padding:8px 0 12px;scrollbar-width:none}
+#match-days::-webkit-scrollbar{display:none}
+#match-days button{flex:0 0 auto;border:1px solid #e0e4e9;background:#fff;color:#596575;padding:7px 13px;border-radius:6px;font:inherit;font-size:12px;cursor:pointer}
+#match-days button.active{background:#283646;color:#fff;border-color:#283646}
+#match-days input{flex:0 0 42px;width:42px;max-width:42px;border:1px solid #e0e4e9;border-radius:6px;padding:6px;background:#fff;color:#293442}
+#match-filter{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+#match-filter select{padding:8px 10px;border:1px solid #dfe3e8;border-radius:6px;background:#fff;color:#344050;font:inherit;font-size:12px}
+@media(max-width:760px){
+ .wrap{width:calc(100% - 20px)}
+ .top{padding:8px 0}
+ .brand{font-size:19px}
+ nav{gap:0;padding-bottom:7px}
+ nav a{font-size:12px;padding:7px 9px}
+ .competition-strip{margin:9px 0 11px;padding:8px}
+ .section{margin:14px 0}
+ .section-head h2{font-size:17px}
+ .grid,.news{grid-template-columns:1fr}
+ #matches-list .card,#results-list .card{padding:10px}
+ .news-icon{height:90px}
+}
+
 </style>
 </head>
 <body>
 <header><div class="wrap">
   <div class="top"><div class="brand-wrap"><div class="brand-mark">M</div><div><div class="brand">MANDO <b>SPORT</b></div><div class="tag">نبض الملاعب لحظة بلحظة</div></div></div><div class="header-status"><span class="pulse"></span> تغطية رياضية مستمرة</div></div>
-  <nav aria-label="التنقل الرئيسي"><a href="#home">الرئيسية</a><a href="#matches">مباشر</a><a href="#matches">مباريات اليوم</a><a href="#results">النتائج</a><a href="#leagues">البطولات</a><a href="#news">الأخبار</a><a href="#news">أخبار الانتقالات</a></nav>
+  <nav aria-label="التنقل الرئيسي"><a href="#matches">مباشر</a><a href="#matches">مباريات اليوم</a><a href="#news">أخبار</a><a href="#leagues">مسابقات</a><a href="#leagues">ترتيب</a><a href="#news">الأكثر رواجاً</a></nav>
 </div></header>
 <div class="wrap"><div class="competition-strip" aria-label="أهم البطولات"><strong>أهم البطولات</strong><a href="#leagues">دوري أبطال أوروبا</a><a href="#leagues">الدوري الإنجليزي</a><a href="#leagues">الدوري الإسباني</a><a href="#leagues">الدوري الإيطالي</a><a href="#leagues">الدوري الألماني</a><a href="#leagues">الدوري الفرنسي</a></div></div>
 <main class="wrap" id="home">
-  <section class="hero"><div class="kicker">منصتك الكروية المتكاملة</div><h1>عِش كل لحظة..<br><span>ولا تفوّت أي هدف</span></h1><p>المباريات، النتائج، ترتيب البطولات وآخر الأخبار — تجربة رياضية واضحة وسريعة، مصممة لتكون أقرب إلى جمهور الكرة.</p><div class="hero-actions"><a class="btn" href="#matches">شاهد مباريات اليوم <span>←</span></a><span class="hero-note">كل ما يهمك في عالم كرة القدم بمكان واحد</span></div></section>
-  <section class="quick-links" aria-label="وصول سريع"><a class="quick-link" href="#matches"><span class="quick-icon">⚽</span><span><strong>المباريات</strong><small>جدول مواجهات اليوم</small></span></a><a class="quick-link" href="#results"><span class="quick-icon">◉</span><span><strong>النتائج</strong><small>المباشر والنهائي</small></span></a><a class="quick-link" href="#leagues"><span class="quick-icon">🏆</span><span><strong>ترتيب الدوريات</strong><small>تابع صدارة الفرق</small></span></a><a class="quick-link" href="#news"><span class="quick-icon">📰</span><span><strong>آخر الأخبار</strong><small>العربية والعالمية</small></span></a></section>
-  <section class="section"><div class="ad">مساحة إعلانية — ستُستخدم لاحقاً بعد تجهيز الموقع وقبول شبكة الإعلانات</div></section>
+
   <section class="section" id="matches"><div class="section-head"><h2>📅 مباريات اليوم</h2><small id="matches-status">جارٍ تحميل المباريات…</small></div>
-    <div id="matches-list" class="grid"><div class="notice">يتم جلب مباريات اليوم من مصدر البيانات.</div></div>
+    <div id="match-days" aria-label="اختيار يوم المباريات"></div><div id="match-filter"><select id="match-competition"><option value="">جميع المسابقات</option><option value="PL">الدوري الإنجليزي</option><option value="PD">الدوري الإسباني</option><option value="SA">الدوري الإيطالي</option><option value="BL1">الدوري الألماني</option><option value="FL1">الدوري الفرنسي</option><option value="CL">دوري أبطال أوروبا</option></select></div><div id="matches-list" class="grid"><div class="notice">يتم جلب مباريات اليوم من مصدر البيانات.</div></div>
   </section>
   <section class="section" id="results"><div class="section-head"><h2>📊 النتائج المباشرة والنهائية</h2><small id="results-status">بانتظار بيانات المباريات</small></div><div id="results-list" class="grid"><div class="notice">يتم تحميل النتائج…</div></div></section>
   <section class="section" id="leagues"><div class="section-head"><h2>🏆 ترتيب الدوريات</h2><small id="standings-status">اختر البطولة لعرض الترتيب</small></div><div class="card" style="margin-bottom:12px"><label for="league-select" style="display:block;margin-bottom:7px;color:var(--gold);font-weight:700">اختر البطولة</label><select id="league-select" style="width:100%;max-width:360px;padding:11px;border-radius:9px;background:var(--panel2);color:var(--white);border:1px solid var(--line);font:inherit"><option value="PL">الدوري الإنجليزي الممتاز</option><option value="PD">الدوري الإسباني</option><option value="SA">الدوري الإيطالي</option><option value="BL1">الدوري الألماني</option><option value="FL1">الدوري الفرنسي</option><option value="CL">دوري أبطال أوروبا</option></select></div><div id="standings-container" class="card"><div class="notice">يتم تحميل ترتيب البطولة…</div></div></section>
@@ -92,21 +151,36 @@ footer{margin-top:34px}
 document.getElementById('year').textContent = new Date().getFullYear();
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const statusAr = (s) => ({'IN_PLAY':'مباشرة الآن','PAUSED':'استراحة','FINISHED':'انتهت','SCHEDULED':'لم تبدأ','TIMED':'لم تبدأ','POSTPONED':'مؤجلة','CANCELLED':'أُلغيت','SUSPENDED':'متوقفة'}[s] || 'موعد المباراة');
-async function loadMatches() {
+let selectedMatchDate = new Date();
+let selectedCompetition = '';
+function localDateString(d){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
+function renderMatchDays(){
+  const host=document.getElementById('match-days');
+  const names=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  host.innerHTML='';
+  [-2,-1,0,1,2,3,4].forEach(offset=>{
+    const d=new Date();d.setDate(d.getDate()+offset);
+    const b=document.createElement('button');
+    b.type='button';b.dataset.date=localDateString(d);
+    b.textContent=(offset===-1?'أمس':offset===0?'اليوم':offset===1?'غداً':names[d.getDay()]+' '+d.getDate());
+    if(offset===0)b.className='active';
+    b.addEventListener('click',()=>{selectedMatchDate=d;host.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));loadMatches(localDateString(d));});
+    host.appendChild(b);
+  });
+}
+async function loadMatches(date = localDateString(selectedMatchDate)) {
   const list = document.getElementById('matches-list');
   const label = document.getElementById('matches-status');
   try {
-    const today = new Date();
-    const date = [today.getFullYear(), String(today.getMonth()+1).padStart(2,'0'), String(today.getDate()).padStart(2,'0')].join('-');
     const response = await fetch('/api/matches?date=' + date);
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'تعذر تحميل المباريات.');
     label.textContent = 'بيانات محدثة من مصدر المباريات';
-    if (!data.matches || data.matches.length === 0) {
+    const filteredMatches = selectedCompetition ? (data.matches||[]).filter(m => String(m.competitionCode||m.competitionId||'')===selectedCompetition || String(m.competition||'').toLowerCase().includes(({PL:'premier',PD:'primera',SA:'serie a',BL1:'bundesliga',FL1:'ligue 1',CL:'champions'}[selectedCompetition]||'~'))) : (data.matches||[]);\n    if (!filteredMatches || filteredMatches.length === 0) {
       list.innerHTML = '<div class="notice">لا توجد مباريات مسجلة لهذا اليوم ضمن البطولات المتاحة في الباقة المجانية.</div>';
       return;
     }
-    list.innerHTML = data.matches.map(m => {
+    list.innerHTML = filteredMatches.map(m => {
       const hasScore = m.homeScore !== null && m.awayScore !== null;
       const time = new Date(m.utcDate).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
       const middle = hasScore ? esc(m.homeScore) + ' - ' + esc(m.awayScore) : esc(time);
@@ -114,7 +188,7 @@ async function loadMatches() {
     }).join('');
     const resultsList = document.getElementById('results-list');
     const resultsLabel = document.getElementById('results-status');
-    const resultMatches = data.matches.filter(m => ['IN_PLAY','PAUSED','FINISHED'].includes(m.status));
+    const resultMatches = filteredMatches.filter(m => ['IN_PLAY','PAUSED','FINISHED'].includes(m.status));
     resultsLabel.textContent = 'مباشرة ونتائج اليوم';
     if (resultMatches.length === 0) {
       resultsList.innerHTML = '<div class="notice">لا توجد حالياً مباريات مباشرة أو نتائج نهائية مسجلة اليوم ضمن البطولات المتاحة.</div>';
@@ -154,6 +228,8 @@ async function loadStandings(code) {
   }
 }
 document.getElementById('league-select').addEventListener('change', event => loadStandings(event.target.value));
+document.getElementById('match-competition').addEventListener('change',event=>{selectedCompetition=event.target.value;loadMatches(localDateString(selectedMatchDate));});
+renderMatchDays();
 loadStandings(document.getElementById('league-select').value);
 loadMatches();
 </script>
