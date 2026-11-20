@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Mando Sport - مباريات اليوم، النتائج، أخبار كرة القدم وترتيب البطولات">
+<meta name="theme-color" content="#090b10">
+<title>Mando Sport | عالم كرة القدم</title>
+<style>
+:root{--bg:#090b10;--panel:#121720;--panel2:#181f2b;--gold:#d8ad55;--muted:#9ba5b5;--line:#293241;--white:#f4f6fa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.7}
+a{color:inherit;text-decoration:none}.wrap{width:min(1120px,92%);margin:auto}
+header{position:sticky;top:0;z-index:5;background:#090b10ed;border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0}.brand{font-weight:900;font-size:24px;letter-spacing:.3px}.brand b{color:var(--gold)}.tag{color:var(--muted);font-size:12px}
+nav{display:flex;gap:18px;overflow:auto;padding:0 0 13px;white-space:nowrap;color:#c5ccd6;font-size:14px}nav a:hover{color:var(--gold)}
+.hero{margin:24px auto 20px;border:1px solid #4b3b20;border-radius:18px;padding:28px 24px;background:radial-gradient(ellipse at 85% 20%,#6c4b1b55,transparent 42%),linear-gradient(120deg,#171d27,#0d1017 65%);min-height:190px;display:flex;flex-direction:column;justify-content:center}
+.kicker{color:var(--gold);font-size:13px;font-weight:700}.hero h1{font-size:clamp(26px,5vw,42px);line-height:1.25;margin:8px 0}.hero p{color:#c0c7d2;margin:0 0 16px}.btn{display:inline-block;background:var(--gold);color:#15110a;font-weight:800;padding:9px 16px;border-radius:9px;width:max-content}
+.section{margin:28px 0}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}.section h2{font-size:20px;margin:0}.section-head small{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px}.match{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:center}.team{flex:1;font-weight:700}.crest{width:38px;height:38px;margin:auto auto 5px;border-radius:50%;display:grid;place-items:center;background:var(--panel2);border:1px solid #3a4658;font-size:18px}.score{font-size:20px;font-weight:900;color:var(--gold)}.meta{color:var(--muted);font-size:12px;text-align:center;margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.notice{border:1px dashed #5a4929;background:#17150f;color:#d9c69f;padding:13px 15px;border-radius:12px;font-size:13px}
+.news{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.news .card h3{font-size:16px;margin:8px 0}.news .card p{font-size:13px;color:var(--muted);margin:0}.news-icon{height:90px;border-radius:10px;background:linear-gradient(135deg,#293548,#141923);display:grid;place-items:center;font-size:34px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px;text-align:right;border-bottom:1px solid var(--line)}th{color:var(--gold);font-weight:700}td{color:#d6dce5}
+.ad{border:1px dashed #4a5362;border-radius:12px;padding:18px;text-align:center;color:var(--muted);font-size:13px;background:#0d1118}
+footer{border-top:1px solid var(--line);margin-top:35px;padding:22px 0;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:700px){.grid,.news{grid-template-columns:1fr}.hero{padding:22px 18px}.top{align-items:flex-start}.brand{font-size:21px}nav{gap:15px}.section{margin:23px 0}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="top"><div><div class="brand">MANDO <b>SPORT</b></div><div class="tag">عالم كرة القدم بين إيديك</div></div><span class="tag">نسخة تجريبية</span></div>
+  <nav><a href="#home">الرئيسية</a><a href="#matches">مباريات اليوم</a><a href="#results">النتائج</a><a href="#leagues">الدوريات</a><a href="#news">الأخبار</a></nav>
+</div></header>
+<main class="wrap" id="home">
+  <section class="hero"><div class="kicker">⚽ أهلاً بك في MANDO SPORT</div><h1>كل أخبار الكرة.. بمكان واحد</h1><p>تابع جدول المباريات والنتائج وأخبار البطولات من واجهة سريعة ومناسبة للموبايل.</p><a class="btn" href="#matches">استكشف مباريات اليوم</a></section>
+  <section class="section"><div class="ad">مساحة إعلانية — ستُستخدم لاحقاً بعد تجهيز الموقع وقبول شبكة الإعلانات</div></section>
+  <section class="section" id="matches"><div class="section-head"><h2>📅 مباريات اليوم</h2><small>نموذج للواجهة — المواعيد غير محدثة</small></div>
+    <div class="grid">
+      <article class="card"><div class="match"><div class="team"><div class="crest">🔵</div>الفريق الأول</div><div><div class="score">VS</div><small class="tag">20:00</small></div><div class="team"><div class="crest">⚪</div>الفريق الثاني</div></div><div class="meta">اسم البطولة · موعد تجريبي</div></article>
+      <article class="card"><div class="match"><div class="team"><div class="crest">🔴</div>الفريق الثالث</div><div><div class="score">VS</div><small class="tag">21:30</small></div><div class="team"><div class="crest">🟡</div>الفريق الرابع</div></div><div class="meta">اسم البطولة · موعد تجريبي</div></article>
+      <article class="card"><div class="match"><div class="team"><div class="crest">⚫</div>الفريق الخامس</div><div><div class="score">VS</div><small class="tag">22:00</small></div><div class="team"><div class="crest">🟢</div>الفريق السادس</div></div><div class="meta">اسم البطولة · موعد تجريبي</div></article>
+    </div>
+  </section>
+  <section class="section" id="results"><div class="section-head"><h2>📊 النتائج المباشرة</h2><small>سيتم ربطها بمصدر بيانات موثوق لاحقاً</small></div><div class="notice">لا توجد نتائج مباشرة متصلة حالياً. لن نعرض نتائج أو توقيتات غير مؤكدة.</div></section>
+  <section class="section" id="leagues"><div class="section-head"><h2>🏆 أبرز البطولات</h2></div><div class="grid"><div class="card">🏴 الدوري الإنجليزي الممتاز</div><div class="card">🇪🇸 الدوري الإسباني</div><div class="card">🇮🇹 الدوري الإيطالي</div><div class="card">🇩🇪 الدوري الألماني</div><div class="card">🇫🇷 الدوري الفرنسي</div><div class="card">🌍 دوري أبطال أوروبا</div></div></section>
+  <section class="section" id="news"><div class="section-head"><h2>📰 الأخبار الرياضية</h2><small>أماكن مخصصة للأخبار</small></div><div class="news">
+    <article class="card"><div class="news-icon">⚽</div><h3>آخر أخبار كرة القدم</h3><p>سيتم إضافة أخبار موثوقة ومحدثة هنا.</p></article>
+    <article class="card"><div class="news-icon">🏆</div><h3>أخبار البطولات</h3><p>تغطية البطولات المحلية والعالمية.</p></article>
+    <article class="card"><div class="news-icon">🎙️</div><h3>تحليلات ومقالات</h3><p>مساحة للمقالات والتحليلات الرياضية الأصلية.</p></article>
+  </div></section>
+  <section class="section"><div class="ad">مساحة إعلانية ثانية</div></section>
+</main>
+<footer><div class="wrap">© <span id="year"></span> Mando Sport — موقع رياضي مستقل. لا نوفر بثاً غير مرخص للمباريات.</div></footer>
+<script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+</body></html>
