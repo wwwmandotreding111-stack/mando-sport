@@ -176,7 +176,8 @@ async function loadMatches(date = localDateString(selectedMatchDate)) {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'تعذر تحميل المباريات.');
     label.textContent = 'بيانات محدثة من مصدر المباريات';
-    const filteredMatches = selectedCompetition ? (data.matches||[]).filter(m => String(m.competitionCode||m.competitionId||'')===selectedCompetition || String(m.competition||'').toLowerCase().includes(({PL:'premier',PD:'primera',SA:'serie a',BL1:'bundesliga',FL1:'ligue 1',CL:'champions'}[selectedCompetition]||'~'))) : (data.matches||[]);\n    if (!filteredMatches || filteredMatches.length === 0) {
+    const filteredMatches = selectedCompetition ? (data.matches||[]).filter(m => String(m.competitionCode||m.competitionId||'')===selectedCompetition || String(m.competition||'').toLowerCase().includes(({PL:'premier',PD:'primera',SA:'serie a',BL1:'bundesliga',FL1:'ligue 1',CL:'champions'}[selectedCompetition]||'~'))) : (data.matches||[]);
+    if (!filteredMatches || filteredMatches.length === 0) {
       list.innerHTML = '<div class="notice">لا توجد مباريات مسجلة لهذا اليوم ضمن البطولات المتاحة في الباقة المجانية.</div>';
       return;
     }
