@@ -115,4 +115,33 @@ document.getElementById('league-select').addEventListener('change', event => loa
 loadStandings(document.getElementById('league-select').value);
 loadMatches();
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(async()=>{
+  const client=window.supabase.createClient('https://ibgvfjuqcolcyjzdzcde.supabase.co','sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_');
+  const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  try{await client.from('page_views').insert({page_path:location.pathname+location.hash});}catch(e){}
+  try{
+    const {data}=await client.from('articles').select('id,title,excerpt,body,image_url,created_at').eq('published',true).order('created_at',{ascending:false}).limit(6);
+    if(data&&data.length){
+      const host=document.querySelector('#news .news');
+      host.innerHTML=data.map(a=>'<article class="card">'+(a.image_url?'<img src="'+safe(a.image_url)+'" alt="" style="width:100%;height:120px;object-fit:cover;border-radius:10px">':'<div class="news-icon">⚽</div>')+'<h3>'+safe(a.title)+'</h3><p>'+safe(a.excerpt||a.body.slice(0,150))+'</p></article>').join('');
+      document.querySelector('#news .section-head small').textContent='آخر الأخبار المنشورة';
+    }
+  }catch(e){}
+  try{
+    const {data}=await client.from('advertisements').select('title,image_url,target_url,placement').eq('active',true).order('created_at',{ascending:false});
+    if(data&&data.length){
+      const slots=[...document.querySelectorAll('.ad')];
+      data.forEach((a,i)=>{
+        const slot=slots[i%Math.max(slots.length,1)];
+        if(!slot)return;
+        slot.innerHTML=(a.target_url?'<a href="'+safe(a.target_url)+'" target="_blank" rel="noopener noreferrer">':'')+(a.image_url?'<img src="'+safe(a.image_url)+'" alt="'+safe(a.title)+'" style="max-width:100%;max-height:180px;object-fit:contain;border-radius:8px">':'<strong>'+safe(a.title)+'</strong>')+(a.target_url?'</a>':'');
+      });
+    }
+  }catch(e){}
+})();
+</script>
+
 </body></html>
