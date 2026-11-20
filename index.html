@@ -171,6 +171,10 @@ function renderMatchDays(){
 async function loadMatches(date = localDateString(selectedMatchDate)) {
   const list = document.getElementById('matches-list');
   const label = document.getElementById('matches-status');
+  const resultsList = document.getElementById('results-list');
+  const resultsLabel = document.getElementById('results-status');
+  resultsList.innerHTML = '<div class="notice">يتم تحديث النتائج…</div>';
+  resultsLabel.textContent = 'جارٍ التحديث…';
   try {
     const response = await fetch('/api/matches?date=' + date);
     const data = await response.json();
@@ -203,6 +207,8 @@ async function loadMatches(date = localDateString(selectedMatchDate)) {
   } catch (error) {
     label.textContent = 'تعذر التحديث';
     list.innerHTML = '<div class="notice">' + esc(error.message) + ' — يرجى المحاولة لاحقاً.</div>';
+    resultsLabel.textContent = 'تعذر تحميل النتائج';
+    resultsList.innerHTML = '<div class="notice">' + esc(error.message) + ' — تعذر جلب النتائج حالياً، حاول لاحقاً.</div>';
   }
 }
 
