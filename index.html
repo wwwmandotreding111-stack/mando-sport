@@ -242,7 +242,14 @@ async function loadMatches(date = localDateString(selectedMatchDate)) {
   list.innerHTML='<div class="match-empty">جارٍ تحميل جدول المباريات…</div>';
   resultsList.innerHTML='<div class="match-empty">جارٍ تحديث النتائج…</div>';
   try{
-    const response=await fetch('/api/matches?date='+encodeURIComponent(date));
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),15000);
+    let response;
+    try {
+      response=await fetch('/api/matches?date='+encodeURIComponent(date),{signal:controller.signal,cache:'no-store'});
+    } finally {
+      clearTimeout(timeout);
+    }
     const data=await response.json();
     if(!response.ok)throw new Error(data.error||'تعذر تحميل المباريات.');
     const all=Array.isArray(data.matches)?data.matches:[];
@@ -253,6 +260,7 @@ async function loadMatches(date = localDateString(selectedMatchDate)) {
     resultsLabel.textContent='المباريات المباشرة والنهائية';
     resultsList.innerHTML=renderMatchGroups(completedOrLive,true);
   }catch(error){
+    if(error.name==='AbortError') error=new Error('تأخر مصدر المباريات أكثر من 15 ثانية');
     label.textContent='تعذر تحديث المباريات';
     list.innerHTML='<div class="match-empty">'+esc(error.message)+' — حاول مرة أخرى لاحقاً.</div>';
     resultsLabel.textContent='تعذر تحميل النتائج';
