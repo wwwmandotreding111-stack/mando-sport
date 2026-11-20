@@ -192,7 +192,7 @@ footer{background:#fff;color:#7b8591;border-color:#e0e4e9}
   </div></section>
   <section class="section"><div class="ad">مساحة إعلانية ثانية</div></section>
 </main>
-<footer><div class="wrap">© <span id="year"></span> Mando Sport — موقع رياضي مستقل. لا نوفر بثاً غير مرخص للمباريات.<div style="margin-top:7px;color:var(--gold);font-weight:700">تم تطوير الموقع بواسطة عامر مندو</div></div></footer>
+<footer><div class="wrap">© <span id="year"></span> Mando Sport — موقع رياضي مستقل. مواعيد المباريات حسب توقيت جهازك. لا نوفر بثاً غير مرخص للمباريات.<div style="margin-top:7px;color:var(--gold);font-weight:700">تم تطوير الموقع بواسطة عامر مندو</div></div></footer>
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -216,7 +216,7 @@ function renderMatchDays(){
 }
 function matchStatusClass(status){return ['IN_PLAY','PAUSED'].includes(status)?'live':status==='FINISHED'?'done':'';}
 function renderMatchGroups(matches, resultsOnly=false){
-  if(!matches.length)return '<div class="match-empty">لا توجد مباريات متاحة في هذا اليوم ضمن البطولات التي يغطيها مصدر البيانات.</div>';
+  if(!matches.length)return '<div class="match-empty">'+(resultsOnly?'لا توجد مباريات مباشرة أو نتائج نهائية لهذا اليوم.':'لا توجد مباريات متاحة في هذا اليوم ضمن البطولات التي يغطيها مصدر البيانات.')+'</div>';
   const groups=new Map();
   matches.forEach(m=>{const key=m.competition||'مباريات كرة القدم';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(m);});
   return [...groups.entries()].map(([competition,items])=>{
