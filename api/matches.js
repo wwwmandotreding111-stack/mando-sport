@@ -6,7 +6,7 @@ module.exports = async function handler(req, res) {
   }
 
   const requestedDate = typeof req.query.date === "string" ? req.query.date : new Date().toISOString().slice(0, 10);
-  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(requestedDate)) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(requestedDate)) {
     return res.status(400).json({ error: "صيغة التاريخ غير صحيحة." });
   }
 
