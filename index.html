@@ -26,13 +26,51 @@ footer{border-top:1px solid #ffffff12;margin-top:45px;padding:25px 0 32px;color:
 @media(max-width:760px){.wrap{width:min(100% - 26px,600px)}.top{padding:11px 0}.brand{font-size:20px}.brand-mark{width:39px;height:39px}.header-status{font-size:10px;padding:5px 8px}nav{gap:3px;padding-bottom:10px}nav a{padding:7px 10px;font-size:12px}.hero{margin:17px auto 14px;min-height:245px;border-radius:20px;padding:25px 21px}.hero:after{left:-5%;font-size:145px}.hero h1{font-size:34px}.hero p{font-size:13px}.quick-links{grid-template-columns:repeat(2,1fr);gap:9px;margin:13px 0 24px}.quick-link{padding:11px;gap:9px}.quick-icon{width:35px;height:35px}.quick-link strong{font-size:12px}.quick-link small{font-size:10px}.section{margin:27px 0}.grid,.news{grid-template-columns:1fr}.grid .card{padding:16px}.news .card{padding:12px}.news-icon{height:130px}.section-head{align-items:flex-start}.section-head small{text-align:left;max-width:45%}}
 @media(min-width:761px) and (max-width:1000px){.grid,.news{grid-template-columns:repeat(2,1fr)}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Kooora-inspired sports portal layout, retaining MANDO SPORT identity */
+.competition-strip{display:flex;align-items:center;gap:8px;overflow-x:auto;padding:11px 13px;margin:14px 0 18px;background:#111722;border:1px solid var(--line);border-radius:13px;scrollbar-width:none}
+.competition-strip::-webkit-scrollbar{display:none}
+.competition-strip strong{color:var(--gold2);font-size:12px;white-space:nowrap;margin-left:5px}
+.competition-strip a{white-space:nowrap;padding:6px 12px;border:1px solid #303b4c;border-radius:20px;color:#cbd3de;font-size:11px;transition:.2s}
+.competition-strip a:hover{border-color:var(--gold);color:var(--gold2);background:#e2b85f12}
+.hero{min-height:220px;margin-top:18px;border-radius:17px;padding:clamp(22px,4vw,36px)}
+.hero h1{font-size:clamp(28px,4.5vw,43px);margin:9px 0}
+.hero:after{font-size:clamp(100px,17vw,175px);opacity:.055}
+.quick-links{margin:14px 0 21px;gap:9px}
+.quick-link{border-radius:12px;padding:11px 13px}
+.section{margin:27px 0}
+.section-head{padding-bottom:10px;border-bottom:1px solid #ffffff12;margin-bottom:13px}
+.section-head h2{font-size:19px}
+.grid{gap:10px}
+#matches-list .card,#results-list .card{padding:13px;border-radius:12px;background:#111722}
+#matches-list .crest,#results-list .crest{width:36px;height:36px;border-radius:50%;font-size:16px;margin-bottom:6px}
+#matches-list .team,#results-list .team{font-size:12px}
+#matches-list .score,#results-list .score{font-size:20px}
+.news{gap:11px}
+.news .card{border-radius:12px;background:#111722}
+.news-icon{height:92px}
+.news .card h3{font-size:14px}
+.ad{border-radius:11px}
+footer{margin-top:34px}
+@media(max-width:760px){
+ .competition-strip{margin:10px 0 14px;padding:9px}
+ .hero{min-height:205px;margin-top:13px;padding:22px 18px}
+ .hero h1{font-size:30px}
+ .section{margin:23px 0}
+ .section-head h2{font-size:17px}
+ .grid{gap:8px}
+ .news{gap:9px}
+ .news-icon{height:105px}
+}
+
 </style>
 </head>
 <body>
 <header><div class="wrap">
   <div class="top"><div class="brand-wrap"><div class="brand-mark">M</div><div><div class="brand">MANDO <b>SPORT</b></div><div class="tag">نبض الملاعب لحظة بلحظة</div></div></div><div class="header-status"><span class="pulse"></span> تغطية رياضية مستمرة</div></div>
-  <nav aria-label="التنقل الرئيسي"><a href="#home">الرئيسية</a><a href="#matches">مباريات اليوم</a><a href="#results">النتائج</a><a href="#leagues">ترتيب الدوريات</a><a href="#news">آخر الأخبار</a></nav>
+  <nav aria-label="التنقل الرئيسي"><a href="#home">الرئيسية</a><a href="#matches">مباشر</a><a href="#matches">مباريات اليوم</a><a href="#results">النتائج</a><a href="#leagues">البطولات</a><a href="#news">الأخبار</a><a href="#news">أخبار الانتقالات</a></nav>
 </div></header>
+<div class="wrap"><div class="competition-strip" aria-label="أهم البطولات"><strong>أهم البطولات</strong><a href="#leagues">دوري أبطال أوروبا</a><a href="#leagues">الدوري الإنجليزي</a><a href="#leagues">الدوري الإسباني</a><a href="#leagues">الدوري الإيطالي</a><a href="#leagues">الدوري الألماني</a><a href="#leagues">الدوري الفرنسي</a></div></div>
 <main class="wrap" id="home">
   <section class="hero"><div class="kicker">منصتك الكروية المتكاملة</div><h1>عِش كل لحظة..<br><span>ولا تفوّت أي هدف</span></h1><p>المباريات، النتائج، ترتيب البطولات وآخر الأخبار — تجربة رياضية واضحة وسريعة، مصممة لتكون أقرب إلى جمهور الكرة.</p><div class="hero-actions"><a class="btn" href="#matches">شاهد مباريات اليوم <span>←</span></a><span class="hero-note">كل ما يهمك في عالم كرة القدم بمكان واحد</span></div></section>
   <section class="quick-links" aria-label="وصول سريع"><a class="quick-link" href="#matches"><span class="quick-icon">⚽</span><span><strong>المباريات</strong><small>جدول مواجهات اليوم</small></span></a><a class="quick-link" href="#results"><span class="quick-icon">◉</span><span><strong>النتائج</strong><small>المباشر والنهائي</small></span></a><a class="quick-link" href="#leagues"><span class="quick-icon">🏆</span><span><strong>ترتيب الدوريات</strong><small>تابع صدارة الفرق</small></span></a><a class="quick-link" href="#news"><span class="quick-icon">📰</span><span><strong>آخر الأخبار</strong><small>العربية والعالمية</small></span></a></section>
