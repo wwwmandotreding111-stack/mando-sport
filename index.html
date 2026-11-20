@@ -33,12 +33,8 @@ footer{border-top:1px solid var(--line);margin-top:35px;padding:22px 0;color:var
 <main class="wrap" id="home">
   <section class="hero"><div class="kicker">⚽ أهلاً بك في MANDO SPORT</div><h1>كل أخبار الكرة.. بمكان واحد</h1><p>تابع جدول المباريات والنتائج وأخبار البطولات من واجهة سريعة ومناسبة للموبايل.</p><a class="btn" href="#matches">استكشف مباريات اليوم</a></section>
   <section class="section"><div class="ad">مساحة إعلانية — ستُستخدم لاحقاً بعد تجهيز الموقع وقبول شبكة الإعلانات</div></section>
-  <section class="section" id="matches"><div class="section-head"><h2>📅 مباريات اليوم</h2><small>نموذج للواجهة — المواعيد غير محدثة</small></div>
-    <div class="grid">
-      <article class="card"><div class="match"><div class="team"><div class="crest">🔵</div>الفريق الأول</div><div><div class="score">VS</div><small class="tag">20:00</small></div><div class="team"><div class="crest">⚪</div>الفريق الثاني</div></div><div class="meta">اسم البطولة · موعد تجريبي</div></article>
-      <article class="card"><div class="match"><div class="team"><div class="crest">🔴</div>الفريق الثالث</div><div><div class="score">VS</div><small class="tag">21:30</small></div><div class="team"><div class="crest">🟡</div>الفريق الرابع</div></div><div class="meta">اسم البطولة · موعد تجريبي</div></article>
-      <article class="card"><div class="match"><div class="team"><div class="crest">⚫</div>الفريق الخامس</div><div><div class="score">VS</div><small class="tag">22:00</small></div><div class="team"><div class="crest">🟢</div>الفريق السادس</div></div><div class="meta">اسم البطولة · موعد تجريبي</div></article>
-    </div>
+  <section class="section" id="matches"><div class="section-head"><h2>📅 مباريات اليوم</h2><small id="matches-status">جارٍ تحميل المباريات…</small></div>
+    <div id="matches-list" class="grid"><div class="notice">يتم جلب مباريات اليوم من مصدر البيانات.</div></div>
   </section>
   <section class="section" id="results"><div class="section-head"><h2>📊 النتائج المباشرة</h2><small>سيتم ربطها بمصدر بيانات موثوق لاحقاً</small></div><div class="notice">لا توجد نتائج مباشرة متصلة حالياً. لن نعرض نتائج أو توقيتات غير مؤكدة.</div></section>
   <section class="section" id="leagues"><div class="section-head"><h2>🏆 أبرز البطولات</h2></div><div class="grid"><div class="card">🏴 الدوري الإنجليزي الممتاز</div><div class="card">🇪🇸 الدوري الإسباني</div><div class="card">🇮🇹 الدوري الإيطالي</div><div class="card">🇩🇪 الدوري الألماني</div><div class="card">🇫🇷 الدوري الفرنسي</div><div class="card">🌍 دوري أبطال أوروبا</div></div></section>
@@ -50,5 +46,35 @@ footer{border-top:1px solid var(--line);margin-top:35px;padding:22px 0;color:var
   <section class="section"><div class="ad">مساحة إعلانية ثانية</div></section>
 </main>
 <footer><div class="wrap">© <span id="year"></span> Mando Sport — موقع رياضي مستقل. لا نوفر بثاً غير مرخص للمباريات.</div></footer>
-<script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const statusAr = (s) => ({'IN_PLAY':'مباشرة الآن','PAUSED':'استراحة','FINISHED':'انتهت','SCHEDULED':'لم تبدأ','TIMED':'لم تبدأ','POSTPONED':'مؤجلة','CANCELLED':'أُلغيت','SUSPENDED':'متوقفة'}[s] || 'موعد المباراة');
+async function loadMatches() {
+  const list = document.getElementById('matches-list');
+  const label = document.getElementById('matches-status');
+  try {
+    const today = new Date();
+    const date = [today.getFullYear(), String(today.getMonth()+1).padStart(2,'0'), String(today.getDate()).padStart(2,'0')].join('-');
+    const response = await fetch('/api/matches?date=' + date);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'تعذر تحميل المباريات.');
+    label.textContent = 'بيانات محدثة من مصدر المباريات';
+    if (!data.matches || data.matches.length === 0) {
+      list.innerHTML = '<div class="notice">لا توجد مباريات مسجلة لهذا اليوم ضمن البطولات المتاحة في الباقة المجانية.</div>';
+      return;
+    }
+    list.innerHTML = data.matches.map(m => {
+      const hasScore = m.homeScore !== null && m.awayScore !== null;
+      const time = new Date(m.utcDate).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
+      const middle = hasScore ? esc(m.homeScore) + ' - ' + esc(m.awayScore) : esc(time);
+      return '<article class="card"><div class="match"><div class="team"><div class="crest">⚽</div>' + esc(m.home) + '</div><div><div class="score">' + middle + '</div><small class="tag">' + esc(statusAr(m.status)) + '</small></div><div class="team"><div class="crest">⚽</div>' + esc(m.away) + '</div></div><div class="meta">' + esc(m.competition) + '</div></article>';
+    }).join('');
+  } catch (error) {
+    label.textContent = 'تعذر التحديث';
+    list.innerHTML = '<div class="notice">' + esc(error.message) + ' — يرجى المحاولة لاحقاً.</div>';
+  }
+}
+loadMatches();
+</script>
 </body></html>
