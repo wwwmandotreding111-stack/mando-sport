@@ -33,6 +33,7 @@ module.exports = async function handler(req, res) {
       date: requestedDate,
       matches: (data.matches || []).map((m) => ({
         id: m.id,
+        competitionCode: m.competition?.code || "",
         competition: m.competition?.name || "بطولة",
         home: m.homeTeam?.shortName || m.homeTeam?.name || "الفريق المضيف",
         away: m.awayTeam?.shortName || m.awayTeam?.name || "الفريق الضيف",
