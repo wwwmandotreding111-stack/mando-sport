@@ -122,14 +122,42 @@ loadMatches();
   const client=window.supabase.createClient('https://ibgvfjuqcolcyjzdzcde.supabase.co','sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_');
   const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   try{await client.from('page_views').insert({page_path:location.pathname+location.hash});}catch(e){}
+  const newsHost=document.querySelector('#news .news');
+  const newsLabel=document.querySelector('#news .section-head small');
+  const renderNews=(automatic,manual)=>{
+    const cards=[];
+    automatic.forEach(a=>{
+      const lang=String(a.language||'').toLowerCase();
+      const label=(lang.includes('arab')||lang==='ara')?'أخبار عربية':'أخبار عالمية';
+      const date=a.publishedAt?new Date(a.publishedAt).toLocaleString('ar',{dateStyle:'medium',timeStyle:'short'}):'';
+      cards.push('<article class="card"><div class="news-icon">⚽</div><small style="color:var(--gold)">'+safe(label)+'</small><h3>'+safe(a.title)+'</h3><p>'+safe(a.source)+(date?' · '+safe(date):'')+'</p><p style="margin-top:10px"><a href="'+safe(a.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);font-weight:700">اقرأ الخبر من المصدر الأصلي ←</a></p></article>');
+    });
+    manual.forEach(a=>{
+      const body=String(a.excerpt||a.body||'').slice(0,180);
+      cards.push('<article class="card">'+(a.image_url?'<img src="'+safe(a.image_url)+'" alt="" style="width:100%;height:120px;object-fit:cover;border-radius:10px">':'<div class="news-icon">📰</div>')+'<small style="color:var(--gold)">من إدارة MANDO SPORT</small><h3>'+safe(a.title)+'</h3><p>'+safe(body)+'</p></article>');
+    });
+    if(cards.length){newsHost.innerHTML=cards.slice(0,12).join('');newsLabel.textContent='أخبار تلقائية ومحتوى الإدارة';}
+    else {newsHost.innerHTML='<div class="notice">لا توجد أخبار متاحة حالياً. سيحاول الموقع التحديث تلقائياً.</div>';newsLabel.textContent='تحديث تلقائي';}
+  };
   try{
-    const {data}=await client.from('articles').select('id,title,excerpt,body,image_url,created_at').eq('published',true).order('created_at',{ascending:false}).limit(6);
-    if(data&&data.length){
-      const host=document.querySelector('#news .news');
-      host.innerHTML=data.map(a=>'<article class="card">'+(a.image_url?'<img src="'+safe(a.image_url)+'" alt="" style="width:100%;height:120px;object-fit:cover;border-radius:10px">':'<div class="news-icon">⚽</div>')+'<h3>'+safe(a.title)+'</h3><p>'+safe(a.excerpt||a.body.slice(0,150))+'</p></article>').join('');
-      document.querySelector('#news .section-head small').textContent='آخر الأخبار المنشورة';
+    const [newsResponse,manualResponse]=await Promise.all([
+      fetch('/api/news'),
+      client.from('articles').select('id,title,excerpt,body,image_url,created_at').eq('published',true).order('created_at',{ascending:false}).limit(6)
+    ]);
+    const newsData=newsResponse.ok?await newsResponse.json():{articles:[]};
+    renderNews(Array.isArray(newsData.articles)?newsData.articles:[],manualResponse.data||[]);
+    if(newsData.attributionUrl){
+      const note=document.createElement('p');
+      note.style.cssText='font-size:11px;color:var(--muted);margin-top:10px';
+      note.innerHTML='مصدر بيانات العناوين: <a href="'+safe(newsData.attributionUrl)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">GDELT Project</a>. العناوين وروابطها تحيل إلى الناشرين الأصليين.';
+      document.querySelector('#news').appendChild(note);
     }
-  }catch(e){}
+  }catch(e){
+    try{
+      const {data}=await client.from('articles').select('id,title,excerpt,body,image_url,created_at').eq('published',true).order('created_at',{ascending:false}).limit(6);
+      renderNews([],data||[]);
+    }catch(ignore){renderNews([],[]);}
+  }
   try{
     const {data}=await client.from('advertisements').select('title,image_url,target_url,placement').eq('active',true).order('created_at',{ascending:false});
     if(data&&data.length){
