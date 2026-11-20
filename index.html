@@ -36,7 +36,7 @@ footer{border-top:1px solid var(--line);margin-top:35px;padding:22px 0;color:var
   <section class="section" id="matches"><div class="section-head"><h2>📅 مباريات اليوم</h2><small id="matches-status">جارٍ تحميل المباريات…</small></div>
     <div id="matches-list" class="grid"><div class="notice">يتم جلب مباريات اليوم من مصدر البيانات.</div></div>
   </section>
-  <section class="section" id="results"><div class="section-head"><h2>📊 النتائج المباشرة</h2><small>سيتم ربطها بمصدر بيانات موثوق لاحقاً</small></div><div class="notice">لا توجد نتائج مباشرة متصلة حالياً. لن نعرض نتائج أو توقيتات غير مؤكدة.</div></section>
+  <section class="section" id="results"><div class="section-head"><h2>📊 النتائج المباشرة والنهائية</h2><small id="results-status">بانتظار بيانات المباريات</small></div><div id="results-list" class="grid"><div class="notice">يتم تحميل النتائج…</div></div></section>
   <section class="section" id="leagues"><div class="section-head"><h2>🏆 أبرز البطولات</h2></div><div class="grid"><div class="card">🏴 الدوري الإنجليزي الممتاز</div><div class="card">🇪🇸 الدوري الإسباني</div><div class="card">🇮🇹 الدوري الإيطالي</div><div class="card">🇩🇪 الدوري الألماني</div><div class="card">🇫🇷 الدوري الفرنسي</div><div class="card">🌍 دوري أبطال أوروبا</div></div></section>
   <section class="section" id="news"><div class="section-head"><h2>📰 الأخبار الرياضية</h2><small>أماكن مخصصة للأخبار</small></div><div class="news">
     <article class="card"><div class="news-icon">⚽</div><h3>آخر أخبار كرة القدم</h3><p>سيتم إضافة أخبار موثوقة ومحدثة هنا.</p></article>
@@ -70,6 +70,19 @@ async function loadMatches() {
       const middle = hasScore ? esc(m.homeScore) + ' - ' + esc(m.awayScore) : esc(time);
       return '<article class="card"><div class="match"><div class="team"><div class="crest">⚽</div>' + esc(m.home) + '</div><div><div class="score">' + middle + '</div><small class="tag">' + esc(statusAr(m.status)) + '</small></div><div class="team"><div class="crest">⚽</div>' + esc(m.away) + '</div></div><div class="meta">' + esc(m.competition) + '</div></article>';
     }).join('');
+    const resultsList = document.getElementById('results-list');
+    const resultsLabel = document.getElementById('results-status');
+    const resultMatches = data.matches.filter(m => ['IN_PLAY','PAUSED','FINISHED'].includes(m.status));
+    resultsLabel.textContent = 'مباشرة ونتائج اليوم';
+    if (resultMatches.length === 0) {
+      resultsList.innerHTML = '<div class="notice">لا توجد حالياً مباريات مباشرة أو نتائج نهائية مسجلة اليوم ضمن البطولات المتاحة.</div>';
+    } else {
+      resultsList.innerHTML = resultMatches.map(m => {
+        const hasScore = m.homeScore !== null && m.awayScore !== null;
+        const score = hasScore ? esc(m.homeScore) + ' - ' + esc(m.awayScore) : '—';
+        return '<article class="card"><div class="match"><div class="team"><div class="crest">⚽</div>' + esc(m.home) + '</div><div><div class="score">' + score + '</div><small class="tag">' + esc(statusAr(m.status)) + '</small></div><div class="team"><div class="crest">⚽</div>' + esc(m.away) + '</div></div><div class="meta">' + esc(m.competition) + '</div></article>';
+      }).join('');
+    }
   } catch (error) {
     label.textContent = 'تعذر التحديث';
     list.innerHTML = '<div class="notice">' + esc(error.message) + ' — يرجى المحاولة لاحقاً.</div>';
