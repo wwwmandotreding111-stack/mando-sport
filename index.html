@@ -124,6 +124,7 @@ footer{background:#fff;color:#7b8591;border-color:#e0e4e9}
  .news-icon{height:90px}
 }
 
+.crest img{width:100%;height:100%;object-fit:contain;padding:5px}.news-photo{display:block;width:100%;height:155px;object-fit:cover;border-radius:7px;margin-bottom:10px;background:#edf0f4}
 </style>
 </head>
 <body>
@@ -189,7 +190,7 @@ async function loadMatches(date = localDateString(selectedMatchDate)) {
       const hasScore = m.homeScore !== null && m.awayScore !== null;
       const time = new Date(m.utcDate).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
       const middle = hasScore ? esc(m.homeScore) + ' - ' + esc(m.awayScore) : esc(time);
-      return '<article class="card"><div class="match"><div class="team"><div class="crest">⚽</div>' + esc(m.home) + '</div><div><div class="score">' + middle + '</div><small class="tag">' + esc(statusAr(m.status)) + '</small></div><div class="team"><div class="crest">⚽</div>' + esc(m.away) + '</div></div><div class="meta">' + esc(m.competition) + '</div></article>';
+      return '<article class="card"><div class="match"><div class="team"><div class="crest">'+(m.homeCrest?'<img src="'+esc(m.homeCrest)+'" alt="" loading="lazy">':'⚽')+'</div>' + esc(m.home) + '</div><div><div class="score">' + middle + '</div><small class="tag">' + esc(statusAr(m.status)) + '</small></div><div class="team"><div class="crest">'+(m.awayCrest?'<img src="'+esc(m.awayCrest)+'" alt="" loading="lazy">':'⚽')+'</div>' + esc(m.away) + '</div></div><div class="meta">' + esc(m.competition) + '</div></article>';
     }).join('');
     const resultsList = document.getElementById('results-list');
     const resultsLabel = document.getElementById('results-status');
@@ -201,7 +202,7 @@ async function loadMatches(date = localDateString(selectedMatchDate)) {
       resultsList.innerHTML = resultMatches.map(m => {
         const hasScore = m.homeScore !== null && m.awayScore !== null;
         const score = hasScore ? esc(m.homeScore) + ' - ' + esc(m.awayScore) : '—';
-        return '<article class="card"><div class="match"><div class="team"><div class="crest">⚽</div>' + esc(m.home) + '</div><div><div class="score">' + score + '</div><small class="tag">' + esc(statusAr(m.status)) + '</small></div><div class="team"><div class="crest">⚽</div>' + esc(m.away) + '</div></div><div class="meta">' + esc(m.competition) + '</div></article>';
+        return '<article class="card"><div class="match"><div class="team"><div class="crest">'+(m.homeCrest?'<img src="'+esc(m.homeCrest)+'" alt="" loading="lazy">':'⚽')+'</div>' + esc(m.home) + '</div><div><div class="score">' + score + '</div><small class="tag">' + esc(statusAr(m.status)) + '</small></div><div class="team"><div class="crest">'+(m.awayCrest?'<img src="'+esc(m.awayCrest)+'" alt="" loading="lazy">':'⚽')+'</div>' + esc(m.away) + '</div></div><div class="meta">' + esc(m.competition) + '</div></article>';
       }).join('');
     }
   } catch (error) {
@@ -255,7 +256,7 @@ loadMatches();
       const lang=String(a.language||'').toLowerCase();
       const label=(lang.includes('arab')||lang==='ara')?'أخبار عربية':'أخبار عالمية';
       const date=a.publishedAt?new Date(a.publishedAt).toLocaleString('ar',{dateStyle:'medium',timeStyle:'short'}):'';
-      cards.push('<article class="card"><div class="news-icon">⚽</div><small style="color:var(--gold)">'+safe(label)+'</small><h3>'+safe(a.title)+'</h3><p>'+safe(a.source)+(date?' · '+safe(date):'')+'</p><p style="margin-top:10px"><a href="'+safe(a.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);font-weight:700">اقرأ الخبر من المصدر الأصلي ←</a></p></article>');
+      cards.push('<article class="card">'+(a.image?'<img class="news-photo" src="'+safe(a.image)+'" alt="" loading="lazy">':'<div class="news-icon">⚽</div>')+'<small style="color:var(--gold)">'+safe(label)+'</small><h3>'+safe(a.title)+'</h3><p>'+safe(a.source)+(date?' · '+safe(date):'')+'</p><p style="margin-top:10px"><a href="'+safe(a.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--gold);font-weight:700">اقرأ الخبر من المصدر الأصلي ←</a></p></article>');
     });
     manual.forEach(a=>{
       const body=String(a.excerpt||a.body||'').slice(0,180);
