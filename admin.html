@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090b10">
+<title>إدارة MANDO SPORT</title>
+<style>
+:root{--bg:#090b10;--panel:#121720;--panel2:#1a2230;--gold:#d8ad55;--muted:#9ba5b5;--line:#293241;--white:#f4f6fa;--red:#e16b6b;--green:#70c99a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.7}.wrap{width:min(1000px,94%);margin:auto}header{border-bottom:1px solid var(--line);padding:16px 0;background:#0c1018}.brand{font-weight:900;font-size:23px}.brand b{color:var(--gold)}.sub{font-size:12px;color:var(--muted)}main{padding:24px 0}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0}.login{max-width:430px;margin:8vh auto}.field{display:grid;gap:6px;margin:12px 0}label{font-size:13px;color:#d8deea}input,textarea,select{width:100%;padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--white);font:inherit}textarea{min-height:95px;resize:vertical}button{border:0;border-radius:9px;padding:10px 16px;background:var(--gold);color:#17120a;font:inherit;font-weight:800;cursor:pointer}button.secondary{background:#293548;color:var(--white)}button.danger{background:#532a31;color:#ffd9d9}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.hidden{display:none!important}.status{font-size:13px;color:var(--muted);margin-top:10px}.error{color:#ff9b9b}.ok{color:var(--green)}h1{font-size:24px;margin:0}h2{font-size:19px;margin:0 0 12px}.muted{color:var(--muted);font-size:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat strong{display:block;color:var(--gold);font-size:26px}.item{border-top:1px solid var(--line);padding:13px 0}.item:first-child{border-top:0}.item h3{font-size:16px;margin:0 0 4px}.pill{font-size:11px;border:1px solid var(--line);padding:2px 8px;border-radius:20px;color:var(--muted)}.item-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.item-actions button{font-size:12px;padding:7px 10px}footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--line)}@media(max-width:650px){.stats{grid-template-columns:1fr}.row>*{flex-basis:100%}.panel{padding:14px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="brand">MANDO <b>SPORT</b> <span class="sub">| لوحة الإدارة</span></div></div></header>
+<main class="wrap">
+<section id="login-panel" class="panel login">
+<h1>تسجيل دخول المدير</h1><p class="muted">هذه الصفحة مخصصة لحساب الإدارة المعتمد فقط.</p>
+<form id="login-form">
+<div class="field"><label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" required></div>
+<div class="field"><label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" required></div>
+<button type="submit" style="width:100%">تسجيل الدخول</button>
+</form><div id="login-status" class="status" aria-live="polite"></div>
+</section>
+<section id="dashboard" class="hidden">
+<div class="row" style="justify-content:space-between"><div><h1>لوحة التحكم</h1><div id="admin-email" class="muted"></div></div><button id="logout" class="secondary">تسجيل الخروج</button></div>
+<div class="stats">
+<div class="panel stat"><span class="muted">إجمالي زيارات الصفحات المسجلة</span><strong id="views-total">—</strong></div>
+<div class="panel stat"><span class="muted">عدد الأخبار</span><strong id="articles-total">—</strong></div>
+<div class="panel stat"><span class="muted">عدد الإعلانات</span><strong id="ads-total">—</strong></div>
+</div>
+<section class="panel">
+<h2>إضافة خبر جديد</h2>
+<form id="article-form">
+<div class="field"><label for="article-title">عنوان الخبر</label><input id="article-title" maxlength="180" required></div>
+<div class="field"><label for="article-excerpt">ملخص قصير</label><textarea id="article-excerpt" maxlength="500"></textarea></div>
+<div class="field"><label for="article-body">نص الخبر</label><textarea id="article-body"></textarea></div>
+<div class="field"><label for="article-image">رابط صورة الخبر (يمكن تركه فارغاً حالياً)</label><input id="article-image" type="url" placeholder="https://..."></div>
+<label><input id="article-published" type="checkbox" style="width:auto"> نشر الخبر مباشرة</label>
+<div style="margin-top:12px"><button type="submit">حفظ الخبر</button></div>
+</form><div id="article-status" class="status"></div>
+</section>
+<section class="panel"><h2>الأخبار المنشورة والمسودات</h2><div id="articles-list" class="muted">جارٍ التحميل…</div></section>
+<section class="panel">
+<h2>إضافة إعلان</h2>
+<form id="ad-form">
+<div class="field"><label for="ad-title">اسم الإعلان</label><input id="ad-title" maxlength="180" required></div>
+<div class="field"><label for="ad-image">رابط صورة الإعلان</label><input id="ad-image" type="url" placeholder="https://..."></div>
+<div class="field"><label for="ad-url">رابط الوجهة عند الضغط</label><input id="ad-url" type="url" placeholder="https://..."></div>
+<div class="field"><label for="ad-placement">مكان الإعلان</label><select id="ad-placement"><option value="home">الرئيسية</option><option value="matches">المباريات</option><option value="news">الأخبار</option><option value="footer">أسفل الموقع</option></select></div>
+<label><input id="ad-active" type="checkbox" style="width:auto"> تفعيل الإعلان</label>
+<div style="margin-top:12px"><button type="submit">حفظ الإعلان</button></div>
+</form><div id="ad-status" class="status"></div>
+</section>
+<section class="panel"><h2>الإعلانات</h2><div id="ads-list" class="muted">جارٍ التحميل…</div></section>
+<section class="panel"><h2>آخر الزيارات المسجلة</h2><div class="muted">يعرض النظام الصفحات وأوقات زيارتها، ولا يجمع أسماء الزوار أو بياناتهم الشخصية.</div><div id="views-list">جارٍ التحميل…</div></section>
+</section>
+</main>
+<footer>MANDO SPORT — لوحة إدارة خاصة</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://ibgvfjuqcolcyjzdzcde.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = id => document.getElementById(id);
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function message(id,text,error=false){$(id).textContent=text;$(id).className='status '+(error?'error':'ok')}
+function showLogin(){ $('login-panel').classList.remove('hidden'); $('dashboard').classList.add('hidden'); }
+function showDashboard(user){ $('login-panel').classList.add('hidden'); $('dashboard').classList.remove('hidden'); $('admin-email').textContent=user.email||'حساب المدير'; }
+async function verifyAdmin(user){
+ const {data,error}=await db.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
+ if(error) throw error;
+ if(!data) throw new Error('هذا الحساب غير مضاف كمدير. لا يمكن الدخول إلى لوحة الإدارة.');
+ return true;
+}
+async function enter(user){
+ try{await verifyAdmin(user);showDashboard(user);await refreshAll();}
+ catch(e){await db.auth.signOut();showLogin();message('login-status',e.message,true);}
+}
+$('login-form').addEventListener('submit',async e=>{
+ e.preventDefault();message('login-status','جارٍ التحقق من الحساب…');
+ const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+ if(error){message('login-status','تعذر تسجيل الدخول: '+error.message,true);return;}
+ await enter(data.user);
+});
+$('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
+db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
+async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews()]);}
+async function loadArticles(){
+ const {data,error}=await db.from('articles').select('*').order('created_at',{ascending:false});
+ if(error){$('articles-list').textContent=error.message;return;}
+ $('articles-total').textContent=data.length;
+ $('articles-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.published?'منشور':'مسودة')+'</span><div class="muted">'+esc(a.excerpt)+'</div><div class="item-actions"><button class="secondary" data-publish="'+a.id+'" data-state="'+(!a.published)+'">'+(a.published?'إلغاء النشر':'نشر')+'</button><button class="danger" data-delete-article="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد أخبار بعد.';
+}
+$('article-form').addEventListener('submit',async e=>{
+ e.preventDefault();message('article-status','جارٍ حفظ الخبر…');
+ const {data:userData}=await db.auth.getUser();
+ const payload={title:$('article-title').value.trim(),excerpt:$('article-excerpt').value.trim(),body:$('article-body').value.trim(),image_url:$('article-image').value.trim(),published:$('article-published').checked,author_id:userData.user.id};
+ const {error}=await db.from('articles').insert(payload);
+ if(error){message('article-status','لم يتم الحفظ: '+error.message,true);return;}
+ e.target.reset();message('article-status','تم حفظ الخبر.');await loadArticles();
+});
+$('articles-list').addEventListener('click',async e=>{
+ const pub=e.target.closest('[data-publish]');const del=e.target.closest('[data-delete-article]');
+ if(pub){const {error}=await db.from('articles').update({published:pub.dataset.state==='true',updated_at:new Date().toISOString()}).eq('id',pub.dataset.publish);if(error)alert(error.message);await loadArticles();}
+ if(del&&confirm('متأكد من حذف الخبر؟')){const {error}=await db.from('articles').delete().eq('id',del.dataset.deleteArticle);if(error)alert(error.message);await loadArticles();}
+});
+async function loadAds(){
+ const {data,error}=await db.from('advertisements').select('*').order('created_at',{ascending:false});
+ if(error){$('ads-list').textContent=error.message;return;}
+ $('ads-total').textContent=data.length;
+ $('ads-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.active?'مفعّل':'متوقف')+'</span><div class="muted">المكان: '+esc(a.placement)+'</div><div class="item-actions"><button class="secondary" data-ad-toggle="'+a.id+'" data-state="'+(!a.active)+'">'+(a.active?'إيقاف':'تفعيل')+'</button><button class="danger" data-delete-ad="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد إعلانات بعد.';
+}
+$('ad-form').addEventListener('submit',async e=>{
+ e.preventDefault();message('ad-status','جارٍ حفظ الإعلان…');
+ const payload={title:$('ad-title').value.trim(),image_url:$('ad-image').value.trim(),target_url:$('ad-url').value.trim(),placement:$('ad-placement').value,active:$('ad-active').checked};
+ const {error}=await db.from('advertisements').insert(payload);
+ if(error){message('ad-status','لم يتم الحفظ: '+error.message,true);return;}
+ e.target.reset();message('ad-status','تم حفظ الإعلان.');await loadAds();
+});
+$('ads-list').addEventListener('click',async e=>{
+ const toggle=e.target.closest('[data-ad-toggle]');const del=e.target.closest('[data-delete-ad]');
+ if(toggle){const {error}=await db.from('advertisements').update({active:toggle.dataset.state==='true',updated_at:new Date().toISOString()}).eq('id',toggle.dataset.adToggle);if(error)alert(error.message);await loadAds();}
+ if(del&&confirm('متأكد من حذف الإعلان؟')){const {error}=await db.from('advertisements').delete().eq('id',del.dataset.deleteAd);if(error)alert(error.message);await loadAds();}
+});
+async function loadViews(){
+ const {count,error}=await db.from('page_views').select('id',{count:'exact',head:true});
+ if(error){$('views-total').textContent='—';$('views-list').textContent=error.message;return;}
+ $('views-total').textContent=count??0;
+ const {data, error:readError}=await db.from('page_views').select('page_path,viewed_at').order('viewed_at',{ascending:false}).limit(30);
+ if(readError){$('views-list').textContent=readError.message;return;}
+ $('views-list').innerHTML=data.length?data.map(v=>'<div class="item"><strong>'+esc(v.page_path)+'</strong><div class="muted">'+new Date(v.viewed_at).toLocaleString('ar')+'</div></div>').join(''):'لا توجد زيارات مسجلة بعد.';
+}
+(async()=>{const {data}=await db.auth.getSession();if(data.session)await enter(data.session.user);})();
+</script>
+</body>
+</html>
