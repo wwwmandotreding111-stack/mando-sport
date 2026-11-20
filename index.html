@@ -37,7 +37,7 @@ footer{border-top:1px solid var(--line);margin-top:35px;padding:22px 0;color:var
     <div id="matches-list" class="grid"><div class="notice">يتم جلب مباريات اليوم من مصدر البيانات.</div></div>
   </section>
   <section class="section" id="results"><div class="section-head"><h2>📊 النتائج المباشرة والنهائية</h2><small id="results-status">بانتظار بيانات المباريات</small></div><div id="results-list" class="grid"><div class="notice">يتم تحميل النتائج…</div></div></section>
-  <section class="section" id="leagues"><div class="section-head"><h2>🏆 أبرز البطولات</h2></div><div class="grid"><div class="card">🏴 الدوري الإنجليزي الممتاز</div><div class="card">🇪🇸 الدوري الإسباني</div><div class="card">🇮🇹 الدوري الإيطالي</div><div class="card">🇩🇪 الدوري الألماني</div><div class="card">🇫🇷 الدوري الفرنسي</div><div class="card">🌍 دوري أبطال أوروبا</div></div></section>
+  <section class="section" id="leagues"><div class="section-head"><h2>🏆 ترتيب الدوريات</h2><small id="standings-status">اختر البطولة لعرض الترتيب</small></div><div class="card" style="margin-bottom:12px"><label for="league-select" style="display:block;margin-bottom:7px;color:var(--gold);font-weight:700">اختر البطولة</label><select id="league-select" style="width:100%;max-width:360px;padding:11px;border-radius:9px;background:var(--panel2);color:var(--white);border:1px solid var(--line);font:inherit"><option value="PL">الدوري الإنجليزي الممتاز</option><option value="PD">الدوري الإسباني</option><option value="SA">الدوري الإيطالي</option><option value="BL1">الدوري الألماني</option><option value="FL1">الدوري الفرنسي</option><option value="CL">دوري أبطال أوروبا</option></select></div><div id="standings-container" class="card"><div class="notice">يتم تحميل ترتيب البطولة…</div></div></section>
   <section class="section" id="news"><div class="section-head"><h2>📰 الأخبار الرياضية</h2><small>أماكن مخصصة للأخبار</small></div><div class="news">
     <article class="card"><div class="news-icon">⚽</div><h3>آخر أخبار كرة القدم</h3><p>سيتم إضافة أخبار موثوقة ومحدثة هنا.</p></article>
     <article class="card"><div class="news-icon">🏆</div><h3>أخبار البطولات</h3><p>تغطية البطولات المحلية والعالمية.</p></article>
@@ -88,6 +88,31 @@ async function loadMatches() {
     list.innerHTML = '<div class="notice">' + esc(error.message) + ' — يرجى المحاولة لاحقاً.</div>';
   }
 }
+
+async function loadStandings(code) {
+  const box = document.getElementById('standings-container');
+  const label = document.getElementById('standings-status');
+  label.textContent = 'جارٍ تحميل الترتيب…';
+  box.innerHTML = '<div class="notice">يتم جلب ترتيب البطولة.</div>';
+  try {
+    const response = await fetch('/api/standings?competition=' + encodeURIComponent(code));
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'تعذر تحميل الترتيب.');
+    label.textContent = data.season ? 'الموسم ' + esc(data.season) : 'ترتيب البطولة';
+    if (!data.table || data.table.length === 0) {
+      box.innerHTML = '<div class="notice">لا يتوفر ترتيب لهذه البطولة حالياً ضمن الباقة المتاحة.</div>';
+      return;
+    }
+    box.innerHTML = '<div style="overflow-x:auto"><table><thead><tr><th>#</th><th>الفريق</th><th>لعب</th><th>فاز</th><th>تعادل</th><th>خسر</th><th>له</th><th>عليه</th><th>الفرق</th><th>نقاط</th></tr></thead><tbody>' +
+      data.table.map(row => '<tr><td>' + esc(row.position) + '</td><td><strong>' + esc(row.team) + '</strong></td><td>' + esc(row.played) + '</td><td>' + esc(row.won) + '</td><td>' + esc(row.drawn) + '</td><td>' + esc(row.lost) + '</td><td>' + esc(row.goalsFor) + '</td><td>' + esc(row.goalsAgainst) + '</td><td>' + esc(row.goalDifference) + '</td><td><strong style="color:var(--gold)">' + esc(row.points) + '</strong></td></tr>').join('') +
+      '</tbody></table></div>';
+  } catch (error) {
+    label.textContent = 'تعذر التحديث';
+    box.innerHTML = '<div class="notice">' + esc(error.message) + '</div>';
+  }
+}
+document.getElementById('league-select').addEventListener('change', event => loadStandings(event.target.value));
+loadStandings(document.getElementById('league-select').value);
 loadMatches();
 </script>
 </body></html>
