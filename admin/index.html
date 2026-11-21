@@ -29,6 +29,18 @@
 <div class="panel stat"><span class="muted">عدد الإعلانات</span><strong id="ads-total">—</strong></div>
 </div>
 <section class="panel">
+<h2>مؤشرات الأداء</h2>
+<div class="stats">
+<div class="panel stat"><span class="muted">زيارات اليوم</span><strong id="views-today">—</strong></div>
+<div class="panel stat"><span class="muted">زيارات هذا الشهر</span><strong id="views-month">—</strong></div>
+<div class="panel stat"><span class="muted">زيارات هذه السنة</span><strong id="views-year">—</strong></div>
+<div class="panel stat"><span class="muted">أخبار اليوم</span><strong id="articles-today">—</strong></div>
+<div class="panel stat"><span class="muted">إعلانات اليوم</span><strong id="ads-today">—</strong></div>
+<div class="panel stat"><span class="muted">آخر تحديث</span><strong id="metrics-updated" style="font-size:15px">—</strong></div>
+</div>
+<p class="muted">الأرقام مبنية على السجلات الموجودة فعلياً في قاعدة البيانات، وليست تقديرات للزيارات أو الأرباح.</p>
+</section>
+<section class="panel">
 <h2>إضافة خبر جديد</h2>
 <form id="article-form">
 <div class="field"><label for="article-title">عنوان الخبر</label><input id="article-title" maxlength="180" required></div>
@@ -84,7 +96,32 @@ $('login-form').addEventListener('submit',async e=>{
 });
 $('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
 db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
-async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews()]);}
+async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics()]);}
+function localStartOf(period){
+ const now=new Date();
+ if(period==='day') return new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString();
+ if(period==='month') return new Date(now.getFullYear(),now.getMonth(),1).toISOString();
+ return new Date(now.getFullYear(),0,1).toISOString();
+}
+async function countSince(table,field,start){
+ const result=await db.from(table).select('id',{count:'exact',head:true}).gte(field,start);
+ if(result.error) throw result.error;
+ return result.count??0;
+}
+async function loadAnalytics(){
+ const ids=['views-today','views-month','views-year','articles-today','ads-today'];
+ try{
+  const [today,month,year,articles,ads]=await Promise.all([
+   countSince('page_views','viewed_at',localStartOf('day')),
+   countSince('page_views','viewed_at',localStartOf('month')),
+   countSince('page_views','viewed_at',localStartOf('year')),
+   countSince('articles','created_at',localStartOf('day')),
+   countSince('advertisements','created_at',localStartOf('day'))
+  ]);
+  [$('views-today').textContent,$('views-month').textContent,$('views-year').textContent,$('articles-today').textContent,$('ads-today').textContent]=[today,month,year,articles,ads];
+  $('metrics-updated').textContent=new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+ }catch(error){ids.forEach(id=>$(id).textContent='—');$('metrics-updated').textContent='تعذر التحديث';console.error('Analytics:',error);}
+}
 async function loadArticles(){
  const {data,error}=await db.from('articles').select('*').order('created_at',{ascending:false});
  if(error){$('articles-list').textContent=error.message;return;}
