@@ -89,7 +89,7 @@ function isMatchHighlight(title) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600');
+  res.setHeader('Cache-Control', 'no-store, no-cache, max-age=0, must-revalidate');
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
 
   const results = await Promise.allSettled(FEEDS.map(async feed => {
@@ -127,6 +127,7 @@ export default async function handler(req, res) {
   const country = /^[A-Za-z]{2}$/.test(countryHeader) ? countryHeader.toUpperCase() : '';
 
   const videos = [];
+  const feedDiagnostics = results.map((result, index) => ({ source: FEEDS[index].name, ok: result.status === 'fulfilled', entries: result.status === 'fulfilled' ? result.value.length : 0 }));
   const seen = new Set();
   for (const result of results) {
     if (result.status !== 'fulfilled') continue;
@@ -155,6 +156,7 @@ export default async function handler(req, res) {
     availabilityFallback: visibleVideos.length === 0 && candidates.length > 0,
     country: country || null,
     availabilityCheck: country ? 'country-aware-best-effort' : 'not-available',
+    feedDiagnostics,
     updatedAt: new Date().toISOString(),
     sources: FEEDS.map(feed => feed.name)
   });
