@@ -48,14 +48,16 @@
 <p class="muted">يعرض الرسم عدد الزيارات المسجلة فعلياً لكل يوم.</p>
 </section>
 <section class="panel">
-<h2>إضافة خبر جديد</h2>
+<h2 id="article-form-heading">إضافة خبر جديد</h2>
 <form id="article-form">
+<input id="article-edit-id" type="hidden">
+
 <div class="field"><label for="article-title">عنوان الخبر</label><input id="article-title" maxlength="180" required></div>
 <div class="field"><label for="article-excerpt">ملخص قصير</label><textarea id="article-excerpt" maxlength="500"></textarea></div>
 <div class="field"><label for="article-body">نص الخبر</label><textarea id="article-body"></textarea></div>
 <div class="field"><label for="article-image">رابط صورة الخبر (يمكن تركه فارغاً حالياً)</label><input id="article-image" type="url" placeholder="https://..."></div>
 <label><input id="article-published" type="checkbox" style="width:auto"> نشر الخبر مباشرة</label>
-<div style="margin-top:12px"><button type="submit">حفظ الخبر</button></div>
+<div class="row" style="margin-top:12px"><button id="article-submit" type="submit">حفظ الخبر</button><button id="article-cancel-edit" class="secondary hidden" type="button">إلغاء التعديل</button></div>
 </form><div id="article-status" class="status"></div>
 </section>
 <section class="panel"><h2>الأخبار المنشورة والمسودات</h2><div id="articles-list" class="muted">جارٍ التحميل…</div></section>
@@ -165,18 +167,39 @@ async function loadArticles(){
  const {data,error}=await db.from('articles').select('*').order('created_at',{ascending:false});
  if(error){$('articles-list').textContent=error.message;return;}
  $('articles-total').textContent=data.length;
- $('articles-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.published?'منشور':'مسودة')+'</span><div class="muted">'+esc(a.excerpt)+'</div><div class="item-actions"><button class="secondary" data-publish="'+a.id+'" data-state="'+(!a.published)+'">'+(a.published?'إلغاء النشر':'نشر')+'</button><button class="danger" data-delete-article="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد أخبار بعد.';
+ $('articles-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.published?'منشور':'مسودة')+'</span><div class="muted">'+esc(a.excerpt)+'</div><div class="item-actions"><button class="secondary" data-edit-article="'+a.id+'">تعديل</button><button class="secondary" data-publish="'+a.id+'" data-state="'+(!a.published)+'">'+(a.published?'إلغاء النشر':'نشر')+'</button><button class="danger" data-delete-article="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد أخبار بعد.';
 }
+function resetArticleEditor(){
+ $('article-form').reset();$('article-edit-id').value='';
+ $('article-form-heading').textContent='إضافة خبر جديد';
+ $('article-submit').textContent='حفظ الخبر';
+ $('article-cancel-edit').classList.add('hidden');
+}
+$('article-cancel-edit').addEventListener('click',resetArticleEditor);
 $('article-form').addEventListener('submit',async e=>{
  e.preventDefault();message('article-status','جارٍ حفظ الخبر…');
- const {data:userData}=await db.auth.getUser();
- const payload={title:$('article-title').value.trim(),excerpt:$('article-excerpt').value.trim(),body:$('article-body').value.trim(),image_url:$('article-image').value.trim(),published:$('article-published').checked,author_id:userData.user.id};
- const {error}=await db.from('articles').insert(payload);
- if(error){message('article-status','لم يتم الحفظ: '+error.message,true);return;}
- e.target.reset();message('article-status','تم حفظ الخبر.');await loadArticles();
+ const editId=$('article-edit-id').value;
+ const payload={title:$('article-title').value.trim(),excerpt:$('article-excerpt').value.trim(),body:$('article-body').value.trim(),image_url:$('article-image').value.trim(),published:$('article-published').checked,updated_at:new Date().toISOString()};
+ if(!payload.title){message('article-status','اكتب عنوان الخبر أولاً.',true);return;}
+ let result;
+ if(editId){result=await db.from('articles').update(payload).eq('id',editId);}
+ else{const {data:userData}=await db.auth.getUser();payload.author_id=userData.user.id;result=await db.from('articles').insert(payload);}
+ if(result.error){message('article-status','لم يتم الحفظ: '+result.error.message,true);return;}
+ resetArticleEditor();message('article-status',editId?'تم تحديث الخبر بنجاح.':'تم حفظ الخبر.');await loadArticles();
 });
 $('articles-list').addEventListener('click',async e=>{
- const pub=e.target.closest('[data-publish]');const del=e.target.closest('[data-delete-article]');
+ const edit=e.target.closest('[data-edit-article]');const pub=e.target.closest('[data-publish]');const del=e.target.closest('[data-delete-article]');
+ if(edit){
+  const {data,error}=await db.from('articles').select('*').eq('id',edit.dataset.editArticle).single();
+  if(error){message('article-status','تعذر تحميل الخبر للتعديل: '+error.message,true);return;}
+  $('article-edit-id').value=data.id;$('article-title').value=data.title||'';
+  $('article-excerpt').value=data.excerpt||'';$('article-body').value=data.body||'';
+  $('article-image').value=data.image_url||'';$('article-published').checked=!!data.published;
+  $('article-form-heading').textContent='تعديل الخبر';
+  $('article-submit').textContent='حفظ التعديلات';
+  $('article-cancel-edit').classList.remove('hidden');
+  $('article-form-heading').scrollIntoView({behavior:'smooth',block:'center'});
+ }
  if(pub){const {error}=await db.from('articles').update({published:pub.dataset.state==='true',updated_at:new Date().toISOString()}).eq('id',pub.dataset.publish);if(error)alert(error.message);await loadArticles();}
  if(del&&confirm('متأكد من حذف الخبر؟')){const {error}=await db.from('articles').delete().eq('id',del.dataset.deleteArticle);if(error)alert(error.message);await loadArticles();}
 });
