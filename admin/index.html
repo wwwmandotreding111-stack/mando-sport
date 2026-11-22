@@ -85,6 +85,14 @@
 </form><div id="ad-status" class="status"></div>
 </section>
 <section class="panel"><h2>الإعلانات</h2><div id="ads-list" class="muted">جارٍ التحميل…</div></section>
+<section class="panel">
+<h2>إدارة مجتمع الأعضاء</h2>
+<p class="muted">راجع التعليقات قبل نشرها، وتابع البلاغات المرسلة من الأعضاء.</p>
+<h3>تعليقات بانتظار الموافقة <span id="community-pending-count" class="pill">0</span></h3>
+<div id="community-pending" class="muted">جارٍ التحميل…</div>
+<h3 style="margin-top:22px">بلاغات التعليقات المفتوحة <span id="community-reports-count" class="pill">0</span></h3>
+<div id="community-reports" class="muted">جارٍ التحميل…</div>
+</section>
 <section class="panel"><h2>آخر الزيارات المسجلة</h2><div class="muted">يعرض النظام الصفحات وأوقات زيارتها، ولا يجمع أسماء الزوار أو بياناتهم الشخصية.</div><div id="views-list">جارٍ التحميل…</div></section>
 </section>
 </main>
@@ -117,7 +125,45 @@ $('login-form').addEventListener('submit',async e=>{
 });
 $('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
 db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
-async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart()]);await loadAdminAlerts();}
+async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart(),loadCommunityModeration()]);await loadAdminAlerts();}
+async function loadCommunityModeration(){
+ const pendingHost=$('community-pending'),reportsHost=$('community-reports');
+ if(!pendingHost||!reportsHost)return;
+ pendingHost.textContent='جارٍ تحميل التعليقات…';reportsHost.textContent='جارٍ تحميل البلاغات…';
+ const [commentsResult,reportsResult]=await Promise.all([
+  db.from('member_comments').select('id,user_id,body,created_at').eq('status','pending').order('created_at',{ascending:true}).limit(100),
+  db.from('comment_reports').select('id,comment_id,reporter_id,reason,details,created_at,status').eq('status','open').order('created_at',{ascending:false}).limit(100)
+ ]);
+ if(commentsResult.error){pendingHost.textContent='تعذر تحميل التعليقات: '+commentsResult.error.message;$('community-pending-count').textContent='—';}
+ else{
+  const rows=commentsResult.data||[];$('community-pending-count').textContent=rows.length;
+  pendingHost.innerHTML=rows.length?rows.map(c=>'<div class="item"><strong>تعليق جديد</strong><div class="muted">العضو: '+esc(c.user_id)+' · '+new Date(c.created_at).toLocaleString('ar')+'</div><p>'+esc(c.body)+'</p><div class="item-actions"><button data-community-approve="'+c.id+'">موافقة ونشر</button><button class="danger" data-community-reject="'+c.id+'">رفض</button></div></div>').join(''):'لا توجد تعليقات بانتظار المراجعة.';
+ }
+ if(reportsResult.error){reportsHost.textContent='تعذر تحميل البلاغات: '+reportsResult.error.message;$('community-reports-count').textContent='—';}
+ else{
+  const reports=reportsResult.data||[];$('community-reports-count').textContent=reports.length;
+  reportsHost.innerHTML=reports.length?reports.map(r=>'<div class="item"><strong>بلاغ على تعليق</strong><div class="muted">رقم التعليق: '+esc(r.comment_id)+' · المبلّغ: '+esc(r.reporter_id)+'</div><p>السبب: '+esc(r.reason)+'</p>'+(r.details?'<p>'+esc(r.details)+'</p>':'')+'<div class="item-actions"><button data-report-reviewed="'+r.id+'">تمت المراجعة</button><button class="secondary" data-report-dismiss="'+r.id+'">إغلاق البلاغ</button></div></div>').join(''):'لا توجد بلاغات مفتوحة.';
+ }
+}
+$('community-pending').addEventListener('click',async e=>{
+ const approve=e.target.closest('[data-community-approve]'),reject=e.target.closest('[data-community-reject]');
+ const btn=approve||reject;if(!btn)return;
+ const id=approve?approve.dataset.communityApprove:reject.dataset.communityReject;
+ const status=approve?'approved':'rejected';
+ if(!approve&&!confirm('تأكيد رفض هذا التعليق؟'))return;
+ const {error}=await db.from('member_comments').update({status,updated_at:new Date().toISOString()}).eq('id',id);
+ if(error){alert('تعذر تحديث التعليق: '+error.message);return;}
+ await loadCommunityModeration();
+});
+$('community-reports').addEventListener('click',async e=>{
+ const reviewed=e.target.closest('[data-report-reviewed]'),dismiss=e.target.closest('[data-report-dismiss]');
+ const btn=reviewed||dismiss;if(!btn)return;
+ const id=reviewed?reviewed.dataset.reportReviewed:dismiss.dataset.reportDismiss;
+ const status=reviewed?'reviewed':'dismissed';
+ const {error}=await db.from('comment_reports').update({status,reviewed_at:new Date().toISOString()}).eq('id',id);
+ if(error){alert('تعذر تحديث البلاغ: '+error.message);return;}
+ await loadCommunityModeration();
+});
 async function loadAdminAlerts(){
  const host=$('admin-alerts');if(!host)return;
  host.textContent='جارٍ فحص التنبيهات…';
