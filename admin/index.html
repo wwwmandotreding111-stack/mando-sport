@@ -54,11 +54,43 @@ header{height:auto;min-height:76px}
 main.wrap{margin:0 auto;width:94%;padding:14px 0}
 }
 
+
+/* Reference-matched MANDO SPORT control room */
+:root{--gold:#f4c23e;--gold2:#ffe28a;--line:#634817;--panel:#0c0c0c}
+body{background:radial-gradient(ellipse at 70% 5%,#5b390f35,transparent 38%),#050505}
+header{position:sticky;top:0;z-index:30;height:88px;padding:0;background:linear-gradient(90deg,#050505,#171107 52%,#050505);border-bottom:2px solid #9b711c}
+header .wrap{max-width:none;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:25px;letter-spacing:.3px}.brand:before{content:"🦅";font-size:36px;margin-left:12px;filter:drop-shadow(0 0 8px #eab52e)}
+.brand .sub{display:block;margin-right:58px;margin-top:-8px;font-size:12px}
+.admin-sidebar{top:90px;width:240px;background:linear-gradient(180deg,#111,#050505);border-right:1px solid #88621a}
+.admin-sidebar .side-brand{font-size:18px}
+main.wrap{margin:0 14px 0 254px;padding:20px 6px}
+#dashboard>.row{border:0;background:transparent;padding:4px 8px 14px}
+#dashboard>.row h1{font-size:27px}
+.panel{border:1px solid #805d1b;box-shadow:0 0 0 1px #f4c23e18,inset 0 0 28px #d99a1910,0 8px 25px #000;background:linear-gradient(145deg,#15130f,#070707);border-radius:12px}
+#dashboard>.stats:first-of-type{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.stat{min-width:0;text-align:right}.stat strong{font-size:30px}
+.admin-shortcuts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:10px 0 16px}
+.admin-shortcut{min-height:100px;border:1px solid #72521a;border-radius:12px;padding:14px;background:linear-gradient(135deg,#201807,#090909);display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;box-shadow:inset 0 0 20px #f0bd3210}
+.admin-shortcut .ico{font-size:32px;color:#f4c23e}.admin-shortcut b{display:block;color:#ffe08a}.admin-shortcut small{color:#c9b989}
+#admin-overview{display:grid;grid-template-columns:1.05fr 1.35fr .8fr;gap:12px;align-items:stretch}
+#admin-overview .panel{margin:0;min-width:0}
+#admin-overview h2,#dashboard h2{color:#f4c23e}
+#admin-system-status .item{display:flex;justify-content:space-between;gap:8px}
+#auto-feed-results{max-height:320px;overflow:auto}
+.member-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.member-card{border:1px solid #4d3a18;border-radius:10px;padding:12px;background:#0b0b0b}
+.member-card strong{color:#ffe08a}
+.member-card .muted{overflow-wrap:anywhere}
+@media(max-width:1100px){.admin-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}#admin-overview{grid-template-columns:1fr 1fr}#admin-overview .panel:last-child{grid-column:1/-1}#dashboard>.stats:first-of-type{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:850px){header .wrap{padding:0 12px}.brand{font-size:19px}.brand:before{font-size:27px}.admin-sidebar{top:88px;position:sticky;width:100%;z-index:25}.admin-sidebar a{white-space:nowrap}main.wrap{margin:0 auto;width:94%}.admin-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}#admin-overview{grid-template-columns:1fr}.member-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.admin-shortcuts{grid-template-columns:1fr 1fr;gap:7px}.admin-shortcut{padding:9px;min-height:84px}.admin-shortcut .ico{font-size:24px}.member-grid{grid-template-columns:1fr}#dashboard>.stats:first-of-type{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
 <header><div class="wrap"><div class="brand">MANDO <b>SPORT</b> <span class="sub">| لوحة الإدارة</span></div></div></header>
-<aside class="admin-sidebar" aria-label="القائمة الجانبية للإدارة"><div class="side-brand">♛ MANDO SPORT</div><a class="active" href="#dashboard"><span>⌂</span>الرئيسية</a><a href="#admin-alerts"><span>♢</span>الزوار والإحصائيات</a><a href="#community-pending"><span>♟</span>الأعضاء</a><a href="#articles-list"><span>▤</span>الأخبار</a><a href="#weekly-chart"><span>⚽</span>المباريات</a><a href="#ads-list"><span>▣</span>الإعلانات</a><a href="#highlights-admin"><span>▶</span>اللقطات المميزة</a><a href="#admin-settings"><span>⚙</span>الإعدادات</a></aside>
+<aside class="admin-sidebar" aria-label="القائمة الجانبية للإدارة"><div class="side-brand">♛ MANDO SPORT</div><a class="active" href="#dashboard"><span>⌂</span>الرئيسية</a><a href="#admin-alerts"><span>♢</span>الزوار والإحصائيات</a><a href="#members-admin"><span>♟</span>الأعضاء والزبائن</a><a href="#articles-list"><span>▤</span>الأخبار</a><a href="#auto-feeds"><span>⚽</span>المباريات والتحديث التلقائي</a><a href="#ads-list"><span>▣</span>الإعلانات</a><a href="#highlights-admin"><span>▶</span>اللقطات المميزة</a><a href="#admin-settings"><span>⚙</span>الإعدادات</a></aside>
 <main class="wrap">
 <section id="login-panel" class="panel login">
 <h1>تسجيل دخول المدير</h1><p class="muted">هذه الصفحة مخصصة لحساب الإدارة المعتمد فقط.</p>
@@ -132,7 +164,15 @@ main.wrap{margin:0 auto;width:94%;padding:14px 0}
 </form><div id="ad-status" class="status"></div>
 </section>
 <section class="panel" id="ads-list-panel"><h2>الإعلانات</h2><div id="ads-list" class="muted">جارٍ التحميل…</div></section>
-<section class="panel" id="community-admin">
+
+<section class="panel" id="members-admin">
+<h2>إدارة الأعضاء والزبائن</h2>
+<p class="muted">بيانات ملفات الأعضاء المحفوظة في member_profiles. لا تعرض هذه الشاشة البريد الإلكتروني أو كلمات المرور أو بيانات دخول حساسة.</p>
+<div class="row"><div class="field"><label for="member-search">بحث بالاسم أو الفريق المفضل</label><input id="member-search" type="search" placeholder="اكتب اسم العضو أو فريقه"></div><div class="field"><label for="member-team-filter">تصفية حسب الفريق</label><input id="member-team-filter" placeholder="اسم الفريق"></div></div>
+<div id="members-list" class="muted">جارٍ تحميل الأعضاء…</div>
+<div id="member-edit-panel" class="hidden panel"><h3>تعديل ملف العضو</h3><input id="member-edit-id" type="hidden"><div class="field"><label for="member-edit-name">اسم العرض</label><input id="member-edit-name" maxlength="40"></div><div class="field"><label for="member-edit-team">الفريق المفضل</label><input id="member-edit-team" maxlength="80"></div><div class="row"><button id="member-save" type="button">حفظ التعديلات</button><button id="member-cancel" class="secondary" type="button">إلغاء</button></div><div id="member-status" class="status"></div></div>
+</section>
+\n<section class="panel" id="community-admin">
 <h2>إدارة مجتمع الأعضاء</h2>
 <p class="muted">راجع التعليقات قبل نشرها، وتابع البلاغات المرسلة من الأعضاء.</p>
 <h3>تعليقات بانتظار الموافقة <span id="community-pending-count" class="pill">0</span></h3>
@@ -172,8 +212,50 @@ $('login-form').addEventListener('submit',async e=>{
 });
 $('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
 db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
-async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart(),loadCommunityModeration()]);await loadAdminAlerts();}
-async function loadCommunityModeration(){
+async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart(),loadCommunityModeration(),loadMembers()]);await loadAdminAlerts();await checkAutomaticFeeds();}
+
+async function checkAutomaticFeeds(){
+ const host=$('auto-feed-results');if(!host)return;
+ host.textContent='جارٍ فحص مصادر المباريات والترتيب…';
+ const date=new Date().toISOString().slice(0,10);
+ const checks=await Promise.all([
+  fetch('/api/matches?date='+encodeURIComponent(date)).then(async r=>({name:'مباريات اليوم',ok:r.ok,data:await r.json().catch(()=>({}))})).catch(e=>({name:'مباريات اليوم',ok:false,data:{error:e.message}})),
+  fetch('/api/standings?competition=PL').then(async r=>({name:'ترتيب الدوري الإنجليزي',ok:r.ok,data:await r.json().catch(()=>({}))})).catch(e=>({name:'ترتيب الدوري الإنجليزي',ok:false,data:{error:e.message}}))
+ ]);
+ host.innerHTML=checks.map(c=>'<div class="item"><strong>'+esc(c.name)+'</strong><div class="'+(c.ok?'ok':'error')+'">'+(c.ok?'متصل':'تعذر الجلب')+'</div><div class="muted">'+(c.ok?(c.data.matches?'عدد المباريات المسترجعة: '+c.data.matches.length:c.data.table?'عدد الفرق في الترتيب: '+c.data.table.length:'تم استلام البيانات'):esc(c.data.error||'خطأ غير معروف'))+'</div></div>').join('');
+ $('feed-checked-at').textContent=new Date().toLocaleString('ar');$('db-status').textContent='تم تحميل بيانات اللوحة';
+}
+$('check-auto-feeds')?.addEventListener('click',checkAutomaticFeeds);
+async function loadMembers(){
+ const host=$('members-list');if(!host)return;
+ host.textContent='جارٍ تحميل ملفات الأعضاء…';
+ const {data,error}=await db.from('member_profiles').select('user_id,display_name,favorite_team,created_at,updated_at').order('created_at',{ascending:false}).limit(500);
+ if(error){host.textContent='تعذر تحميل الأعضاء: '+error.message+' — تحقق من تطبيق صلاحيات إدارة الأعضاء في قاعدة البيانات.';return;}
+ window.mandoMembers=data||[];renderMembers();
+}
+function renderMembers(){
+ const host=$('members-list'),q=($('member-search')?.value||'').trim().toLowerCase(),team=($('member-team-filter')?.value||'').trim().toLowerCase();
+ const rows=(window.mandoMembers||[]).filter(m=>(!q||(m.display_name||'').toLowerCase().includes(q)||(m.favorite_team||'').toLowerCase().includes(q))&&(!team||(m.favorite_team||'').toLowerCase().includes(team)));
+ host.innerHTML='<p class="muted">إجمالي الملفات المعروضة: '+rows.length+'</p><div class="member-grid">'+(rows.length?rows.map(m=>'<div class="member-card"><strong>'+esc(m.display_name||'مشجع')+'</strong><div class="muted">الفريق المفضل: '+esc(m.favorite_team||'غير محدد')+'</div><div class="muted">معرّف العضو: '+esc(m.user_id)+'</div><div class="muted">تاريخ الانضمام: '+(m.created_at?new Date(m.created_at).toLocaleDateString('ar'):'—')+'</div><div class="item-actions"><button class="secondary" data-edit-member="'+esc(m.user_id)+'">تعديل الملف</button></div></div>').join(''):'لا توجد ملفات أعضاء مطابقة.')+'</div>';
+}
+$('member-search')?.addEventListener('input',renderMembers);
+$('member-team-filter')?.addEventListener('input',renderMembers);
+$('members-list')?.addEventListener('click',e=>{
+ const btn=e.target.closest('[data-edit-member]');if(!btn)return;
+ const m=(window.mandoMembers||[]).find(x=>x.user_id===btn.dataset.editMember);if(!m)return;
+ $('member-edit-id').value=m.user_id;$('member-edit-name').value=m.display_name||'';$('member-edit-team').value=m.favorite_team||'';
+ $('member-edit-panel').classList.remove('hidden');$('member-edit-panel').scrollIntoView({behavior:'smooth',block:'center'});
+});
+$('member-cancel')?.addEventListener('click',()=>$('member-edit-panel').classList.add('hidden'));
+$('member-save')?.addEventListener('click',async()=>{
+ const id=$('member-edit-id').value;
+ const payload={display_name:$('member-edit-name').value.trim(),favorite_team:$('member-edit-team').value.trim(),updated_at:new Date().toISOString()};
+ if(payload.display_name.length<2){message('member-status','اسم العرض يجب أن يكون حرفين على الأقل.',true);return;}
+ const {error}=await db.from('member_profiles').update(payload).eq('user_id',id);
+ if(error){message('member-status','تعذر حفظ التعديلات: '+error.message,true);return;}
+ message('member-status','تم تحديث ملف العضو.');$('member-edit-panel').classList.add('hidden');await loadMembers();
+});
+\nasync function loadCommunityModeration(){
  const pendingHost=$('community-pending'),reportsHost=$('community-reports');
  if(!pendingHost||!reportsHost)return;
  pendingHost.textContent='جارٍ تحميل التعليقات…';reportsHost.textContent='جارٍ تحميل البلاغات…';
