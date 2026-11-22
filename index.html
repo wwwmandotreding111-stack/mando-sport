@@ -193,6 +193,35 @@ footer{background:#080a0f;color:var(--muted);border-color:#ffffff18}
     <article class="card"><div class="news-icon">🏆</div><h3>أخبار البطولات</h3><p>تغطية البطولات المحلية والعالمية.</p></article>
     <article class="card"><div class="news-icon">🎙️</div><h3>تحليلات ومقالات</h3><p>مساحة للمقالات والتحليلات الرياضية الأصلية.</p></article>
   </div></section>
+  <section class="section" id="community">
+    <div class="section-head"><h2>مجتمع MANDO SPORT</h2><small>شارك رأيك وشجّع فريقك</small></div>
+    <div class="card" style="padding:18px">
+      <div id="community-auth">
+        <h3 style="margin-top:0">حساب المشجع</h3>
+        <p class="muted">سجّل الدخول أو أنشئ حساباً للمشاركة بالتعليقات واختيار فريقك المفضل.</p>
+        <form id="community-auth-form" class="form-grid" style="display:grid;gap:10px">
+          <input id="community-name" type="text" maxlength="40" minlength="2" placeholder="اسم العرض (للحساب الجديد)" autocomplete="nickname">
+          <input id="community-email" type="email" required placeholder="البريد الإلكتروني" autocomplete="email">
+          <input id="community-password" type="password" required minlength="6" placeholder="كلمة المرور (6 أحرف على الأقل)" autocomplete="current-password">
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="submit" id="community-signin">تسجيل الدخول</button><button type="button" id="community-signup" class="secondary">إنشاء حساب جديد</button></div>
+        </form>
+      </div>
+      <div id="community-member" hidden>
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><strong id="community-welcome">أهلاً بك</strong><button type="button" id="community-signout" class="secondary">تسجيل الخروج</button></div>
+        <div style="display:grid;gap:10px;margin-top:14px">
+          <label>اسم العرض<input id="community-display-name" maxlength="40" minlength="2" placeholder="اسمك في الموقع"></label>
+          <label>فريقك المفضل<input id="community-favorite-team" maxlength="80" placeholder="مثلاً: برشلونة"></label>
+          <button type="button" id="community-save-profile">حفظ الملف الشخصي</button>
+          <div id="community-status" class="muted" aria-live="polite"></div>
+          <label for="community-comment">اكتب تعليقك</label>
+          <textarea id="community-comment" maxlength="1500" rows="3" placeholder="شاركنا رأيك باحترام…"></textarea>
+          <button type="button" id="community-send-comment">إرسال التعليق للمراجعة</button>
+          <p class="muted" style="margin:0">التعليقات لا تظهر للآخرين إلا بعد موافقة الإدارة.</p>
+          <h3>التعليقات المعتمدة</h3><div id="community-comments" class="muted">جارٍ تحميل التعليقات…</div>
+        </div>
+      </div>
+    </div>
+  </section>
   <section class="section"><div class="ad">مساحة إعلانية ثانية</div></section>
 </main>
 <footer><div class="wrap">© <span id="year"></span> Mando Sport — موقع رياضي مستقل. مواعيد المباريات حسب توقيت جهازك. لا نوفر بثاً غير مرخص للمباريات.<div style="margin-top:7px;color:var(--gold);font-weight:700">تم تطوير الموقع بواسطة عامر مندو</div></div></footer>
@@ -402,6 +431,74 @@ loadMatches();
       console.warn('Advertisements unavailable:', error);
     }
   }
+
+  const communityAuth = document.getElementById('community-auth');
+  const communityMember = document.getElementById('community-member');
+  const communityStatus = document.getElementById('community-status');
+  const communityMessage = (text, bad=false) => { if(communityStatus){communityStatus.textContent=text;communityStatus.style.color=bad?'#e16b6b':'var(--muted)';} };
+  async function loadCommunityComments(){
+    const host=document.getElementById('community-comments'); if(!host||!client)return;
+    host.textContent='جارٍ تحميل التعليقات…';
+    const {data,error}=await client.from('member_comments').select('id,body,created_at,user_id').eq('status','approved').order('created_at',{ascending:false}).limit(30);
+    if(error){host.textContent='تعذر تحميل التعليقات: '+error.message;return;}
+    if(!data?.length){host.textContent='لا توجد تعليقات معتمدة حتى الآن.';return;}
+    const ids=[...new Set(data.map(x=>x.user_id))];
+    const profiles=ids.length?await client.from('member_profiles').select('user_id,display_name,favorite_team').in('user_id',ids):{data:[]};
+    const byId=new Map((profiles.data||[]).map(p=>[p.user_id,p]));
+    host.innerHTML=data.map(c=>{const p=byId.get(c.user_id)||{};return '<div class="item" style="padding:12px 0;border-top:1px solid var(--line)"><strong>'+safe(p.display_name||'مشجع')+'</strong>'+(p.favorite_team?' <small>· '+safe(p.favorite_team)+'</small>':'')+'<p>'+safe(c.body)+'</p><small class="muted">'+new Date(c.created_at).toLocaleString('ar')+'</small> <button type="button" class="secondary" data-community-report="'+c.id+'" style="padding:5px 9px">إبلاغ</button></div>';}).join('');
+  }
+  async function showCommunitySession(user){
+    if(!communityAuth||!communityMember)return;
+    communityAuth.hidden=!!user;communityMember.hidden=!user;
+    if(!user)return;
+    document.getElementById('community-welcome').textContent='أهلاً بك، '+(user.email||'مشجع');
+    const {data,error}=await client.from('member_profiles').select('display_name,favorite_team').eq('user_id',user.id).maybeSingle();
+    if(error){communityMessage('تعذر تحميل الملف الشخصي: '+error.message,true);return;}
+    document.getElementById('community-display-name').value=data?.display_name||'مشجع';
+    document.getElementById('community-favorite-team').value=data?.favorite_team||'';
+    await loadCommunityComments();
+  }
+  if(client&&communityAuth){
+    const {data:sessionData}=await client.auth.getSession();
+    await showCommunitySession(sessionData.session?.user||null);
+    document.getElementById('community-auth-form').addEventListener('submit',async e=>{
+      e.preventDefault();communityMessage('جارٍ تسجيل الدخول…');
+      const {data,error}=await client.auth.signInWithPassword({email:document.getElementById('community-email').value.trim(),password:document.getElementById('community-password').value});
+      if(error){communityMessage('تعذر تسجيل الدخول: '+error.message,true);return;}
+      await showCommunitySession(data.user);communityMessage('تم تسجيل الدخول بنجاح.');
+    });
+    document.getElementById('community-signup').addEventListener('click',async()=>{
+      const email=document.getElementById('community-email').value.trim(),password=document.getElementById('community-password').value,name=document.getElementById('community-name').value.trim();
+      if(!email||password.length<6||name.length<2){communityMessage('أدخل البريد وكلمة مرور من 6 أحرف على الأقل واسم عرض من حرفين.',true);return;}
+      communityMessage('جارٍ إنشاء الحساب…');
+      const {data,error}=await client.auth.signUp({email,password,options:{data:{display_name:name}}});
+      if(error){communityMessage('تعذر إنشاء الحساب: '+error.message,true);return;}
+      if(data.session&&data.user){await showCommunitySession(data.user);communityMessage('تم إنشاء الحساب بنجاح.');}
+      else communityMessage('تم إرسال رسالة تأكيد إلى بريدك الإلكتروني. أكّد الحساب ثم سجّل الدخول.');
+    });
+    document.getElementById('community-signout').addEventListener('click',async()=>{await client.auth.signOut();await showCommunitySession(null);communityMessage('تم تسجيل الخروج.');});
+    client.auth.onAuthStateChange(async(event,session)=>{if(event==='SIGNED_IN')await showCommunitySession(session.user);if(event==='SIGNED_OUT')await showCommunitySession(null);});
+    document.getElementById('community-save-profile').addEventListener('click',async()=>{
+      const display_name=document.getElementById('community-display-name').value.trim(),favorite_team=document.getElementById('community-favorite-team').value.trim();
+      if(display_name.length<2){communityMessage('اسم العرض يجب أن يكون حرفين على الأقل.',true);return;}
+      const {error}=await client.from('member_profiles').upsert({user_id:(await client.auth.getUser()).data.user.id,display_name,favorite_team,updated_at:new Date().toISOString()});
+      communityMessage(error?'تعذر حفظ الملف الشخصي: '+error.message:'تم حفظ الملف الشخصي.',!!error);
+    });
+    document.getElementById('community-send-comment').addEventListener('click',async()=>{
+      const body=document.getElementById('community-comment').value.trim();if(body.length<2){communityMessage('اكتب تعليقاً من حرفين على الأقل.',true);return;}
+      const {data:{user}}=await client.auth.getUser();
+      const {error}=await client.from('member_comments').insert({user_id:user.id,body,status:'pending'});
+      if(error){communityMessage('تعذر إرسال التعليق: '+error.message,true);return;}
+      document.getElementById('community-comment').value='';communityMessage('وصل تعليقك، وسيظهر بعد موافقة الإدارة.');
+    });
+    document.getElementById('community-comments').addEventListener('click',async e=>{
+      const btn=e.target.closest('[data-community-report]');if(!btn)return;
+      const reason=prompt('اكتب سبب الإبلاغ باختصار:');if(!reason||reason.trim().length<2)return;
+      const {data:{user}}=await client.auth.getUser();
+      const {error}=await client.from('comment_reports').insert({comment_id:btn.dataset.communityReport,reporter_id:user.id,reason:reason.trim().slice(0,60)});
+      communityMessage(error?(error.code==='23505'?'سبق أن أبلغت عن هذا التعليق.':'تعذر إرسال البلاغ: '+error.message):'تم إرسال البلاغ للإدارة.',!!error);
+    });
+  } else if(communityAuth){communityMessage('خدمة الحسابات غير متاحة حالياً.',true);}
 })();
 </script>
 
