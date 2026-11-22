@@ -80,6 +80,41 @@ async function checkCountryAvailability(videoId, country) {
   }
 }
 
+async function translateToArabic(text) {
+  const value = String(text || '').trim();
+  if (!value) return '';
+  // Avoid sending text that is already Arabic through machine translation.
+  if (/[\\u0600-\\u06FF]/.test(value)) return value;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 3500);
+  try {
+    const url = new URL('https://translate.googleapis.com/translate_a/single');
+    url.searchParams.set('client', 'gtx');
+    url.searchParams.set('sl', 'auto');
+    url.searchParams.set('tl', 'ar');
+    url.searchParams.set('dt', 't');
+    url.searchParams.set('q', value);
+    const response = await fetch(url.toString(), { signal: controller.signal });
+    if (!response.ok) throw new Error('Translation unavailable');
+    const data = await response.json();
+    const translated = Array.isArray(data?.[0]) ? data[0].map(part => part?.[0] || '').join('').trim() : '';
+    return translated || 'أهداف وملخصات كرة القدم';
+  } catch {
+    return 'أهداف وملخصات كرة القدم';
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function arabicSource(source) {
+  const names = {
+    'Premier League': 'الدوري الإنجليزي الممتاز',
+    'UEFA': 'الاتحاد الأوروبي لكرة القدم',
+    'Sky Sports Football': 'سكاي سبورتس لكرة القدم'
+  };
+  return names[source] || 'قناة رياضية رسمية';
+}
+
 function isMatchHighlight(title) {
   const value = title.toLowerCase();
   const excluded = ['fpl', 'fantasy', 'podcast', 'preview', 'predict', 'press conference', 'interview', 'quiz', 'on the spot', 'behind the scenes', 'training', 'transfer', 'reaction', 'watchalong', 'watch along'];
@@ -142,10 +177,18 @@ export default async function handler(req, res) {
   // Check newest candidates against the visitor's country before displaying them.
   // Unknown checks are retained because YouTube may throttle server-side page requests.
   const candidates = videos.slice(0, 8);
-  const checked = await Promise.all(candidates.map(async video => ({
-    ...video,
-    availability: await checkCountryAvailability(video.id, country)
-  })));
+  const checked = await Promise.all(candidates.map(async video => {
+    const [title, source] = await Promise.all([
+      translateToArabic(video.title),
+      Promise.resolve(arabicSource(video.source))
+    ]);
+    return {
+      ...video,
+      title,
+      source,
+      availability: await checkCountryAvailability(video.id, country)
+    };
+  }));
   const visibleVideos = checked.filter(video => video.availability !== 'blocked');
   // Never leave the highlights section empty solely because the regional check
   // could not confidently classify the videos.
