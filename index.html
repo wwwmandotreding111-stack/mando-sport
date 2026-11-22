@@ -149,12 +149,21 @@ footer{background:#080a0f;color:var(--muted);border-color:#ffffff18}
 @media(max-width:1249px){.sport-sidebar{position:static;width:min(1160px,92%);margin:10px auto 0;flex-direction:row;align-items:center;overflow-x:auto;white-space:nowrap}.sidebar-title,.sidebar-divider,.sidebar-note{display:none}.sport-sidebar a{flex:0 0 auto}}
 @media(max-width:760px){.sport-sidebar{width:calc(100% - 20px);gap:3px;padding:7px}.sport-sidebar a{font-size:11px;padding:7px 8px}.sport-sidebar a span{width:20px;height:20px}}
 
+
+/* Automatic official football highlights */
+#highlights-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.highlight-card{overflow:hidden;padding:10px}
+.highlight-video{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#05070a}
+.highlight-card h3{font-size:14px;line-height:1.5;margin:9px 2px 5px}
+.highlight-meta{font-size:11px;color:var(--muted);margin:0 2px 4px}
+@media(max-width:760px){#highlights-grid{grid-template-columns:1fr}.highlight-card{display:block}.highlight-card h3{font-size:13px}}
+
 </style>
 </head>
 <body>
 <header><div class="wrap">
   <div class="top"><div class="brand-wrap"><div class="brand-mark">⚽</div><div><div class="brand">MANDO <b>SPORT</b></div><div class="tag">نبض الملاعب لحظة بلحظة</div></div></div><div class="header-status"><span class="pulse"></span> تغطية رياضية مستمرة</div></div>
-  <nav aria-label="التنقل الرئيسي"><a href="#matches">مباشر</a><a href="#matches">مباريات اليوم</a><a href="#news">أخبار</a><a href="#leagues">مسابقات</a><a href="#leagues">ترتيب</a><a href="#news">الأكثر رواجاً</a></nav>
+  <nav aria-label="التنقل الرئيسي"><a href="#matches">مباشر</a><a href="#matches">مباريات اليوم</a><a href="#highlights">لقطات مميزة</a><a href="#news">أخبار</a><a href="#leagues">مسابقات</a><a href="#leagues">ترتيب</a><a href="#news">الأكثر رواجاً</a></nav>
 </div></header>
 <aside class="sport-sidebar" aria-label="القائمة الجانبية">
   <div class="sidebar-title">استكشف MANDO</div>
@@ -162,6 +171,7 @@ footer{background:#080a0f;color:var(--muted);border-color:#ffffff18}
   <a href="#matches"><span>◷</span> مباريات اليوم</a>
   <a href="#results"><span>▣</span> النتائج المباشرة</a>
   <a href="#leagues"><span>♜</span> ترتيب البطولات</a>
+  <a href="#highlights"><span>▶</span> لقطات مميزة</a>
   <a href="#news"><span>▤</span> آخر الأخبار</a>
   <div class="sidebar-divider"></div>
   <div class="sidebar-note">نبض الملاعب لحظة بلحظة</div>
@@ -174,6 +184,10 @@ footer{background:#080a0f;color:var(--muted);border-color:#ffffff18}
   </section>
   <section class="section" id="results"><div class="section-head"><h2>النتائج المباشرة والنهائية</h2><small id="results-status">بانتظار بيانات المباريات</small></div><div id="results-list" class="grid"><div class="notice">يتم تحميل النتائج…</div></div></section>
   <section class="section" id="leagues"><div class="section-head"><h2>🏆 ترتيب الدوريات</h2><small id="standings-status">اختر البطولة لعرض الترتيب</small></div><div class="card" style="margin-bottom:12px"><label for="league-select" style="display:block;margin-bottom:7px;color:var(--gold);font-weight:700">اختر البطولة</label><select id="league-select" style="width:100%;max-width:360px;padding:11px;border-radius:9px;background:#fff;color:#344050;border:1px solid #dfe3e8;font:inherit"><option value="PL">الدوري الإنجليزي الممتاز</option><option value="PD">الدوري الإسباني</option><option value="SA">الدوري الإيطالي</option><option value="BL1">الدوري الألماني</option><option value="FL1">الدوري الفرنسي</option><option value="CL">دوري أبطال أوروبا</option></select></div><div id="standings-container" class="card"><div class="notice">يتم تحميل ترتيب البطولة…</div></div></section>
+  <section class="section" id="highlights">
+    <div class="section-head"><h2>🎬 لقطات مميزة</h2><small id="highlights-status">أحدث أهداف وملخصات كرة القدم من القنوات الرسمية</small></div>
+    <div id="highlights-grid"><div class="notice">جارٍ جلب أحدث اللقطات من المصادر الرسمية…</div></div>
+  </section>
   <section class="section" id="news"><div class="section-head"><h2>آخر الأخبار الرياضية</h2><small>آخر المستجدات من الملاعب</small></div><div class="news">
     <article class="card"><div class="news-icon">⚽</div><h3>آخر أخبار كرة القدم</h3><p>سيتم إضافة أخبار موثوقة ومحدثة هنا.</p></article>
     <article class="card"><div class="news-icon">🏆</div><h3>أخبار البطولات</h3><p>تغطية البطولات المحلية والعالمية.</p></article>
@@ -378,6 +392,40 @@ loadMatches();
     } catch (error) {
       console.warn('Advertisements unavailable:', error);
     }
+  }
+})();
+</script>
+
+
+<script>
+(async function loadHighlights(){
+  const host = document.getElementById('highlights-grid');
+  const label = document.getElementById('highlights-status');
+  const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  try {
+    const response = await fetch('/api/highlights', {cache:'no-store'});
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'تعذر جلب اللقطات');
+    const videos = Array.isArray(data.videos) ? data.videos : [];
+    if (!videos.length) {
+      host.innerHTML = '<div class="notice">لا توجد لقطات أهداف جديدة حالياً من القنوات الرسمية. سيتم التحديث تلقائياً عند توفر فيديوهات مناسبة.</div>';
+      label.textContent = 'تحديث تلقائي من YouTube';
+      return;
+    }
+    host.innerHTML = videos.slice(0, 6).map(video => {
+      const date = video.publishedAt && !Number.isNaN(new Date(video.publishedAt).getTime())
+        ? new Date(video.publishedAt).toLocaleDateString('ar')
+        : '';
+      const embed = /^https:\/\/www\.youtube-nocookie\.com\/embed\/[A-Za-z0-9_-]+$/.test(String(video.embedUrl || '')) ? video.embedUrl : '';
+      const link = /^https:\/\/www\.youtube\.com\/watch\?v=[A-Za-z0-9_-]+$/.test(String(video.url || '')) ? video.url : '';
+      if (!embed || !link) return '';
+      return '<article class="card highlight-card"><iframe class="highlight-video" src="' + safe(embed) + '" title="' + safe(video.title) + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe><h3>' + safe(video.title) + '</h3><p class="highlight-meta">' + safe(video.source) + (date ? ' · ' + safe(date) : '') + '</p><a href="' + safe(link) + '" target="_blank" rel="noopener noreferrer" style="color:var(--gold);font-size:11px">مشاهدة على YouTube ↗</a></article>';
+    }).filter(Boolean).join('');
+    if (!host.innerHTML) host.innerHTML = '<div class="notice">لا توجد لقطات مناسبة حالياً.</div>';
+    label.textContent = 'تُحدّث تلقائياً من القنوات الرسمية';
+  } catch (error) {
+    host.innerHTML = '<div class="notice">تعذر تحميل اللقطات الآن. سيحاول الموقع مجدداً لاحقاً.</div>';
+    label.textContent = 'تعذر التحديث مؤقتاً';
   }
 })();
 </script>
