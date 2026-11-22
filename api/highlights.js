@@ -137,7 +137,7 @@ export default async function handler(req, res) {
     ...video,
     availability: await checkCountryAvailability(video.id, country)
   })));
-  const visibleVideos = checked.filter(video => video.availability !== 'blocked');
+  const visibleVideos = country\n    ? checked.filter(video => video.availability === 'available')\n    : checked;
 
   res.status(200).json({
     videos: visibleVideos.slice(0, 12),
