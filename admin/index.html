@@ -86,11 +86,74 @@ main.wrap{margin:0 14px 0 254px;padding:20px 6px}
 @media(max-width:850px){header .wrap{padding:0 12px}.brand{font-size:19px}.brand:before{font-size:27px}.admin-sidebar{top:88px;position:sticky;width:100%;z-index:25}.admin-sidebar a{white-space:nowrap}main.wrap{margin:0 auto;width:94%}.admin-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}#admin-overview{grid-template-columns:1fr}.member-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.admin-shortcuts{grid-template-columns:1fr 1fr;gap:7px}.admin-shortcut{padding:9px;min-height:84px}.admin-shortcut .ico{font-size:24px}.member-grid{grid-template-columns:1fr}#dashboard>.stats:first-of-type{grid-template-columns:1fr 1fr}}
 
+
+/* Dashboard interior refresh: clear hierarchy, working section navigation, responsive control room */
+#dashboard{display:block!important;min-width:0}
+#dashboard>.row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px!important;margin:0 0 18px!important;border:1px solid #806020!important;border-radius:16px!important;background:linear-gradient(110deg,#211806 0%,#11100c 55%,#090909 100%)!important;box-shadow:0 12px 30px #0009}
+#dashboard>.row h1{font-size:30px;letter-spacing:.2px}
+#admin-email{margin-top:5px;font-size:14px}
+#logout{flex:0 0 auto;min-width:150px}
+.admin-sidebar{scrollbar-width:thin;scrollbar-color:#8d6925 #090909}
+.admin-sidebar a{transition:background .18s ease,transform .18s ease}
+.admin-sidebar a:active{transform:scale(.98)}
+.admin-shortcuts{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 18px}
+.admin-shortcut{min-height:104px;border-radius:14px;transition:transform .18s ease,border-color .18s ease}
+.admin-shortcut:hover{transform:translateY(-3px);border-color:#f4c23e}
+#dashboard>.panel,#dashboard>section.panel{padding:22px;margin:0 0 18px;border-radius:16px}
+#dashboard h2{display:flex;align-items:center;gap:10px;font-size:20px;margin-bottom:16px}
+#dashboard>.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 18px}
+#dashboard>.stats .stat{min-height:116px;padding:20px;border-radius:15px;display:flex;flex-direction:column;justify-content:space-between}
+#dashboard>.stats .stat strong{font-size:34px;line-height:1.2;margin-top:12px}
+#dashboard .stats .panel.stat{margin:0}
+#weekly-chart{min-height:190px!important}
+#articles-list,#ads-list,#members-list,#community-pending,#community-reports,#views-list{overflow-wrap:anywhere}
+#dashboard section[id]{scroll-margin-top:110px}
+#dashboard .field{min-width:0}
+#dashboard input,#dashboard textarea,#dashboard select{min-height:48px;border-radius:10px}
+#dashboard textarea{min-height:110px}
+#dashboard button{min-height:44px;border-radius:10px}
+#dashboard .item{padding:16px 4px}
+#dashboard .member-card{border-radius:13px;padding:16px}
+.admin-sidebar a[href="#dashboard"]:focus-visible,.admin-sidebar a:focus-visible,.admin-shortcut:focus-visible{outline:2px solid #ffe28a;outline-offset:2px}
+@media(min-width:1100px){
+ main.wrap{max-width:none;margin-left:258px;margin-right:24px;padding-top:26px}
+ #dashboard>.stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #dashboard #weekly-chart-panel,#dashboard #auto-feeds{display:block}
+ #dashboard .member-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:850px){
+ header{height:auto;min-height:76px}
+ .admin-sidebar{position:sticky;top:0;bottom:auto;width:100%;height:auto;display:flex;gap:6px;padding:9px 8px;overflow-x:auto;white-space:nowrap;background:#090909f5;backdrop-filter:blur(12px);border-right:0;border-bottom:1px solid #88621a}
+ .admin-sidebar a{flex:0 0 auto;padding:9px 12px;font-size:12px}
+ main.wrap{width:94%;margin:0 auto;padding:16px 0}
+ #dashboard>.row{padding:16px!important}
+ #dashboard>.row h1{font-size:25px}
+ .admin-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #dashboard>.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #dashboard>.stats .stat{min-height:105px;padding:15px}
+ #dashboard>.stats .stat strong{font-size:30px}
+}
+@media(max-width:480px){
+ .brand{font-size:19px}
+ .brand:before{font-size:26px}
+ .admin-sidebar{top:0}
+ .admin-sidebar a{padding:8px 10px;font-size:11px}
+ #dashboard>.row{align-items:flex-start;flex-direction:column}
+ #logout{width:100%}
+ .admin-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .admin-shortcut{min-height:88px;padding:10px;gap:8px}
+ #dashboard>.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ #dashboard>.stats .stat{min-height:96px;padding:12px}
+ #dashboard>.stats .stat strong{font-size:27px}
+ #dashboard>.panel,#dashboard>section.panel{padding:15px;margin-bottom:13px}
+ #dashboard h2{font-size:17px}
+}
+
 </style>
 </head>
 <body>
 <header><div class="wrap"><div class="brand">MANDO <b>SPORT</b> <span class="sub">| لوحة الإدارة</span></div></div></header>
-<aside class="admin-sidebar" aria-label="القائمة الجانبية للإدارة"><div class="side-brand">♛ MANDO SPORT</div><a class="active" href="#dashboard"><span>⌂</span>الرئيسية</a><a href="#admin-alerts"><span>♢</span>الزوار والإحصائيات</a><a href="#members-admin"><span>♟</span>الأعضاء والزبائن</a><a href="#articles-list"><span>▤</span>الأخبار</a><a href="#auto-feeds"><span>⚽</span>المباريات والتحديث التلقائي</a><a href="#ads-list"><span>▣</span>الإعلانات</a><a href="#auto-feeds"><span>▶</span>اللقطات المميزة</a><a href="#admin-settings"><span>⚙</span>الإعدادات</a></aside>
+<aside class="admin-sidebar" aria-label="القائمة الجانبية للإدارة"><div class="side-brand">♛ MANDO SPORT</div><a class="active" href="#dashboard"><span>⌂</span>الرئيسية</a><a href="#visits-admin"><span>♢</span>الزوار والإحصائيات</a><a href="#members-admin"><span>♟</span>الأعضاء والزبائن</a><a href="#articles-list-panel"><span>▤</span>الأخبار</a><a href="#auto-feeds"><span>⚽</span>المباريات والتحديث التلقائي</a><a href="#ads-list-panel"><span>▣</span>الإعلانات</a><a href="#weekly-chart-panel"><span>▶</span>اللقطات والإحصائيات</a><a href="#dashboard"><span>⚙</span>الإعدادات</a></aside>
 <main class="wrap">
 <section id="login-panel" class="panel login">
 <h1>تسجيل دخول المدير</h1><p class="muted">هذه الصفحة مخصصة لحساب الإدارة المعتمد فقط.</p>
