@@ -1,7 +1,6 @@
 const FEEDS = [
-  { name: 'Premier League', id: 'UCG5qGWdu8nIRZqJ_GgDwQ-w' },
-  { name: 'UEFA', id: 'UCyGa1YEx9ST66rYrJTGIKOw' },
-  { name: 'Sky Sports Football', id: 'UCNAf1k0yIjyGu3k9BwAg3lg' }
+  // Official Arabic-language beIN SPORTS MENA channel.
+  { name: 'beIN SPORTS', id: 'UCJUCcJUeh0Cz2xyKwkw5Q1w' }
 ];
 
 function decodeXml(value = '') {
@@ -108,9 +107,7 @@ async function translateToArabic(text) {
 
 function arabicSource(source) {
   const value = String(source || '').toLowerCase();
-  if (value.includes('premier league')) return 'الدوري الإنجليزي الممتاز';
-  if (value.includes('uefa')) return 'الاتحاد الأوروبي لكرة القدم';
-  if (value.includes('sky sports')) return 'سكاي سبورتس لكرة القدم';
+  if (value.includes('bein')) return 'بي إن سبورتس';
   return 'قناة رياضية رسمية';
 }
 
@@ -118,7 +115,7 @@ function isMatchHighlight(title) {
   const value = title.toLowerCase();
   const excluded = ['fpl', 'fantasy', 'podcast', 'preview', 'predict', 'press conference', 'interview', 'quiz', 'on the spot', 'behind the scenes', 'training', 'transfer', 'reaction', 'watchalong', 'watch along'];
   if (excluded.some(word => value.includes(word))) return false;
-  const included = ['highlights', 'highlight', 'all goals', 'every goal', 'goals |', 'matchday', 'best moments', 'top goals', 'goal of the', 'extended highlights', 'short highlights'];
+  const included = ['highlights', 'highlight', 'all goals', 'every goal', 'goals |', 'matchday', 'best moments', 'top goals', 'goal of the', 'extended highlights', 'short highlights', 'ملخص', 'أهداف', 'اهداف', 'لقطات', 'أبرز اللحظات'];
   return included.some(word => value.includes(word));
 }
 
