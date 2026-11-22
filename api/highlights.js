@@ -107,12 +107,11 @@ async function translateToArabic(text) {
 }
 
 function arabicSource(source) {
-  const names = {
-    'Premier League': 'الدوري الإنجليزي الممتاز',
-    'UEFA': 'الاتحاد الأوروبي لكرة القدم',
-    'Sky Sports Football': 'سكاي سبورتس لكرة القدم'
-  };
-  return names[source] || 'قناة رياضية رسمية';
+  const value = String(source || '').toLowerCase();
+  if (value.includes('premier league')) return 'الدوري الإنجليزي الممتاز';
+  if (value.includes('uefa')) return 'الاتحاد الأوروبي لكرة القدم';
+  if (value.includes('sky sports')) return 'سكاي سبورتس لكرة القدم';
+  return 'قناة رياضية رسمية';
 }
 
 function isMatchHighlight(title) {
