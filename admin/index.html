@@ -66,6 +66,11 @@
 <div class="field"><label for="ad-image">رابط صورة الإعلان</label><input id="ad-image" type="url" placeholder="https://..."></div>
 <div class="field"><label for="ad-url">رابط الوجهة عند الضغط</label><input id="ad-url" type="url" placeholder="https://..."></div>
 <div class="field"><label for="ad-placement">مكان الإعلان</label><select id="ad-placement"><option value="home">الرئيسية</option><option value="matches">المباريات</option><option value="news">الأخبار</option><option value="footer">أسفل الموقع</option></select></div>
+<div class="row">
+ <div class="field"><label for="ad-starts">موعد بدء الإعلان (اختياري)</label><input id="ad-starts" type="datetime-local"></div>
+ <div class="field"><label for="ad-ends">موعد انتهاء الإعلان (اختياري)</label><input id="ad-ends" type="datetime-local"></div>
+</div>
+<p class="muted">إذا تركت الموعدين فارغين، يبقى الإعلان دون مدة محددة. الإعلان المجدول لن يظهر قبل موعده أو بعد انتهائه.</p>
 <label><input id="ad-active" type="checkbox" style="width:auto"> تفعيل الإعلان</label>
 <div style="margin-top:12px"><button type="submit">حفظ الإعلان</button></div>
 </form><div id="ad-status" class="status"></div>
@@ -179,14 +184,28 @@ async function loadAds(){
  const {data,error}=await db.from('advertisements').select('*').order('created_at',{ascending:false});
  if(error){$('ads-list').textContent=error.message;return;}
  $('ads-total').textContent=data.length;
- $('ads-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.active?'مفعّل':'متوقف')+'</span><div class="muted">المكان: '+esc(a.placement)+'</div><div class="item-actions"><button class="secondary" data-ad-toggle="'+a.id+'" data-state="'+(!a.active)+'">'+(a.active?'إيقاف':'تفعيل')+'</button><button class="danger" data-delete-ad="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد إعلانات بعد.';
+ $('ads-list').innerHTML=data.length?data.map(a=>{
+ const now=Date.now();
+ const starts=a.starts_at?new Date(a.starts_at).getTime():null;
+ const ends=a.ends_at?new Date(a.ends_at).getTime():null;
+ const schedule=starts&&starts>now?'مجدول للمستقبل':ends&&ends<now?'انتهت مدته':a.active?'مفعّل':'متوقف';
+ const range=(a.starts_at?'من '+new Date(a.starts_at).toLocaleString('ar'):'بلا موعد بدء')+' — '+(a.ends_at?'حتى '+new Date(a.ends_at).toLocaleString('ar'):'بلا موعد انتهاء');
+ return '<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+schedule+'</span><div class="muted">المكان: '+esc(a.placement)+'</div><div class="muted">'+esc(range)+'</div><div class="item-actions"><button class="secondary" data-ad-toggle="'+a.id+'" data-state="'+(!a.active)+'">'+(a.active?'إيقاف':'تفعيل')+'</button><button class="danger" data-delete-ad="'+a.id+'">حذف</button></div></div>';
+ }).join(''):'لا توجد إعلانات بعد.';
 }
 $('ad-form').addEventListener('submit',async e=>{
  e.preventDefault();message('ad-status','جارٍ حفظ الإعلان…');
- const payload={title:$('ad-title').value.trim(),image_url:$('ad-image').value.trim(),target_url:$('ad-url').value.trim(),placement:$('ad-placement').value,active:$('ad-active').checked};
+ const startValue=$('ad-starts').value;
+ const endValue=$('ad-ends').value;
+ const startsAt=startValue?new Date(startValue):null;
+ const endsAt=endValue?new Date(endValue):null;
+ if(startsAt&&Number.isNaN(startsAt.getTime())){message('ad-status','موعد بدء الإعلان غير صالح.',true);return;}
+ if(endsAt&&Number.isNaN(endsAt.getTime())){message('ad-status','موعد انتهاء الإعلان غير صالح.',true);return;}
+ if(startsAt&&endsAt&&endsAt<=startsAt){message('ad-status','موعد الانتهاء يجب أن يكون بعد موعد البدء.',true);return;}
+ const payload={title:$('ad-title').value.trim(),image_url:$('ad-image').value.trim(),target_url:$('ad-url').value.trim(),placement:$('ad-placement').value,starts_at:startsAt?startsAt.toISOString():null,ends_at:endsAt?endsAt.toISOString():null,active:$('ad-active').checked};
  const {error}=await db.from('advertisements').insert(payload);
  if(error){message('ad-status','لم يتم الحفظ: '+error.message,true);return;}
- e.target.reset();message('ad-status','تم حفظ الإعلان.');await loadAds();
+ e.target.reset();message('ad-status','تم حفظ الإعلان وجدولته.');await loadAds();
 });
 $('ads-list').addEventListener('click',async e=>{
  const toggle=e.target.closest('[data-ad-toggle]');const del=e.target.closest('[data-delete-ad]');
