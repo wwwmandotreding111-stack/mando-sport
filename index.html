@@ -150,14 +150,14 @@ footer{background:#080a0f;color:var(--muted);border-color:#ffffff18}
 @media(max-width:760px){.sport-sidebar{width:calc(100% - 20px);gap:3px;padding:7px}.sport-sidebar a{font-size:11px;padding:7px 8px}.sport-sidebar a span{width:20px;height:20px}}
 
 
-/* Automatic official football highlights */
+/* Official football highlights: thumbnail cards instead of error-prone embedded players */
 #highlights-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
 .highlight-card{overflow:hidden;padding:10px}
-.highlight-video{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#05070a}
-.highlight-card h3{font-size:14px;line-height:1.5;margin:9px 2px 5px}
-.highlight-meta{font-size:11px;color:var(--muted);margin:0 2px 4px}
-@media(max-width:760px){#highlights-grid{grid-template-columns:1fr}.highlight-card{display:block}.highlight-card h3{font-size:13px}}
-
+.highlight-thumb{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#05070a}
+.highlight-card h3{font-size:14px;line-height:1.5;margin:9px 2px 5px;color:var(--white)}
+.highlight-meta{font-size:11px;color:var(--muted);margin:0 2px 10px}
+.highlight-watch{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 12px;border-radius:9px;background:linear-gradient(135deg,#f4d58f,#c18b38);color:#171108;font-size:12px;font-weight:900}
+@media(max-width:760px){#highlights-grid{grid-template-columns:1fr}.highlight-card h3{font-size:13px}}
 </style>
 </head>
 <body>
@@ -408,21 +408,22 @@ loadMatches();
     if (!response.ok) throw new Error(data.error || 'تعذر جلب اللقطات');
     const videos = Array.isArray(data.videos) ? data.videos : [];
     if (!videos.length) {
-      host.innerHTML = '<div class="notice">لا توجد لقطات أهداف جديدة حالياً من القنوات الرسمية. سيتم التحديث تلقائياً عند توفر فيديوهات مناسبة.</div>';
-      label.textContent = 'تحديث تلقائي من YouTube';
+      host.innerHTML = '<div class="notice">لا توجد لقطات جديدة حالياً. سيتم التحديث تلقائياً عند توفر مقاطع مناسبة.</div>';
+      label.textContent = 'تحديث تلقائي من القنوات الرياضية الرسمية';
       return;
     }
     host.innerHTML = videos.slice(0, 6).map(video => {
+      const id = /^[A-Za-z0-9_-]{6,20}$/.test(String(video.id || '')) ? video.id : '';
+      if (!id) return '';
       const date = video.publishedAt && !Number.isNaN(new Date(video.publishedAt).getTime())
         ? new Date(video.publishedAt).toLocaleDateString('ar')
         : '';
-      const embed = /^https:\/\/www\.youtube-nocookie\.com\/embed\/[A-Za-z0-9_-]+$/.test(String(video.embedUrl || '')) ? video.embedUrl : '';
-      const link = /^https:\/\/www\.youtube\.com\/watch\?v=[A-Za-z0-9_-]+$/.test(String(video.url || '')) ? video.url : '';
-      if (!embed || !link) return '';
-      return '<article class="card highlight-card"><iframe class="highlight-video" src="' + safe(embed) + '" title="' + safe(video.title) + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe><h3>' + safe(video.title) + '</h3><p class="highlight-meta">' + safe(video.source) + (date ? ' · ' + safe(date) : '') + '</p><a href="' + safe(link) + '" target="_blank" rel="noopener noreferrer" style="color:var(--gold);font-size:11px">مشاهدة على YouTube ↗</a></article>';
+      const thumbnail = 'https://i.ytimg.com/vi/' + encodeURIComponent(id) + '/hqdefault.jpg';
+      const link = 'https://www.youtube.com/watch?v=' + encodeURIComponent(id) + '&hl=ar';
+      return '<article class="card highlight-card"><a href="' + safe(link) + '" target="_blank" rel="noopener noreferrer" aria-label="شاهد المقطع على يوتيوب"><img class="highlight-thumb" src="' + safe(thumbnail) + '" alt="صورة المقطع" loading="lazy"></a><h3>لقطات وأهداف كرة القدم</h3><p class="highlight-meta">مقطع رياضي رسمي' + (date ? ' · ' + safe(date) : '') + '</p><a class="highlight-watch" href="' + safe(link) + '" target="_blank" rel="noopener noreferrer">▶ شاهد المقطع على يوتيوب</a></article>';
     }).filter(Boolean).join('');
     if (!host.innerHTML) host.innerHTML = '<div class="notice">لا توجد لقطات مناسبة حالياً.</div>';
-    label.textContent = data.country ? 'فحص التوفر حسب بلد الزائر (' + safe(data.country) + ')' : 'تُحدّث تلقائياً من القنوات الرسمية';
+    label.textContent = 'مقاطع مختارة من القنوات الرياضية الرسمية';
   } catch (error) {
     host.innerHTML = '<div class="notice">تعذر تحميل اللقطات الآن. سيحاول الموقع مجدداً لاحقاً.</div>';
     label.textContent = 'تعذر التحديث مؤقتاً';
