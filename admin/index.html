@@ -56,10 +56,11 @@
 </section>
 </main>
 <footer>MANDO SPORT — لوحة إدارة خاصة</footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;document.getElementById('login-status').textContent='تعذّر تحميل خدمة تسجيل الدخول. حدّث الصفحة أو جرّب بعد قليل.';document.getElementById('login-status').className='status error';"></script>
 <script>
 const SUPABASE_URL = 'https://ibgvfjuqcolcyjzdzcde.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_';
+if (!window.supabase) { $('login-status').textContent='تعذّر تحميل خدمة تسجيل الدخول. حدّث الصفحة أو جرّب بعد قليل.'; $('login-status').className='status error'; throw new Error('Supabase SDK failed to load'); }
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -78,9 +79,12 @@ async function enter(user){
 }
 $('login-form').addEventListener('submit',async e=>{
  e.preventDefault();message('login-status','جارٍ التحقق من الحساب…');
- const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
- if(error){message('login-status','تعذر تسجيل الدخول: '+error.message,true);return;}
- await enter(data.user);
+ try {
+  const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+  if(error){message('login-status','تعذر تسجيل الدخول: '+error.message,true);return;}
+  if(!data.user){message('login-status','لم يتم العثور على حساب صالح. تحقق من بيانات الدخول.',true);return;}
+  await enter(data.user);
+ } catch(err) { message('login-status','تعذّر إكمال تسجيل الدخول: '+(err?.message||'خطأ في الاتصال بالخدمة'),true); }
 });
 $('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
 db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
