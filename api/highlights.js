@@ -50,7 +50,7 @@ function extractJsonObject(source, marker) {
 async function checkCountryAvailability(videoId, country) {
   if (!country) return 'unknown';
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 7000);
+  const timeout = setTimeout(() => controller.abort(), 3500);
   try {
     const url = new URL('https://www.youtube.com/watch');
     url.searchParams.set('v', videoId);
@@ -86,7 +86,7 @@ export default async function handler(req, res) {
 
   const results = await Promise.allSettled(FEEDS.map(async feed => {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 9000);
+    const timeout = setTimeout(() => controller.abort(), 5500);
     try {
       const response = await fetch('https://www.youtube.com/feeds/videos.xml?channel_id=' + feed.id, {
         signal: controller.signal,
@@ -132,7 +132,7 @@ export default async function handler(req, res) {
 
   // Check newest candidates against the visitor's country before displaying them.
   // Unknown checks are retained because YouTube may throttle server-side page requests.
-  const candidates = videos.slice(0, 18);
+  const candidates = videos.slice(0, 8);
   const checked = await Promise.all(candidates.map(async video => ({
     ...video,
     availability: await checkCountryAvailability(video.id, country)
