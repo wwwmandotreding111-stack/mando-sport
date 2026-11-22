@@ -24,6 +24,54 @@ function readTag(entry, name) {
   return decodeXml(entry.slice(from + start.length, to).replace(/<[^>]*>/g, ''));
 }
 
+function extractJsonObject(source, marker) {
+  const markerIndex = source.indexOf(marker);
+  if (markerIndex < 0) return null;
+  const start = source.indexOf('{', markerIndex + marker.length);
+  if (start < 0) return null;
+  let depth = 0, inString = false, escaped = false;
+  for (let i = start; i < source.length; i++) {
+    const char = source[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === '"') inString = false;
+      continue;
+    }
+    if (char === '"') inString = true;
+    else if (char === '{') depth++;
+    else if (char === '}' && --depth === 0) {
+      try { return JSON.parse(source.slice(start, i + 1)); } catch { return null; }
+    }
+  }
+  return null;
+}
+
+async function checkCountryAvailability(videoId, country) {
+  if (!country) return 'unknown';
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 7000);
+  try {
+    const url = new URL('https://www.youtube.com/watch');
+    url.searchParams.set('v', videoId);
+    url.searchParams.set('gl', country);
+    url.searchParams.set('hl', 'en');
+    const response = await fetch(url.toString(), {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36' }
+    });
+    if (!response.ok) return 'unknown';
+    const html = await response.text();
+    const player = extractJsonObject(html, '"playabilityStatus":');
+    if (!player || !player.status) return 'unknown';
+    return player.status === 'OK' ? 'available' : 'blocked';
+  } catch {
+    return 'unknown';
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function isMatchHighlight(title) {
   const value = title.toLowerCase();
   const excluded = ['fpl', 'fantasy', 'podcast', 'preview', 'predict', 'press conference', 'interview', 'quiz', 'on the spot', 'behind the scenes', 'training', 'transfer', 'reaction', 'watchalong', 'watch along'];
@@ -67,6 +115,9 @@ export default async function handler(req, res) {
     }
   }));
 
+  const countryHeader = req.headers['x-vercel-ip-country'] || req.headers['cf-ipcountry'] || '';
+  const country = /^[A-Za-z]{2}$/.test(countryHeader) ? countryHeader.toUpperCase() : '';
+
   const videos = [];
   const seen = new Set();
   for (const result of results) {
@@ -78,8 +129,20 @@ export default async function handler(req, res) {
     }
   }
   videos.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+
+  // Check newest candidates against the visitor's country before displaying them.
+  // Unknown checks are retained because YouTube may throttle server-side page requests.
+  const candidates = videos.slice(0, 18);
+  const checked = await Promise.all(candidates.map(async video => ({
+    ...video,
+    availability: await checkCountryAvailability(video.id, country)
+  })));
+  const visibleVideos = checked.filter(video => video.availability !== 'blocked');
+
   res.status(200).json({
-    videos: videos.slice(0, 12),
+    videos: visibleVideos.slice(0, 12),
+    country: country || null,
+    availabilityCheck: country ? 'country-aware-best-effort' : 'not-available',
     updatedAt: new Date().toISOString(),
     sources: FEEDS.map(feed => feed.name)
   });
