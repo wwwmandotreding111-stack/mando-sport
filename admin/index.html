@@ -87,68 +87,68 @@ main.wrap{margin:0 14px 0 254px;padding:20px 6px}
 @media(max-width:480px){.admin-shortcuts{grid-template-columns:1fr 1fr;gap:7px}.admin-shortcut{padding:9px;min-height:84px}.admin-shortcut .ico{font-size:24px}.member-grid{grid-template-columns:1fr}#dashboard>.stats:first-of-type{grid-template-columns:1fr 1fr}}
 
 
-/* Dashboard interior refresh: clear hierarchy, working section navigation, responsive control room */
-#dashboard{display:block!important;min-width:0}
-#dashboard>.row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px!important;margin:0 0 18px!important;border:1px solid #806020!important;border-radius:16px!important;background:linear-gradient(110deg,#211806 0%,#11100c 55%,#090909 100%)!important;box-shadow:0 12px 30px #0009}
-#dashboard>.row h1{font-size:30px;letter-spacing:.2px}
-#admin-email{margin-top:5px;font-size:14px}
-#logout{flex:0 0 auto;min-width:150px}
-.admin-sidebar{scrollbar-width:thin;scrollbar-color:#8d6925 #090909}
-.admin-sidebar a{transition:background .18s ease,transform .18s ease}
-.admin-sidebar a:active{transform:scale(.98)}
-.admin-shortcuts{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 18px}
-.admin-shortcut{min-height:104px;border-radius:14px;transition:transform .18s ease,border-color .18s ease}
+/* MANDO SPORT admin dashboard: structured interior layout */
+#dashboard{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;min-width:0}
+#dashboard>.row,#dashboard>#dashboard-status,#dashboard>.admin-shortcuts{grid-column:1/-1}
+#dashboard>.row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px;margin:0;border:1px solid #806020;border-radius:14px;background:linear-gradient(110deg,#211806,#11100c 55%,#090909);box-shadow:0 12px 30px #0009}
+#dashboard>.row h1{font-size:28px;color:#f4c23e}
+#admin-email{margin-top:5px;font-size:13px}
+#logout{flex:0 0 auto;min-width:145px}
+#dashboard>.admin-shortcuts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0}
+.admin-shortcut{min-height:104px;border-radius:12px;transition:transform .18s,border-color .18s}
 .admin-shortcut:hover{transform:translateY(-3px);border-color:#f4c23e}
-#dashboard>.panel,#dashboard>section.panel{padding:22px;margin:0 0 18px;border-radius:16px}
-#dashboard h2{display:flex;align-items:center;gap:10px;font-size:20px;margin-bottom:16px}
-#dashboard>.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 18px}
-#dashboard>.stats .stat{min-height:116px;padding:20px;border-radius:15px;display:flex;flex-direction:column;justify-content:space-between}
-#dashboard>.stats .stat strong{font-size:34px;line-height:1.2;margin-top:12px}
-#dashboard .stats .panel.stat{margin:0}
-#weekly-chart{min-height:190px!important}
-#articles-list,#ads-list,#members-list,#community-pending,#community-reports,#views-list{overflow-wrap:anywhere}
-#dashboard section[id]{scroll-margin-top:110px}
+#dashboard>section.panel{min-width:0;padding:20px;margin:0;border-radius:14px}
+#dashboard>section.panel h2{font-size:19px;color:#f4c23e;margin-bottom:15px}
+#dashboard>.stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0}
+#dashboard>.stats .stat{min-width:0;min-height:108px;padding:17px;border-radius:13px}
+#dashboard>.stats .stat strong{font-size:31px;line-height:1.25;margin-top:10px}
+#dashboard>section.panel:nth-of-type(2){grid-column:1/-1}
+#dashboard>#weekly-chart-panel{grid-column:1/7}
+#dashboard>#auto-feeds{grid-column:7/-1}
+#dashboard>#articles-list-panel,#dashboard>#ads-list-panel{grid-column:1/-1}
+#dashboard>#members-admin,#dashboard>#community-admin,#dashboard>#visits-admin{grid-column:1/-1}
 #dashboard .field{min-width:0}
-#dashboard input,#dashboard textarea,#dashboard select{min-height:48px;border-radius:10px}
-#dashboard textarea{min-height:110px}
-#dashboard button{min-height:44px;border-radius:10px}
-#dashboard .item{padding:16px 4px}
-#dashboard .member-card{border-radius:13px;padding:16px}
-.admin-sidebar a[href="#dashboard"]:focus-visible,.admin-sidebar a:focus-visible,.admin-shortcut:focus-visible{outline:2px solid #ffe28a;outline-offset:2px}
-@media(min-width:1100px){
- main.wrap{max-width:none;margin-left:258px;margin-right:24px;padding-top:26px}
- #dashboard>.stats{grid-template-columns:repeat(3,minmax(0,1fr))}
- #dashboard #weekly-chart-panel,#dashboard #auto-feeds{display:block}
- #dashboard .member-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+#dashboard input,#dashboard textarea,#dashboard select{min-height:46px;border-radius:9px}
+#dashboard textarea{min-height:105px}
+#dashboard button{min-height:42px;border-radius:9px}
+#dashboard .item{padding:15px 4px}
+#dashboard .member-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+#dashboard section[id]{scroll-margin-top:108px}
+#weekly-chart{min-height:180px}
+#articles-list,#ads-list,#members-list,#community-pending,#community-reports,#views-list{overflow-wrap:anywhere}
+@media(max-width:1100px){
+ #dashboard>.admin-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #dashboard>#weekly-chart-panel,#dashboard>#auto-feeds{grid-column:1/-1}
+ #dashboard .member-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:850px){
  header{height:auto;min-height:76px}
  .admin-sidebar{position:sticky;top:0;bottom:auto;width:100%;height:auto;display:flex;gap:6px;padding:9px 8px;overflow-x:auto;white-space:nowrap;background:#090909f5;backdrop-filter:blur(12px);border-right:0;border-bottom:1px solid #88621a}
  .admin-sidebar a{flex:0 0 auto;padding:9px 12px;font-size:12px}
  main.wrap{width:94%;margin:0 auto;padding:16px 0}
- #dashboard>.row{padding:16px!important}
- #dashboard>.row h1{font-size:25px}
- .admin-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #dashboard{grid-template-columns:repeat(6,minmax(0,1fr));gap:11px}
+ #dashboard>.row,#dashboard>#dashboard-status,#dashboard>.admin-shortcuts,#dashboard>.stats,#dashboard>section.panel{grid-column:1/-1}
+ #dashboard>.row{padding:15px}
+ #dashboard>.row h1{font-size:24px}
+ #dashboard>.admin-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}
  #dashboard>.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
- #dashboard>.stats .stat{min-height:105px;padding:15px}
- #dashboard>.stats .stat strong{font-size:30px}
+ #dashboard>.stats .stat{min-height:98px;padding:14px}
+ #dashboard>.stats .stat strong{font-size:28px}
 }
 @media(max-width:480px){
  .brand{font-size:19px}
  .brand:before{font-size:26px}
- .admin-sidebar{top:0}
  .admin-sidebar a{padding:8px 10px;font-size:11px}
  #dashboard>.row{align-items:flex-start;flex-direction:column}
  #logout{width:100%}
- .admin-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
- .admin-shortcut{min-height:88px;padding:10px;gap:8px}
- #dashboard>.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
- #dashboard>.stats .stat{min-height:96px;padding:12px}
- #dashboard>.stats .stat strong{font-size:27px}
- #dashboard>.panel,#dashboard>section.panel{padding:15px;margin-bottom:13px}
- #dashboard h2{font-size:17px}
+ #dashboard>.admin-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ #dashboard>.admin-shortcuts .admin-shortcut{min-height:86px;padding:10px;gap:8px}
+ #dashboard>.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ #dashboard>.stats .stat{min-height:92px;padding:11px}
+ #dashboard>.stats .stat strong{font-size:25px}
+ #dashboard>section.panel{padding:14px}
+ #dashboard .member-grid{grid-template-columns:1fr}
 }
-
 </style>
 </head>
 <body>
