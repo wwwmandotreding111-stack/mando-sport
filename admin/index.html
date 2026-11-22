@@ -102,6 +102,13 @@ main.wrap{margin:0 14px 0 254px;padding:20px 6px}
 </section>
 <section id="dashboard" class="hidden">
 <div class="row" style="justify-content:space-between"><div><h1>لوحة التحكم</h1><div id="admin-email" class="muted"></div></div><button id="logout" class="secondary">تسجيل الخروج</button></div>
+<nav class="admin-shortcuts" aria-label="اختصارات الإدارة">
+<a class="admin-shortcut" href="#admin-alerts"><span class="ico">♢</span><span><b>التنبيهات</b><small>متابعة حالة الموقع</small></span></a>
+<a class="admin-shortcut" href="#members-admin"><span class="ico">♟</span><span><b>الأعضاء والزبائن</b><small>عرض وتعديل الملفات</small></span></a>
+<a class="admin-shortcut" href="#articles-list-panel"><span class="ico">▤</span><span><b>الأخبار</b><small>إضافة وتعديل ونشر</small></span></a>
+<a class="admin-shortcut" href="#auto-feeds"><span class="ico">⚽</span><span><b>المباريات والتحديث</b><small>فحص مصادر البيانات</small></span></a>
+<a class="admin-shortcut" href="#ads-list-panel"><span class="ico">▣</span><span><b>الإعلانات</b><small>إدارة الحملات</small></span></a>
+</nav>
 <section class="panel">
 <h2>مركز التنبيهات الإدارية <span id="admin-alert-count" class="pill">0</span></h2>
 <div id="admin-alerts" class="muted">جارٍ فحص التنبيهات…</div>
@@ -130,6 +137,14 @@ main.wrap{margin:0 14px 0 254px;padding:20px 6px}
 <div class="muted">جارٍ تحميل الرسم…</div>
 </div>
 <p class="muted">يعرض الرسم عدد الزيارات المسجلة فعلياً لكل يوم.</p>
+</section>
+<section class="panel" id="auto-feeds">
+<div class="row" style="justify-content:space-between;align-items:center"><div><h2>مراقبة التحديث التلقائي</h2><p class="muted">فحص مباشر لمصدر مباريات اليوم وترتيب الدوري. هذا فحص للمصادر وليس جدولة نشر تلقائي.</p></div><button id="check-auto-feeds" type="button">فحص المصادر الآن</button></div>
+<div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+<div class="stat"><span class="muted">حالة لوحة الإدارة</span><strong id="db-status" style="font-size:17px">بانتظار الفحص</strong></div>
+<div class="stat"><span class="muted">آخر فحص للمصادر</span><strong id="feed-checked-at" style="font-size:15px">—</strong></div>
+</div>
+<div id="auto-feed-results" aria-live="polite" class="muted">سيظهر هنا وضع مصادر المباريات والترتيب.</div>
 </section>
 <section class="panel">
 <h2 id="article-form-heading">إضافة خبر جديد</h2>
@@ -172,7 +187,8 @@ main.wrap{margin:0 14px 0 254px;padding:20px 6px}
 <div id="members-list" class="muted">جارٍ تحميل الأعضاء…</div>
 <div id="member-edit-panel" class="hidden panel"><h3>تعديل ملف العضو</h3><input id="member-edit-id" type="hidden"><div class="field"><label for="member-edit-name">اسم العرض</label><input id="member-edit-name" maxlength="40"></div><div class="field"><label for="member-edit-team">الفريق المفضل</label><input id="member-edit-team" maxlength="80"></div><div class="row"><button id="member-save" type="button">حفظ التعديلات</button><button id="member-cancel" class="secondary" type="button">إلغاء</button></div><div id="member-status" class="status"></div></div>
 </section>
-\n<section class="panel" id="community-admin">
+
+<section class="panel" id="community-admin">
 <h2>إدارة مجتمع الأعضاء</h2>
 <p class="muted">راجع التعليقات قبل نشرها، وتابع البلاغات المرسلة من الأعضاء.</p>
 <h3>تعليقات بانتظار الموافقة <span id="community-pending-count" class="pill">0</span></h3>
