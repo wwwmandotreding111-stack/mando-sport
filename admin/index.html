@@ -236,13 +236,36 @@ async function enter(user){
  }
 }
 $('login-form').addEventListener('submit',async e=>{
- e.preventDefault();message('login-status','جارٍ التحقق من الحساب…');
- const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
- if(error){message('login-status','تعذر تسجيل الدخول: '+error.message,true);return;}
- await enter(data.user);
+ e.preventDefault();
+ const form=e.currentTarget,submit=form.querySelector('button[type="submit"]');
+ submit.disabled=true;submit.textContent='جارٍ التحقق…';
+ message('login-status','جارٍ التحقق من الحساب…');
+ try{
+  const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+  if(error)throw error;
+  if(!data?.user)throw new Error('تم الاتصال دون استلام بيانات الحساب. أعد المحاولة.');
+  await enter(data.user);
+ }catch(error){
+  console.error('Admin login failed:',error);
+  showLogin();
+  message('login-status','تعذر إكمال تسجيل الدخول: '+(error?.message||'تحقق من الاتصال وحاول مجدداً.'),true);
+ }finally{
+  submit.disabled=false;submit.textContent='تسجيل الدخول';
+ }
 });
 $('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
 db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
+(async()=>{
+ try{
+  const {data,error}=await db.auth.getSession();
+  if(error)throw error;
+  if(data?.session?.user)await enter(data.session.user);
+ }catch(error){
+  console.error('Admin session restore failed:',error);
+  showLogin();
+  message('login-status','تعذر استعادة جلسة المدير: '+(error?.message||'تحقق من الاتصال ثم سجّل الدخول مجدداً.'),true);
+ }
+})();
 async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart(),loadCommunityModeration(),loadMembers()]);await loadAdminAlerts();await checkAutomaticFeeds();}
 
 async function checkAutomaticFeeds(){
