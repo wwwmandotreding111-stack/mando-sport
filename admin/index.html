@@ -94,7 +94,7 @@ main.wrap{margin:0 14px 0 254px;padding:20px 6px}
 <main class="wrap">
 <section id="login-panel" class="panel login">
 <h1>تسجيل دخول المدير</h1><p class="muted">هذه الصفحة مخصصة لحساب الإدارة المعتمد فقط.</p>
-<form id="login-form">
+<form id="login-form" onsubmit="return false;">
 <div class="field"><label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" required></div>
 <div class="field"><label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" required></div>
 <button type="submit" style="width:100%">تسجيل الدخول</button>
@@ -201,7 +201,7 @@ main.wrap{margin:0 14px 0 254px;padding:20px 6px}
 </section>
 </main>
 <footer>MANDO SPORT — لوحة إدارة خاصة</footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="var s=document.getElementById('login-status');if(s){s.textContent='تعذر تحميل مكتبة تسجيل الدخول. تحقق من اتصال الإنترنت ثم أعد تحميل الصفحة.';s.className='status error';}"></script>
 <script>
 const SUPABASE_URL = 'https://ibgvfjuqcolcyjzdzcde.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_';
