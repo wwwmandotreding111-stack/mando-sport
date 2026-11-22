@@ -62,8 +62,10 @@
 </section>
 <section class="panel"><h2>الأخبار المنشورة والمسودات</h2><div id="articles-list" class="muted">جارٍ التحميل…</div></section>
 <section class="panel">
-<h2>إضافة إعلان</h2>
+<h2 id="ad-form-heading">إضافة إعلان</h2>
 <form id="ad-form">
+<input id="ad-edit-id" type="hidden">
+
 <div class="field"><label for="ad-title">اسم الإعلان</label><input id="ad-title" maxlength="180" required></div>
 <div class="field"><label for="ad-image">رابط صورة الإعلان</label><input id="ad-image" type="url" placeholder="https://..."></div>
 <div class="field"><label for="ad-url">رابط الوجهة عند الضغط</label><input id="ad-url" type="url" placeholder="https://..."></div>
@@ -74,7 +76,7 @@
 </div>
 <p class="muted">إذا تركت الموعدين فارغين، يبقى الإعلان دون مدة محددة. الإعلان المجدول لن يظهر قبل موعده أو بعد انتهائه.</p>
 <label><input id="ad-active" type="checkbox" style="width:auto"> تفعيل الإعلان</label>
-<div style="margin-top:12px"><button type="submit">حفظ الإعلان</button></div>
+<div class="row" style="margin-top:12px"><button id="ad-submit" type="submit">حفظ الإعلان</button><button id="ad-cancel-edit" class="secondary hidden" type="button">إلغاء التعديل</button></div>
 </form><div id="ad-status" class="status"></div>
 </section>
 <section class="panel"><h2>الإعلانات</h2><div id="ads-list" class="muted">جارٍ التحميل…</div></section>
@@ -213,25 +215,44 @@ async function loadAds(){
  const ends=a.ends_at?new Date(a.ends_at).getTime():null;
  const schedule=starts&&starts>now?'مجدول للمستقبل':ends&&ends<now?'انتهت مدته':a.active?'مفعّل':'متوقف';
  const range=(a.starts_at?'من '+new Date(a.starts_at).toLocaleString('ar'):'بلا موعد بدء')+' — '+(a.ends_at?'حتى '+new Date(a.ends_at).toLocaleString('ar'):'بلا موعد انتهاء');
- return '<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+schedule+'</span><div class="muted">المكان: '+esc(a.placement)+'</div><div class="muted">'+esc(range)+'</div><div class="item-actions"><button class="secondary" data-ad-toggle="'+a.id+'" data-state="'+(!a.active)+'">'+(a.active?'إيقاف':'تفعيل')+'</button><button class="danger" data-delete-ad="'+a.id+'">حذف</button></div></div>';
+ return '<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+schedule+'</span><div class="muted">المكان: '+esc(a.placement)+'</div><div class="muted">'+esc(range)+'</div><div class="item-actions"><button class="secondary" data-edit-ad="'+a.id+'">تعديل</button><button class="secondary" data-ad-toggle="'+a.id+'" data-state="'+(!a.active)+'">'+(a.active?'إيقاف':'تفعيل')+'</button><button class="danger" data-delete-ad="'+a.id+'">حذف</button></div></div>';
  }).join(''):'لا توجد إعلانات بعد.';
 }
+function resetAdEditor(){
+ $('ad-form').reset();$('ad-edit-id').value='';
+ $('ad-form-heading').textContent='إضافة إعلان';
+ $('ad-submit').textContent='حفظ الإعلان';
+ $('ad-cancel-edit').classList.add('hidden');
+}
+$('ad-cancel-edit').addEventListener('click',resetAdEditor);
 $('ad-form').addEventListener('submit',async e=>{
  e.preventDefault();message('ad-status','جارٍ حفظ الإعلان…');
- const startValue=$('ad-starts').value;
- const endValue=$('ad-ends').value;
- const startsAt=startValue?new Date(startValue):null;
- const endsAt=endValue?new Date(endValue):null;
+ const editId=$('ad-edit-id').value;
+ const startValue=$('ad-starts').value,endValue=$('ad-ends').value;
+ const startsAt=startValue?new Date(startValue):null,endsAt=endValue?new Date(endValue):null;
  if(startsAt&&Number.isNaN(startsAt.getTime())){message('ad-status','موعد بدء الإعلان غير صالح.',true);return;}
  if(endsAt&&Number.isNaN(endsAt.getTime())){message('ad-status','موعد انتهاء الإعلان غير صالح.',true);return;}
  if(startsAt&&endsAt&&endsAt<=startsAt){message('ad-status','موعد الانتهاء يجب أن يكون بعد موعد البدء.',true);return;}
- const payload={title:$('ad-title').value.trim(),image_url:$('ad-image').value.trim(),target_url:$('ad-url').value.trim(),placement:$('ad-placement').value,starts_at:startsAt?startsAt.toISOString():null,ends_at:endsAt?endsAt.toISOString():null,active:$('ad-active').checked};
- const {error}=await db.from('advertisements').insert(payload);
- if(error){message('ad-status','لم يتم الحفظ: '+error.message,true);return;}
- e.target.reset();message('ad-status','تم حفظ الإعلان وجدولته.');await loadAds();
+ const payload={title:$('ad-title').value.trim(),image_url:$('ad-image').value.trim(),target_url:$('ad-url').value.trim(),placement:$('ad-placement').value,starts_at:startsAt?startsAt.toISOString():null,ends_at:endsAt?endsAt.toISOString():null,active:$('ad-active').checked,updated_at:new Date().toISOString()};
+ if(!payload.title){message('ad-status','اكتب اسم الإعلان أولاً.',true);return;}
+ const result=editId?await db.from('advertisements').update(payload).eq('id',editId):await db.from('advertisements').insert(payload);
+ if(result.error){message('ad-status','لم يتم الحفظ: '+result.error.message,true);return;}
+ resetAdEditor();message('ad-status',editId?'تم تحديث الإعلان بنجاح.':'تم حفظ الإعلان وجدولته.');await loadAds();
 });
 $('ads-list').addEventListener('click',async e=>{
- const toggle=e.target.closest('[data-ad-toggle]');const del=e.target.closest('[data-delete-ad]');
+ const edit=e.target.closest('[data-edit-ad]');const toggle=e.target.closest('[data-ad-toggle]');const del=e.target.closest('[data-delete-ad]');
+ if(edit){
+  const {data,error}=await db.from('advertisements').select('*').eq('id',edit.dataset.editAd).single();
+  if(error){message('ad-status','تعذر تحميل الإعلان للتعديل: '+error.message,true);return;}
+  const toLocal=value=>{if(!value)return '';const d=new Date(value);return Number.isNaN(d.getTime())?'':new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);};
+  $('ad-edit-id').value=data.id;$('ad-title').value=data.title||'';
+  $('ad-image').value=data.image_url||'';$('ad-url').value=data.target_url||'';
+  $('ad-placement').value=data.placement||'home';$('ad-starts').value=toLocal(data.starts_at);
+  $('ad-ends').value=toLocal(data.ends_at);$('ad-active').checked=!!data.active;
+  $('ad-form-heading').textContent='تعديل الإعلان';$('ad-submit').textContent='حفظ التعديلات';
+  $('ad-cancel-edit').classList.remove('hidden');
+  $('ad-form-heading').scrollIntoView({behavior:'smooth',block:'center'});
+ }
  if(toggle){const {error}=await db.from('advertisements').update({active:toggle.dataset.state==='true',updated_at:new Date().toISOString()}).eq('id',toggle.dataset.adToggle);if(error)alert(error.message);await loadAds();}
  if(del&&confirm('متأكد من حذف الإعلان؟')){const {error}=await db.from('advertisements').delete().eq('id',del.dataset.deleteAd);if(error)alert(error.message);await loadAds();}
 });
