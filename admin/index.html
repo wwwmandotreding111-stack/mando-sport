@@ -521,7 +521,7 @@ async function loadViews(){
  if(readError){$('views-list').textContent=readError.message;return;}
  $('views-list').innerHTML=data.length?data.map(v=>'<div class="item"><strong>'+esc(v.page_path)+'</strong><div class="muted">'+new Date(v.viewed_at).toLocaleString('ar')+'</div></div>').join(''):'لا توجد زيارات مسجلة بعد.';
 }
-(async()=>{const {data}=await db.auth.getSession();if(data.session)await enter(data.session.user);})();
+
 </script>
 </body>
 </html>
