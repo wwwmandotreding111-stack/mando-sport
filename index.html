@@ -376,10 +376,19 @@ loadMatches();
   if (client) {
     try { await client.from('page_views').insert({page_path:location.pathname + location.hash}); } catch (error) {}
     try {
-      const {data} = await client.from('advertisements').select('title,image_url,target_url,placement').eq('active', true).order('created_at', {ascending:false});
-      if (data && data.length) {
+      const {data} = await client.from('advertisements')
+        .select('title,image_url,target_url,placement,starts_at,ends_at')
+        .eq('active', true).order('created_at', {ascending:false});
+      const now = Date.now();
+      const eligible = (data || []).filter(ad => {
+        const start = ad.starts_at ? new Date(ad.starts_at).getTime() : null;
+        const end = ad.ends_at ? new Date(ad.ends_at).getTime() : null;
+        return (!start || (Number.isFinite(start) && start <= now)) &&
+          (!end || (Number.isFinite(end) && end >= now));
+      });
+      if (eligible.length) {
         const slots = [...document.querySelectorAll('.ad')];
-        data.forEach((ad, index) => {
+        eligible.forEach((ad, index) => {
           const slot = slots[index % Math.max(slots.length, 1)];
           if (!slot) return;
           const image = /^https?:\/\//i.test(String(ad.image_url || '')) ? ad.image_url : '';
