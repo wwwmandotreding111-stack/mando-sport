@@ -8,10 +8,89 @@
 <style>
 :root{--bg:#090b10;--panel:#121720;--panel2:#1a2230;--gold:#d8ad55;--muted:#9ba5b5;--line:#293241;--white:#f4f6fa;--red:#e16b6b;--green:#70c99a}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.7}.wrap{width:min(1000px,94%);margin:auto}header{border-bottom:1px solid var(--line);padding:16px 0;background:#0c1018}.brand{font-weight:900;font-size:23px}.brand b{color:var(--gold)}.sub{font-size:12px;color:var(--muted)}main{padding:24px 0}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0}.login{max-width:430px;margin:8vh auto}.field{display:grid;gap:6px;margin:12px 0}label{font-size:13px;color:#d8deea}input,textarea,select{width:100%;padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--white);font:inherit}textarea{min-height:95px;resize:vertical}button{border:0;border-radius:9px;padding:10px 16px;background:var(--gold);color:#17120a;font:inherit;font-weight:800;cursor:pointer}button.secondary{background:#293548;color:var(--white)}button.danger{background:#532a31;color:#ffd9d9}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.hidden{display:none!important}.status{font-size:13px;color:var(--muted);margin-top:10px}.error{color:#ff9b9b}.ok{color:var(--green)}h1{font-size:24px;margin:0}h2{font-size:19px;margin:0 0 12px}.muted{color:var(--muted);font-size:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat strong{display:block;color:var(--gold);font-size:26px}.item{border-top:1px solid var(--line);padding:13px 0}.item:first-child{border-top:0}.item h3{font-size:16px;margin:0 0 4px}.pill{font-size:11px;border:1px solid var(--line);padding:2px 8px;border-radius:20px;color:var(--muted)}.item-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.item-actions button{font-size:12px;padding:7px 10px}footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--line)}@media(max-width:650px){.stats{grid-template-columns:1fr}.row>*{flex-basis:100%}.panel{padding:14px}}
+
+/* Approved reference layout: premium black/gold admin dashboard */
+:root{--gold:#f3c64f;--gold-soft:#ffdf82;--panel:#101010;--line:#59451b}
+body{background:radial-gradient(ellipse at 50% 0%,#38250c 0,transparent 42%),#050505;color:#f8f4e9}
+header{height:88px;display:flex;align-items:center;background:linear-gradient(90deg,#080808,#15110a,#080808);border-bottom:2px solid #8f681d;box-shadow:0 5px 24px #000}
+header .wrap{width:100%;max-width:none;padding:0 24px}
+.brand{font-size:24px;color:#f4c54e;text-shadow:0 0 18px #d99a24aa}
+.brand b{color:#ffe28a}.sub{color:#f1d58b}
+.admin-sidebar{position:fixed;z-index:20;top:90px;bottom:0;left:0;width:240px;padding:16px 12px;background:linear-gradient(180deg,#111,#070707);border-right:1px solid #75571c;box-shadow:8px 0 25px #0009;overflow:auto}
+.admin-sidebar .side-brand{font-size:19px;font-weight:950;color:#f4c64e;text-align:center;padding:8px 4px 18px;border-bottom:1px solid #5b451b;margin-bottom:12px}
+.admin-sidebar a{display:flex;align-items:center;gap:12px;padding:11px 13px;margin:4px 0;border-radius:8px;color:#f3eee1;text-decoration:none;font-weight:700;font-size:14px;border:1px solid transparent}
+.admin-sidebar a span{font-size:19px;color:#f4c64e;width:26px;text-align:center}
+.admin-sidebar a:hover,.admin-sidebar a.active{background:linear-gradient(90deg,#f8d45b,#c68a13);color:#171006;border-color:#ffe28a;box-shadow:0 0 16px #e3aa2b55}
+.admin-sidebar a:hover span,.admin-sidebar a.active span{color:#171006}
+main.wrap{width:auto;max-width:none;margin:0 16px 0 256px;padding:24px 4px}
+#dashboard>.row{padding:12px 16px;background:linear-gradient(100deg,#15120b,#090909);border:1px solid #574117;border-radius:12px;margin-bottom:16px}
+#dashboard h1,#dashboard h2{color:#f4c64e;text-shadow:0 0 12px #d49b2c44}
+.panel{background:linear-gradient(145deg,#151515,#090909);border:1px solid #71551c;border-radius:12px;box-shadow:0 0 0 1px #f4c64e12,inset 0 0 24px #e0a52a08,0 8px 22px #0009;padding:17px;margin:12px 0}
+.stats{gap:12px}
+.stat{background:linear-gradient(145deg,#17130a,#0b0b0b);border-color:#80601d}
+.stat strong{color:#f8cb4f;text-shadow:0 0 12px #e2a72c55}
+input,textarea,select{background:#111;border-color:#51401e;color:#fff}
+button{background:linear-gradient(135deg,#ffe27c,#c88d16);color:#1b1304;box-shadow:0 3px 12px #d69c2c22}
+button.secondary{background:#28231a;color:#f5d77e;border:1px solid #75571c}
+.item{border-color:#45371d}
+.pill{border-color:#75571c;color:#f3d27d}
+footer{border-color:#4c3917;color:#bda66d}
+@media(min-width:900px){
+#dashboard{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:7px}
+#dashboard>.row{grid-column:1/-1}
+#dashboard>.panel:nth-of-type(1){grid-column:1/-1}
+#dashboard>.stats{grid-column:1/-1;grid-template-columns:repeat(3,1fr)}
+#dashboard>section.panel:nth-of-type(3){grid-column:1/-1}
+#dashboard>section.panel:nth-of-type(4){grid-column:1/7}
+#dashboard>section.panel:nth-of-type(5){grid-column:7/-1}
+#dashboard>section.panel:nth-of-type(6),#dashboard>section.panel:nth-of-type(7){grid-column:1/-1}
+#dashboard>section.panel:nth-of-type(8){grid-column:1/-1}
+}
+@media(max-width:850px){
+header{height:auto;min-height:76px}
+.admin-sidebar{position:sticky;top:0;bottom:auto;width:100%;height:auto;display:flex;gap:4px;padding:7px;overflow-x:auto;border-right:0;border-bottom:1px solid #75571c}
+.admin-sidebar .side-brand{display:none}
+.admin-sidebar a{flex:0 0 auto;padding:8px 10px;font-size:12px;margin:0}
+main.wrap{margin:0 auto;width:94%;padding:14px 0}
+}
+
+
+/* Reference-matched MANDO SPORT control room */
+:root{--gold:#f4c23e;--gold2:#ffe28a;--line:#634817;--panel:#0c0c0c}
+body{background:radial-gradient(ellipse at 70% 5%,#5b390f35,transparent 38%),#050505}
+header{position:sticky;top:0;z-index:30;height:88px;padding:0;background:linear-gradient(90deg,#050505,#171107 52%,#050505);border-bottom:2px solid #9b711c}
+header .wrap{max-width:none;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:25px;letter-spacing:.3px}.brand:before{content:"🦅";font-size:36px;margin-left:12px;filter:drop-shadow(0 0 8px #eab52e)}
+.brand .sub{display:block;margin-right:58px;margin-top:-8px;font-size:12px}
+.admin-sidebar{top:90px;width:240px;background:linear-gradient(180deg,#111,#050505);border-right:1px solid #88621a}
+.admin-sidebar .side-brand{font-size:18px}
+main.wrap{margin:0 14px 0 254px;padding:20px 6px}
+#dashboard>.row{border:0;background:transparent;padding:4px 8px 14px}
+#dashboard>.row h1{font-size:27px}
+.panel{border:1px solid #805d1b;box-shadow:0 0 0 1px #f4c23e18,inset 0 0 28px #d99a1910,0 8px 25px #000;background:linear-gradient(145deg,#15130f,#070707);border-radius:12px}
+#dashboard>.stats:first-of-type{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.stat{min-width:0;text-align:right}.stat strong{font-size:30px}
+.admin-shortcuts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:10px 0 16px}
+.admin-shortcut{min-height:100px;border:1px solid #72521a;border-radius:12px;padding:14px;background:linear-gradient(135deg,#201807,#090909);display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;box-shadow:inset 0 0 20px #f0bd3210}
+.admin-shortcut .ico{font-size:32px;color:#f4c23e}.admin-shortcut b{display:block;color:#ffe08a}.admin-shortcut small{color:#c9b989}
+#admin-overview{display:grid;grid-template-columns:1.05fr 1.35fr .8fr;gap:12px;align-items:stretch}
+#admin-overview .panel{margin:0;min-width:0}
+#admin-overview h2,#dashboard h2{color:#f4c23e}
+#admin-system-status .item{display:flex;justify-content:space-between;gap:8px}
+#auto-feed-results{max-height:320px;overflow:auto}
+.member-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.member-card{border:1px solid #4d3a18;border-radius:10px;padding:12px;background:#0b0b0b}
+.member-card strong{color:#ffe08a}
+.member-card .muted{overflow-wrap:anywhere}
+@media(max-width:1100px){.admin-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}#admin-overview{grid-template-columns:1fr 1fr}#admin-overview .panel:last-child{grid-column:1/-1}#dashboard>.stats:first-of-type{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:850px){header .wrap{padding:0 12px}.brand{font-size:19px}.brand:before{font-size:27px}.admin-sidebar{top:88px;position:sticky;width:100%;z-index:25}.admin-sidebar a{white-space:nowrap}main.wrap{margin:0 auto;width:94%}.admin-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}#admin-overview{grid-template-columns:1fr}.member-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.admin-shortcuts{grid-template-columns:1fr 1fr;gap:7px}.admin-shortcut{padding:9px;min-height:84px}.admin-shortcut .ico{font-size:24px}.member-grid{grid-template-columns:1fr}#dashboard>.stats:first-of-type{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
 <header><div class="wrap"><div class="brand">MANDO <b>SPORT</b> <span class="sub">| لوحة الإدارة</span></div></div></header>
+<aside class="admin-sidebar" aria-label="القائمة الجانبية للإدارة"><div class="side-brand">♛ MANDO SPORT</div><a class="active" href="#dashboard"><span>⌂</span>الرئيسية</a><a href="#admin-alerts"><span>♢</span>الزوار والإحصائيات</a><a href="#members-admin"><span>♟</span>الأعضاء والزبائن</a><a href="#articles-list"><span>▤</span>الأخبار</a><a href="#auto-feeds"><span>⚽</span>المباريات والتحديث التلقائي</a><a href="#ads-list"><span>▣</span>الإعلانات</a><a href="#auto-feeds"><span>▶</span>اللقطات المميزة</a><a href="#admin-settings"><span>⚙</span>الإعدادات</a></aside>
 <main class="wrap">
 <section id="login-panel" class="panel login">
 <h1>تسجيل دخول المدير</h1><p class="muted">هذه الصفحة مخصصة لحساب الإدارة المعتمد فقط.</p>
@@ -23,36 +102,102 @@
 </section>
 <section id="dashboard" class="hidden">
 <div class="row" style="justify-content:space-between"><div><h1>لوحة التحكم</h1><div id="admin-email" class="muted"></div></div><button id="logout" class="secondary">تسجيل الخروج</button></div>
+<div id="dashboard-status" class="status" aria-live="polite"></div>
+<nav class="admin-shortcuts" aria-label="اختصارات الإدارة">
+<a class="admin-shortcut" href="#admin-alerts"><span class="ico">♢</span><span><b>التنبيهات</b><small>متابعة حالة الموقع</small></span></a>
+<a class="admin-shortcut" href="#members-admin"><span class="ico">♟</span><span><b>الأعضاء والزبائن</b><small>عرض وتعديل الملفات</small></span></a>
+<a class="admin-shortcut" href="#articles-list-panel"><span class="ico">▤</span><span><b>الأخبار</b><small>إضافة وتعديل ونشر</small></span></a>
+<a class="admin-shortcut" href="#auto-feeds"><span class="ico">⚽</span><span><b>المباريات والتحديث</b><small>فحص مصادر البيانات</small></span></a>
+<a class="admin-shortcut" href="#ads-list-panel"><span class="ico">▣</span><span><b>الإعلانات</b><small>إدارة الحملات</small></span></a>
+</nav>
+<section class="panel">
+<h2>مركز التنبيهات الإدارية <span id="admin-alert-count" class="pill">0</span></h2>
+<div id="admin-alerts" class="muted">جارٍ فحص التنبيهات…</div>
+<p class="muted">تنبيهات تشغيلية مستخرجة من الأخبار والإعلانات المسجلة في قاعدة البيانات.</p>
+</section>
 <div class="stats">
 <div class="panel stat"><span class="muted">إجمالي زيارات الصفحات المسجلة</span><strong id="views-total">—</strong></div>
 <div class="panel stat"><span class="muted">عدد الأخبار</span><strong id="articles-total">—</strong></div>
 <div class="panel stat"><span class="muted">عدد الإعلانات</span><strong id="ads-total">—</strong></div>
 </div>
 <section class="panel">
-<h2>إضافة خبر جديد</h2>
+<h2>مؤشرات الأداء</h2>
+<div class="stats">
+<div class="panel stat"><span class="muted">زيارات اليوم</span><strong id="views-today">—</strong></div>
+<div class="panel stat"><span class="muted">زيارات هذا الشهر</span><strong id="views-month">—</strong></div>
+<div class="panel stat"><span class="muted">زيارات هذه السنة</span><strong id="views-year">—</strong></div>
+<div class="panel stat"><span class="muted">أخبار اليوم</span><strong id="articles-today">—</strong></div>
+<div class="panel stat"><span class="muted">إعلانات اليوم</span><strong id="ads-today">—</strong></div>
+<div class="panel stat"><span class="muted">آخر تحديث</span><strong id="metrics-updated" style="font-size:15px">—</strong></div>
+</div>
+<p class="muted">الأرقام مبنية على السجلات الموجودة فعلياً في قاعدة البيانات، وليست تقديرات للزيارات أو الأرباح.</p>
+</section>
+<section class="panel" id="weekly-chart-panel">
+<h2>حركة الزيارات خلال آخر 7 أيام</h2>
+<div id="weekly-chart" class="stats" style="align-items:end;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;min-height:150px">
+<div class="muted">جارٍ تحميل الرسم…</div>
+</div>
+<p class="muted">يعرض الرسم عدد الزيارات المسجلة فعلياً لكل يوم.</p>
+</section>
+<section class="panel" id="auto-feeds">
+<div class="row" style="justify-content:space-between;align-items:center"><div><h2>مراقبة التحديث التلقائي</h2><p class="muted">فحص مباشر لمصدر مباريات اليوم وترتيب الدوري. هذا فحص للمصادر وليس جدولة نشر تلقائي.</p></div><button id="check-auto-feeds" type="button">فحص المصادر الآن</button></div>
+<div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+<div class="stat"><span class="muted">حالة لوحة الإدارة</span><strong id="db-status" style="font-size:17px">بانتظار الفحص</strong></div>
+<div class="stat"><span class="muted">آخر فحص للمصادر</span><strong id="feed-checked-at" style="font-size:15px">—</strong></div>
+</div>
+<div id="auto-feed-results" aria-live="polite" class="muted">سيظهر هنا وضع مصادر المباريات والترتيب.</div>
+</section>
+<section class="panel">
+<h2 id="article-form-heading">إضافة خبر جديد</h2>
 <form id="article-form">
+<input id="article-edit-id" type="hidden">
+
 <div class="field"><label for="article-title">عنوان الخبر</label><input id="article-title" maxlength="180" required></div>
 <div class="field"><label for="article-excerpt">ملخص قصير</label><textarea id="article-excerpt" maxlength="500"></textarea></div>
 <div class="field"><label for="article-body">نص الخبر</label><textarea id="article-body"></textarea></div>
 <div class="field"><label for="article-image">رابط صورة الخبر (يمكن تركه فارغاً حالياً)</label><input id="article-image" type="url" placeholder="https://..."></div>
 <label><input id="article-published" type="checkbox" style="width:auto"> نشر الخبر مباشرة</label>
-<div style="margin-top:12px"><button type="submit">حفظ الخبر</button></div>
+<div class="row" style="margin-top:12px"><button id="article-submit" type="submit">حفظ الخبر</button><button id="article-cancel-edit" class="secondary hidden" type="button">إلغاء التعديل</button></div>
 </form><div id="article-status" class="status"></div>
 </section>
-<section class="panel"><h2>الأخبار المنشورة والمسودات</h2><div id="articles-list" class="muted">جارٍ التحميل…</div></section>
+<section class="panel" id="articles-list-panel"><h2>الأخبار المنشورة والمسودات</h2><div id="articles-list" class="muted">جارٍ التحميل…</div></section>
 <section class="panel">
-<h2>إضافة إعلان</h2>
+<h2 id="ad-form-heading">إضافة إعلان</h2>
 <form id="ad-form">
+<input id="ad-edit-id" type="hidden">
+
 <div class="field"><label for="ad-title">اسم الإعلان</label><input id="ad-title" maxlength="180" required></div>
 <div class="field"><label for="ad-image">رابط صورة الإعلان</label><input id="ad-image" type="url" placeholder="https://..."></div>
 <div class="field"><label for="ad-url">رابط الوجهة عند الضغط</label><input id="ad-url" type="url" placeholder="https://..."></div>
 <div class="field"><label for="ad-placement">مكان الإعلان</label><select id="ad-placement"><option value="home">الرئيسية</option><option value="matches">المباريات</option><option value="news">الأخبار</option><option value="footer">أسفل الموقع</option></select></div>
+<div class="row">
+ <div class="field"><label for="ad-starts">موعد بدء الإعلان (اختياري)</label><input id="ad-starts" type="datetime-local"></div>
+ <div class="field"><label for="ad-ends">موعد انتهاء الإعلان (اختياري)</label><input id="ad-ends" type="datetime-local"></div>
+</div>
+<p class="muted">إذا تركت الموعدين فارغين، يبقى الإعلان دون مدة محددة. الإعلان المجدول لن يظهر قبل موعده أو بعد انتهائه.</p>
 <label><input id="ad-active" type="checkbox" style="width:auto"> تفعيل الإعلان</label>
-<div style="margin-top:12px"><button type="submit">حفظ الإعلان</button></div>
+<div class="row" style="margin-top:12px"><button id="ad-submit" type="submit">حفظ الإعلان</button><button id="ad-cancel-edit" class="secondary hidden" type="button">إلغاء التعديل</button></div>
 </form><div id="ad-status" class="status"></div>
 </section>
-<section class="panel"><h2>الإعلانات</h2><div id="ads-list" class="muted">جارٍ التحميل…</div></section>
-<section class="panel"><h2>آخر الزيارات المسجلة</h2><div class="muted">يعرض النظام الصفحات وأوقات زيارتها، ولا يجمع أسماء الزوار أو بياناتهم الشخصية.</div><div id="views-list">جارٍ التحميل…</div></section>
+<section class="panel" id="ads-list-panel"><h2>الإعلانات</h2><div id="ads-list" class="muted">جارٍ التحميل…</div></section>
+
+<section class="panel" id="members-admin">
+<h2>إدارة الأعضاء والزبائن</h2>
+<p class="muted">بيانات ملفات الأعضاء المحفوظة في member_profiles. لا تعرض هذه الشاشة البريد الإلكتروني أو كلمات المرور أو بيانات دخول حساسة.</p>
+<div class="row"><div class="field"><label for="member-search">بحث بالاسم أو الفريق المفضل</label><input id="member-search" type="search" placeholder="اكتب اسم العضو أو فريقه"></div><div class="field"><label for="member-team-filter">تصفية حسب الفريق</label><input id="member-team-filter" placeholder="اسم الفريق"></div></div>
+<div id="members-list" class="muted">جارٍ تحميل الأعضاء…</div>
+<div id="member-edit-panel" class="hidden panel"><h3>تعديل ملف العضو</h3><input id="member-edit-id" type="hidden"><div class="field"><label for="member-edit-name">اسم العرض</label><input id="member-edit-name" maxlength="40"></div><div class="field"><label for="member-edit-team">الفريق المفضل</label><input id="member-edit-team" maxlength="80"></div><div class="row"><button id="member-save" type="button">حفظ التعديلات</button><button id="member-cancel" class="secondary" type="button">إلغاء</button></div><div id="member-status" class="status"></div></div>
+</section>
+
+<section class="panel" id="community-admin">
+<h2>إدارة مجتمع الأعضاء</h2>
+<p class="muted">راجع التعليقات قبل نشرها، وتابع البلاغات المرسلة من الأعضاء.</p>
+<h3>تعليقات بانتظار الموافقة <span id="community-pending-count" class="pill">0</span></h3>
+<div id="community-pending" class="muted">جارٍ التحميل…</div>
+<h3 style="margin-top:22px">بلاغات التعليقات المفتوحة <span id="community-reports-count" class="pill">0</span></h3>
+<div id="community-reports" class="muted">جارٍ التحميل…</div>
+</section>
+<section class="panel" id="visits-admin"><h2>آخر الزيارات المسجلة</h2><div class="muted">يعرض النظام الصفحات وأوقات زيارتها، ولا يجمع أسماء الزوار أو بياناتهم الشخصية.</div><div id="views-list">جارٍ التحميل…</div></section>
 </section>
 </main>
 <footer>MANDO SPORT — لوحة إدارة خاصة</footer>
@@ -74,37 +219,247 @@ async function verifyAdmin(user){
  return true;
 }
 async function enter(user){
- try{await verifyAdmin(user);showDashboard(user);await refreshAll();}
- catch(e){await db.auth.signOut();showLogin();message('login-status',e.message,true);}
+ try{
+  await verifyAdmin(user);
+ }catch(e){
+  showLogin();
+  message('login-status','تعذر التحقق من صلاحية المدير: '+(e.message||'خطأ غير معروف'),true);
+  await db.auth.signOut();
+  return;
+ }
+ showDashboard(user);
+ try{
+  await refreshAll();
+  message('dashboard-status','تم تسجيل الدخول بنجاح.',false);
+ }catch(e){
+  console.error('Dashboard refresh failed:',e);
+  message('dashboard-status','تم تسجيل الدخول، لكن تعذر تحميل بعض بيانات اللوحة: '+(e.message||'خطأ في الاتصال'),true);
+ }
 }
 $('login-form').addEventListener('submit',async e=>{
- e.preventDefault();message('login-status','جارٍ التحقق من الحساب…');
- try {
+ e.preventDefault();
+ const form=e.currentTarget,submit=form.querySelector('button[type="submit"]');
+ submit.disabled=true;submit.textContent='جارٍ التحقق…';
+ message('login-status','جارٍ التحقق من الحساب…');
+ try{
   const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
-  if(error){message('login-status','تعذر تسجيل الدخول: '+error.message,true);return;}
-  if(!data.user){message('login-status','لم يتم العثور على حساب صالح. تحقق من بيانات الدخول.',true);return;}
+  if(error)throw error;
+  if(!data?.user)throw new Error('تم الاتصال دون استلام بيانات الحساب. أعد المحاولة.');
   await enter(data.user);
- } catch(err) { message('login-status','تعذّر إكمال تسجيل الدخول: '+(err?.message||'خطأ في الاتصال بالخدمة'),true); }
+ }catch(error){
+  console.error('Admin login failed:',error);
+  showLogin();
+  message('login-status','تعذر إكمال تسجيل الدخول: '+(error?.message||'تحقق من الاتصال وحاول مجدداً.'),true);
+ }finally{
+  submit.disabled=false;submit.textContent='تسجيل الدخول';
+ }
 });
 $('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
 db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
-async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews()]);}
+(async()=>{
+ try{
+  const {data,error}=await db.auth.getSession();
+  if(error)throw error;
+  if(data?.session?.user)await enter(data.session.user);
+ }catch(error){
+  console.error('Admin session restore failed:',error);
+  showLogin();
+  message('login-status','تعذر استعادة جلسة المدير: '+(error?.message||'تحقق من الاتصال ثم سجّل الدخول مجدداً.'),true);
+ }
+})();
+async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart(),loadCommunityModeration(),loadMembers()]);await loadAdminAlerts();await checkAutomaticFeeds();}
+
+async function checkAutomaticFeeds(){
+ const host=$('auto-feed-results');if(!host)return;
+ host.textContent='جارٍ فحص مصادر المباريات والترتيب…';
+ const date=new Date().toISOString().slice(0,10);
+ const checks=await Promise.all([
+  fetch('/api/matches?date='+encodeURIComponent(date)).then(async r=>({name:'مباريات اليوم',ok:r.ok,data:await r.json().catch(()=>({}))})).catch(e=>({name:'مباريات اليوم',ok:false,data:{error:e.message}})),
+  fetch('/api/standings?competition=PL').then(async r=>({name:'ترتيب الدوري الإنجليزي',ok:r.ok,data:await r.json().catch(()=>({}))})).catch(e=>({name:'ترتيب الدوري الإنجليزي',ok:false,data:{error:e.message}}))
+ ]);
+ host.innerHTML=checks.map(c=>'<div class="item"><strong>'+esc(c.name)+'</strong><div class="'+(c.ok?'ok':'error')+'">'+(c.ok?'متصل':'تعذر الجلب')+'</div><div class="muted">'+(c.ok?(c.data.matches?'عدد المباريات المسترجعة: '+c.data.matches.length:c.data.table?'عدد الفرق في الترتيب: '+c.data.table.length:'تم استلام البيانات'):esc(c.data.error||'خطأ غير معروف'))+'</div></div>').join('');
+ $('feed-checked-at').textContent=new Date().toLocaleString('ar');$('db-status').textContent='تم تحميل بيانات اللوحة';
+}
+$('check-auto-feeds')?.addEventListener('click',checkAutomaticFeeds);
+async function loadMembers(){
+ const host=$('members-list');if(!host)return;
+ host.textContent='جارٍ تحميل ملفات الأعضاء…';
+ const {data,error}=await db.from('member_profiles').select('user_id,display_name,favorite_team,created_at,updated_at').order('created_at',{ascending:false}).limit(500);
+ if(error){host.textContent='تعذر تحميل الأعضاء: '+error.message+' — تحقق من تطبيق صلاحيات إدارة الأعضاء في قاعدة البيانات.';return;}
+ window.mandoMembers=data||[];renderMembers();
+}
+function renderMembers(){
+ const host=$('members-list'),q=($('member-search')?.value||'').trim().toLowerCase(),team=($('member-team-filter')?.value||'').trim().toLowerCase();
+ const rows=(window.mandoMembers||[]).filter(m=>(!q||(m.display_name||'').toLowerCase().includes(q)||(m.favorite_team||'').toLowerCase().includes(q))&&(!team||(m.favorite_team||'').toLowerCase().includes(team)));
+ host.innerHTML='<p class="muted">إجمالي الملفات المعروضة: '+rows.length+'</p><div class="member-grid">'+(rows.length?rows.map(m=>'<div class="member-card"><strong>'+esc(m.display_name||'مشجع')+'</strong><div class="muted">الفريق المفضل: '+esc(m.favorite_team||'غير محدد')+'</div><div class="muted">معرّف العضو: '+esc(m.user_id)+'</div><div class="muted">تاريخ الانضمام: '+(m.created_at?new Date(m.created_at).toLocaleDateString('ar'):'—')+'</div><div class="item-actions"><button class="secondary" data-edit-member="'+esc(m.user_id)+'">تعديل الملف</button></div></div>').join(''):'لا توجد ملفات أعضاء مطابقة.')+'</div>';
+}
+$('member-search')?.addEventListener('input',renderMembers);
+$('member-team-filter')?.addEventListener('input',renderMembers);
+$('members-list')?.addEventListener('click',e=>{
+ const btn=e.target.closest('[data-edit-member]');if(!btn)return;
+ const m=(window.mandoMembers||[]).find(x=>x.user_id===btn.dataset.editMember);if(!m)return;
+ $('member-edit-id').value=m.user_id;$('member-edit-name').value=m.display_name||'';$('member-edit-team').value=m.favorite_team||'';
+ $('member-edit-panel').classList.remove('hidden');$('member-edit-panel').scrollIntoView({behavior:'smooth',block:'center'});
+});
+$('member-cancel')?.addEventListener('click',()=>$('member-edit-panel').classList.add('hidden'));
+$('member-save')?.addEventListener('click',async()=>{
+ const id=$('member-edit-id').value;
+ const payload={display_name:$('member-edit-name').value.trim(),favorite_team:$('member-edit-team').value.trim(),updated_at:new Date().toISOString()};
+ if(payload.display_name.length<2){message('member-status','اسم العرض يجب أن يكون حرفين على الأقل.',true);return;}
+ const {error}=await db.from('member_profiles').update(payload).eq('user_id',id);
+ if(error){message('member-status','تعذر حفظ التعديلات: '+error.message,true);return;}
+ message('member-status','تم تحديث ملف العضو.');$('member-edit-panel').classList.add('hidden');await loadMembers();
+});
+\nasync function loadCommunityModeration(){
+ const pendingHost=$('community-pending'),reportsHost=$('community-reports');
+ if(!pendingHost||!reportsHost)return;
+ pendingHost.textContent='جارٍ تحميل التعليقات…';reportsHost.textContent='جارٍ تحميل البلاغات…';
+ const [commentsResult,reportsResult]=await Promise.all([
+  db.from('member_comments').select('id,user_id,body,created_at').eq('status','pending').order('created_at',{ascending:true}).limit(100),
+  db.from('comment_reports').select('id,comment_id,reporter_id,reason,details,created_at,status').eq('status','open').order('created_at',{ascending:false}).limit(100)
+ ]);
+ if(commentsResult.error){pendingHost.textContent='تعذر تحميل التعليقات: '+commentsResult.error.message;$('community-pending-count').textContent='—';}
+ else{
+  const rows=commentsResult.data||[];$('community-pending-count').textContent=rows.length;
+  pendingHost.innerHTML=rows.length?rows.map(c=>'<div class="item"><strong>تعليق جديد</strong><div class="muted">العضو: '+esc(c.user_id)+' · '+new Date(c.created_at).toLocaleString('ar')+'</div><p>'+esc(c.body)+'</p><div class="item-actions"><button data-community-approve="'+c.id+'">موافقة ونشر</button><button class="danger" data-community-reject="'+c.id+'">رفض</button></div></div>').join(''):'لا توجد تعليقات بانتظار المراجعة.';
+ }
+ if(reportsResult.error){reportsHost.textContent='تعذر تحميل البلاغات: '+reportsResult.error.message;$('community-reports-count').textContent='—';}
+ else{
+  const reports=reportsResult.data||[];$('community-reports-count').textContent=reports.length;
+  reportsHost.innerHTML=reports.length?reports.map(r=>'<div class="item"><strong>بلاغ على تعليق</strong><div class="muted">رقم التعليق: '+esc(r.comment_id)+' · المبلّغ: '+esc(r.reporter_id)+'</div><p>السبب: '+esc(r.reason)+'</p>'+(r.details?'<p>'+esc(r.details)+'</p>':'')+'<div class="item-actions"><button data-report-reviewed="'+r.id+'">تمت المراجعة</button><button class="secondary" data-report-dismiss="'+r.id+'">إغلاق البلاغ</button></div></div>').join(''):'لا توجد بلاغات مفتوحة.';
+ }
+}
+$('community-pending').addEventListener('click',async e=>{
+ const approve=e.target.closest('[data-community-approve]'),reject=e.target.closest('[data-community-reject]');
+ const btn=approve||reject;if(!btn)return;
+ const id=approve?approve.dataset.communityApprove:reject.dataset.communityReject;
+ const status=approve?'approved':'rejected';
+ if(!approve&&!confirm('تأكيد رفض هذا التعليق؟'))return;
+ const {error}=await db.from('member_comments').update({status,updated_at:new Date().toISOString()}).eq('id',id);
+ if(error){alert('تعذر تحديث التعليق: '+error.message);return;}
+ await loadCommunityModeration();
+});
+$('community-reports').addEventListener('click',async e=>{
+ const reviewed=e.target.closest('[data-report-reviewed]'),dismiss=e.target.closest('[data-report-dismiss]');
+ const btn=reviewed||dismiss;if(!btn)return;
+ const id=reviewed?reviewed.dataset.reportReviewed:dismiss.dataset.reportDismiss;
+ const status=reviewed?'reviewed':'dismissed';
+ const {error}=await db.from('comment_reports').update({status,reviewed_at:new Date().toISOString()}).eq('id',id);
+ if(error){alert('تعذر تحديث البلاغ: '+error.message);return;}
+ await loadCommunityModeration();
+});
+async function loadAdminAlerts(){
+ const host=$('admin-alerts');if(!host)return;
+ host.textContent='جارٍ فحص التنبيهات…';
+ try{
+  const [articlesResult,adsResult]=await Promise.all([
+   db.from('articles').select('id,title,created_at').eq('published',false).order('created_at',{ascending:false}).limit(20),
+   db.from('advertisements').select('id,title,active,starts_at,ends_at').order('created_at',{ascending:false}).limit(100)
+  ]);
+  if(articlesResult.error)throw articlesResult.error;
+  if(adsResult.error)throw adsResult.error;
+  const alerts=[];
+  (articlesResult.data||[]).forEach(a=>alerts.push({kind:'مسودة خبر',title:a.title,detail:'خبر بانتظار المراجعة أو النشر.'}));
+  const now=Date.now();
+  (adsResult.data||[]).forEach(a=>{
+   const start=a.starts_at?new Date(a.starts_at).getTime():null;
+   const end=a.ends_at?new Date(a.ends_at).getTime():null;
+   if(a.active&&start&&start>now)alerts.push({kind:'إعلان مجدول',title:a.title,detail:'سيبدأ في '+new Date(a.starts_at).toLocaleString('ar')});
+   else if(a.active&&end&&end<now)alerts.push({kind:'إعلان منتهي',title:a.title,detail:'انتهت مدة الإعلان ويُنصح بمراجعته.'});
+  });
+  $('admin-alert-count').textContent=alerts.length;
+  host.innerHTML=alerts.length?alerts.slice(0,30).map(a=>'<div class="item"><strong>'+esc(a.kind)+': '+esc(a.title)+'</strong><div class="muted">'+esc(a.detail)+'</div></div>').join(''):'لا توجد تنبيهات إدارية حالياً.';
+ }catch(error){host.textContent='تعذر تحميل التنبيهات: '+error.message;}
+}
+async function loadWeeklyChart(){
+ const host=$('weekly-chart');
+ if(!host)return;
+ host.innerHTML='<div class="muted">جارٍ تحميل الرسم…</div>';
+ try{
+  const now=new Date();
+  const days=Array.from({length:7},(_,i)=>{
+   const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()-6+i);
+   const next=new Date(day.getFullYear(),day.getMonth(),day.getDate()+1);
+   return {day,next,label:day.toLocaleDateString('ar',{weekday:'short'}),date:day.toLocaleDateString('ar',{day:'numeric',month:'numeric'})};
+  });
+  const counts=await Promise.all(days.map(async item=>{
+   const {count,error}=await db.from('page_views').select('id',{count:'exact',head:true})
+    .gte('viewed_at',item.day.toISOString()).lt('viewed_at',item.next.toISOString());
+   if(error)throw error;
+   return count??0;
+  }));
+  const max=Math.max(1,...counts);
+  host.innerHTML=days.map((item,i)=>{
+   const height=Math.max(5,Math.round(counts[i]/max*100));
+   return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:end;gap:6px;min-width:0;height:145px">'+
+    '<strong style="font-size:12px;color:var(--gold)">'+counts[i]+'</strong>'+
+    '<div title="'+counts[i]+' زيارة" style="width:min(100%,34px);height:'+height+'%;min-height:5px;background:linear-gradient(180deg,#f0d18a,#a9772d);border-radius:7px 7px 3px 3px"></div>'+
+    '<span class="muted" style="font-size:10px">'+item.label+'</span><span class="muted" style="font-size:9px">'+item.date+'</span></div>';
+  }).join('');
+ }catch(error){host.innerHTML='<div class="muted">تعذر تحميل الرسم حالياً: '+esc(error.message)+'</div>';}
+}
+function localStartOf(period){
+ const now=new Date();
+ if(period==='day') return new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString();
+ if(period==='month') return new Date(now.getFullYear(),now.getMonth(),1).toISOString();
+ return new Date(now.getFullYear(),0,1).toISOString();
+}
+async function countSince(table,field,start){
+ const result=await db.from(table).select('id',{count:'exact',head:true}).gte(field,start);
+ if(result.error) throw result.error;
+ return result.count??0;
+}
+async function loadAnalytics(){
+ const ids=['views-today','views-month','views-year','articles-today','ads-today'];
+ try{
+  const [today,month,year,articles,ads]=await Promise.all([
+   countSince('page_views','viewed_at',localStartOf('day')),
+   countSince('page_views','viewed_at',localStartOf('month')),
+   countSince('page_views','viewed_at',localStartOf('year')),
+   countSince('articles','created_at',localStartOf('day')),
+   countSince('advertisements','created_at',localStartOf('day'))
+  ]);
+  [$('views-today').textContent,$('views-month').textContent,$('views-year').textContent,$('articles-today').textContent,$('ads-today').textContent]=[today,month,year,articles,ads];
+  $('metrics-updated').textContent=new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+ }catch(error){ids.forEach(id=>$(id).textContent='—');$('metrics-updated').textContent='تعذر التحديث';console.error('Analytics:',error);}
+}
 async function loadArticles(){
  const {data,error}=await db.from('articles').select('*').order('created_at',{ascending:false});
  if(error){$('articles-list').textContent=error.message;return;}
  $('articles-total').textContent=data.length;
- $('articles-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.published?'منشور':'مسودة')+'</span><div class="muted">'+esc(a.excerpt)+'</div><div class="item-actions"><button class="secondary" data-publish="'+a.id+'" data-state="'+(!a.published)+'">'+(a.published?'إلغاء النشر':'نشر')+'</button><button class="danger" data-delete-article="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد أخبار بعد.';
+ $('articles-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.published?'منشور':'مسودة')+'</span><div class="muted">'+esc(a.excerpt)+'</div><div class="item-actions"><button class="secondary" data-edit-article="'+a.id+'">تعديل</button><button class="secondary" data-publish="'+a.id+'" data-state="'+(!a.published)+'">'+(a.published?'إلغاء النشر':'نشر')+'</button><button class="danger" data-delete-article="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد أخبار بعد.';
 }
+function resetArticleEditor(){
+ $('article-form').reset();$('article-edit-id').value='';
+ $('article-form-heading').textContent='إضافة خبر جديد';
+ $('article-submit').textContent='حفظ الخبر';
+ $('article-cancel-edit').classList.add('hidden');
+}
+$('article-cancel-edit').addEventListener('click',resetArticleEditor);
 $('article-form').addEventListener('submit',async e=>{
  e.preventDefault();message('article-status','جارٍ حفظ الخبر…');
- const {data:userData}=await db.auth.getUser();
- const payload={title:$('article-title').value.trim(),excerpt:$('article-excerpt').value.trim(),body:$('article-body').value.trim(),image_url:$('article-image').value.trim(),published:$('article-published').checked,author_id:userData.user.id};
- const {error}=await db.from('articles').insert(payload);
- if(error){message('article-status','لم يتم الحفظ: '+error.message,true);return;}
- e.target.reset();message('article-status','تم حفظ الخبر.');await loadArticles();
+ const editId=$('article-edit-id').value;
+ const payload={title:$('article-title').value.trim(),excerpt:$('article-excerpt').value.trim(),body:$('article-body').value.trim(),image_url:$('article-image').value.trim(),published:$('article-published').checked,updated_at:new Date().toISOString()};
+ if(!payload.title){message('article-status','اكتب عنوان الخبر أولاً.',true);return;}
+ let result;
+ if(editId){result=await db.from('articles').update(payload).eq('id',editId);}
+ else{const {data:userData}=await db.auth.getUser();payload.author_id=userData.user.id;result=await db.from('articles').insert(payload);}
+ if(result.error){message('article-status','لم يتم الحفظ: '+result.error.message,true);return;}
+ resetArticleEditor();message('article-status',editId?'تم تحديث الخبر بنجاح.':'تم حفظ الخبر.');await loadArticles();
 });
 $('articles-list').addEventListener('click',async e=>{
- const pub=e.target.closest('[data-publish]');const del=e.target.closest('[data-delete-article]');
+ const edit=e.target.closest('[data-edit-article]');const pub=e.target.closest('[data-publish]');const del=e.target.closest('[data-delete-article]');
+ if(edit){
+  const {data,error}=await db.from('articles').select('*').eq('id',edit.dataset.editArticle).single();
+  if(error){message('article-status','تعذر تحميل الخبر للتعديل: '+error.message,true);return;}
+  $('article-edit-id').value=data.id;$('article-title').value=data.title||'';
+  $('article-excerpt').value=data.excerpt||'';$('article-body').value=data.body||'';
+  $('article-image').value=data.image_url||'';$('article-published').checked=!!data.published;
+  $('article-form-heading').textContent='تعديل الخبر';
+  $('article-submit').textContent='حفظ التعديلات';
+  $('article-cancel-edit').classList.remove('hidden');
+  $('article-form-heading').scrollIntoView({behavior:'smooth',block:'center'});
+ }
  if(pub){const {error}=await db.from('articles').update({published:pub.dataset.state==='true',updated_at:new Date().toISOString()}).eq('id',pub.dataset.publish);if(error)alert(error.message);await loadArticles();}
  if(del&&confirm('متأكد من حذف الخبر؟')){const {error}=await db.from('articles').delete().eq('id',del.dataset.deleteArticle);if(error)alert(error.message);await loadArticles();}
 });
@@ -112,17 +467,50 @@ async function loadAds(){
  const {data,error}=await db.from('advertisements').select('*').order('created_at',{ascending:false});
  if(error){$('ads-list').textContent=error.message;return;}
  $('ads-total').textContent=data.length;
- $('ads-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.active?'مفعّل':'متوقف')+'</span><div class="muted">المكان: '+esc(a.placement)+'</div><div class="item-actions"><button class="secondary" data-ad-toggle="'+a.id+'" data-state="'+(!a.active)+'">'+(a.active?'إيقاف':'تفعيل')+'</button><button class="danger" data-delete-ad="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد إعلانات بعد.';
+ $('ads-list').innerHTML=data.length?data.map(a=>{
+ const now=Date.now();
+ const starts=a.starts_at?new Date(a.starts_at).getTime():null;
+ const ends=a.ends_at?new Date(a.ends_at).getTime():null;
+ const schedule=starts&&starts>now?'مجدول للمستقبل':ends&&ends<now?'انتهت مدته':a.active?'مفعّل':'متوقف';
+ const range=(a.starts_at?'من '+new Date(a.starts_at).toLocaleString('ar'):'بلا موعد بدء')+' — '+(a.ends_at?'حتى '+new Date(a.ends_at).toLocaleString('ar'):'بلا موعد انتهاء');
+ return '<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+schedule+'</span><div class="muted">المكان: '+esc(a.placement)+'</div><div class="muted">'+esc(range)+'</div><div class="item-actions"><button class="secondary" data-edit-ad="'+a.id+'">تعديل</button><button class="secondary" data-ad-toggle="'+a.id+'" data-state="'+(!a.active)+'">'+(a.active?'إيقاف':'تفعيل')+'</button><button class="danger" data-delete-ad="'+a.id+'">حذف</button></div></div>';
+ }).join(''):'لا توجد إعلانات بعد.';
 }
+function resetAdEditor(){
+ $('ad-form').reset();$('ad-edit-id').value='';
+ $('ad-form-heading').textContent='إضافة إعلان';
+ $('ad-submit').textContent='حفظ الإعلان';
+ $('ad-cancel-edit').classList.add('hidden');
+}
+$('ad-cancel-edit').addEventListener('click',resetAdEditor);
 $('ad-form').addEventListener('submit',async e=>{
  e.preventDefault();message('ad-status','جارٍ حفظ الإعلان…');
- const payload={title:$('ad-title').value.trim(),image_url:$('ad-image').value.trim(),target_url:$('ad-url').value.trim(),placement:$('ad-placement').value,active:$('ad-active').checked};
- const {error}=await db.from('advertisements').insert(payload);
- if(error){message('ad-status','لم يتم الحفظ: '+error.message,true);return;}
- e.target.reset();message('ad-status','تم حفظ الإعلان.');await loadAds();
+ const editId=$('ad-edit-id').value;
+ const startValue=$('ad-starts').value,endValue=$('ad-ends').value;
+ const startsAt=startValue?new Date(startValue):null,endsAt=endValue?new Date(endValue):null;
+ if(startsAt&&Number.isNaN(startsAt.getTime())){message('ad-status','موعد بدء الإعلان غير صالح.',true);return;}
+ if(endsAt&&Number.isNaN(endsAt.getTime())){message('ad-status','موعد انتهاء الإعلان غير صالح.',true);return;}
+ if(startsAt&&endsAt&&endsAt<=startsAt){message('ad-status','موعد الانتهاء يجب أن يكون بعد موعد البدء.',true);return;}
+ const payload={title:$('ad-title').value.trim(),image_url:$('ad-image').value.trim(),target_url:$('ad-url').value.trim(),placement:$('ad-placement').value,starts_at:startsAt?startsAt.toISOString():null,ends_at:endsAt?endsAt.toISOString():null,active:$('ad-active').checked,updated_at:new Date().toISOString()};
+ if(!payload.title){message('ad-status','اكتب اسم الإعلان أولاً.',true);return;}
+ const result=editId?await db.from('advertisements').update(payload).eq('id',editId):await db.from('advertisements').insert(payload);
+ if(result.error){message('ad-status','لم يتم الحفظ: '+result.error.message,true);return;}
+ resetAdEditor();message('ad-status',editId?'تم تحديث الإعلان بنجاح.':'تم حفظ الإعلان وجدولته.');await loadAds();
 });
 $('ads-list').addEventListener('click',async e=>{
- const toggle=e.target.closest('[data-ad-toggle]');const del=e.target.closest('[data-delete-ad]');
+ const edit=e.target.closest('[data-edit-ad]');const toggle=e.target.closest('[data-ad-toggle]');const del=e.target.closest('[data-delete-ad]');
+ if(edit){
+  const {data,error}=await db.from('advertisements').select('*').eq('id',edit.dataset.editAd).single();
+  if(error){message('ad-status','تعذر تحميل الإعلان للتعديل: '+error.message,true);return;}
+  const toLocal=value=>{if(!value)return '';const d=new Date(value);return Number.isNaN(d.getTime())?'':new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);};
+  $('ad-edit-id').value=data.id;$('ad-title').value=data.title||'';
+  $('ad-image').value=data.image_url||'';$('ad-url').value=data.target_url||'';
+  $('ad-placement').value=data.placement||'home';$('ad-starts').value=toLocal(data.starts_at);
+  $('ad-ends').value=toLocal(data.ends_at);$('ad-active').checked=!!data.active;
+  $('ad-form-heading').textContent='تعديل الإعلان';$('ad-submit').textContent='حفظ التعديلات';
+  $('ad-cancel-edit').classList.remove('hidden');
+  $('ad-form-heading').scrollIntoView({behavior:'smooth',block:'center'});
+ }
  if(toggle){const {error}=await db.from('advertisements').update({active:toggle.dataset.state==='true',updated_at:new Date().toISOString()}).eq('id',toggle.dataset.adToggle);if(error)alert(error.message);await loadAds();}
  if(del&&confirm('متأكد من حذف الإعلان؟')){const {error}=await db.from('advertisements').delete().eq('id',del.dataset.deleteAd);if(error)alert(error.message);await loadAds();}
 });
@@ -134,7 +522,7 @@ async function loadViews(){
  if(readError){$('views-list').textContent=readError.message;return;}
  $('views-list').innerHTML=data.length?data.map(v=>'<div class="item"><strong>'+esc(v.page_path)+'</strong><div class="muted">'+new Date(v.viewed_at).toLocaleString('ar')+'</div></div>').join(''):'لا توجد زيارات مسجلة بعد.';
 }
-(async()=>{const {data}=await db.auth.getSession();if(data.session)await enter(data.session.user);})();
+
 </script>
 </body>
 </html>
