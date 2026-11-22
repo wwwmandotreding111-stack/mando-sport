@@ -64,7 +64,15 @@ async function checkCountryAvailability(videoId, country) {
     const html = await response.text();
     const player = extractJsonObject(html, '"playabilityStatus":');
     if (!player || !player.status) return 'unknown';
-    return player.status === 'OK' ? 'available' : 'blocked';
+    if (player.status === 'OK') return 'available';
+    const lowerHtml = html.toLowerCase();
+    const regionalBlock = [
+      'not available in your country',
+      'not available in your region',
+      'uploader has not made this video available in your country',
+      'this video is not available in your country'
+    ].some(phrase => lowerHtml.includes(phrase));
+    return regionalBlock ? 'blocked' : 'unknown';
   } catch {
     return 'unknown';
   } finally {
@@ -137,7 +145,7 @@ export default async function handler(req, res) {
     ...video,
     availability: await checkCountryAvailability(video.id, country)
   })));
-  const visibleVideos = country\n    ? checked.filter(video => video.availability === 'available')\n    : checked;
+  const visibleVideos = checked.filter(video => video.availability !== 'blocked');
 
   res.status(200).json({
     videos: visibleVideos.slice(0, 12),
