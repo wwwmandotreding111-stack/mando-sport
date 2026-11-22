@@ -422,7 +422,7 @@ loadMatches();
       return '<article class="card highlight-card"><iframe class="highlight-video" src="' + safe(embed) + '" title="' + safe(video.title) + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe><h3>' + safe(video.title) + '</h3><p class="highlight-meta">' + safe(video.source) + (date ? ' · ' + safe(date) : '') + '</p><a href="' + safe(link) + '" target="_blank" rel="noopener noreferrer" style="color:var(--gold);font-size:11px">مشاهدة على YouTube ↗</a></article>';
     }).filter(Boolean).join('');
     if (!host.innerHTML) host.innerHTML = '<div class="notice">لا توجد لقطات مناسبة حالياً.</div>';
-    label.textContent = 'تُحدّث تلقائياً من القنوات الرسمية';
+    label.textContent = data.country ? 'فحص التوفر حسب بلد الزائر (' + safe(data.country) + ')' : 'تُحدّث تلقائياً من القنوات الرسمية';
   } catch (error) {
     host.innerHTML = '<div class="notice">تعذر تحميل اللقطات الآن. سيحاول الموقع مجدداً لاحقاً.</div>';
     label.textContent = 'تعذر التحديث مؤقتاً';
