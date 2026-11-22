@@ -102,6 +102,7 @@ main.wrap{margin:0 14px 0 254px;padding:20px 6px}
 </section>
 <section id="dashboard" class="hidden">
 <div class="row" style="justify-content:space-between"><div><h1>لوحة التحكم</h1><div id="admin-email" class="muted"></div></div><button id="logout" class="secondary">تسجيل الخروج</button></div>
+<div id="dashboard-status" class="status" aria-live="polite"></div>
 <nav class="admin-shortcuts" aria-label="اختصارات الإدارة">
 <a class="admin-shortcut" href="#admin-alerts"><span class="ico">♢</span><span><b>التنبيهات</b><small>متابعة حالة الموقع</small></span></a>
 <a class="admin-shortcut" href="#members-admin"><span class="ico">♟</span><span><b>الأعضاء والزبائن</b><small>عرض وتعديل الملفات</small></span></a>
@@ -217,8 +218,22 @@ async function verifyAdmin(user){
  return true;
 }
 async function enter(user){
- try{await verifyAdmin(user);showDashboard(user);await refreshAll();}
- catch(e){await db.auth.signOut();showLogin();message('login-status',e.message,true);}
+ try{
+  await verifyAdmin(user);
+ }catch(e){
+  showLogin();
+  message('login-status','تعذر التحقق من صلاحية المدير: '+(e.message||'خطأ غير معروف'),true);
+  await db.auth.signOut();
+  return;
+ }
+ showDashboard(user);
+ try{
+  await refreshAll();
+  message('dashboard-status','تم تسجيل الدخول بنجاح.',false);
+ }catch(e){
+  console.error('Dashboard refresh failed:',e);
+  message('dashboard-status','تم تسجيل الدخول، لكن تعذر تحميل بعض بيانات اللوحة: '+(e.message||'خطأ في الاتصال'),true);
+ }
 }
 $('login-form').addEventListener('submit',async e=>{
  e.preventDefault();message('login-status','جارٍ التحقق من الحساب…');
