@@ -23,6 +23,11 @@
 </section>
 <section id="dashboard" class="hidden">
 <div class="row" style="justify-content:space-between"><div><h1>لوحة التحكم</h1><div id="admin-email" class="muted"></div></div><button id="logout" class="secondary">تسجيل الخروج</button></div>
+<section class="panel">
+<h2>مركز التنبيهات الإدارية <span id="admin-alert-count" class="pill">0</span></h2>
+<div id="admin-alerts" class="muted">جارٍ فحص التنبيهات…</div>
+<p class="muted">تنبيهات تشغيلية مستخرجة من الأخبار والإعلانات المسجلة في قاعدة البيانات.</p>
+</section>
 <div class="stats">
 <div class="panel stat"><span class="muted">إجمالي زيارات الصفحات المسجلة</span><strong id="views-total">—</strong></div>
 <div class="panel stat"><span class="muted">عدد الأخبار</span><strong id="articles-total">—</strong></div>
@@ -112,7 +117,30 @@ $('login-form').addEventListener('submit',async e=>{
 });
 $('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
 db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
-async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart()]);}
+async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart()]);await loadAdminAlerts();}
+async function loadAdminAlerts(){
+ const host=$('admin-alerts');if(!host)return;
+ host.textContent='جارٍ فحص التنبيهات…';
+ try{
+  const [articlesResult,adsResult]=await Promise.all([
+   db.from('articles').select('id,title,created_at').eq('published',false).order('created_at',{ascending:false}).limit(20),
+   db.from('advertisements').select('id,title,active,starts_at,ends_at').order('created_at',{ascending:false}).limit(100)
+  ]);
+  if(articlesResult.error)throw articlesResult.error;
+  if(adsResult.error)throw adsResult.error;
+  const alerts=[];
+  (articlesResult.data||[]).forEach(a=>alerts.push({kind:'مسودة خبر',title:a.title,detail:'خبر بانتظار المراجعة أو النشر.'}));
+  const now=Date.now();
+  (adsResult.data||[]).forEach(a=>{
+   const start=a.starts_at?new Date(a.starts_at).getTime():null;
+   const end=a.ends_at?new Date(a.ends_at).getTime():null;
+   if(a.active&&start&&start>now)alerts.push({kind:'إعلان مجدول',title:a.title,detail:'سيبدأ في '+new Date(a.starts_at).toLocaleString('ar')});
+   else if(a.active&&end&&end<now)alerts.push({kind:'إعلان منتهي',title:a.title,detail:'انتهت مدة الإعلان ويُنصح بمراجعته.'});
+  });
+  $('admin-alert-count').textContent=alerts.length;
+  host.innerHTML=alerts.length?alerts.slice(0,30).map(a=>'<div class="item"><strong>'+esc(a.kind)+': '+esc(a.title)+'</strong><div class="muted">'+esc(a.detail)+'</div></div>').join(''):'لا توجد تنبيهات إدارية حالياً.';
+ }catch(error){host.textContent='تعذر تحميل التنبيهات: '+error.message;}
+}
 async function loadWeeklyChart(){
  const host=$('weekly-chart');
  if(!host)return;
