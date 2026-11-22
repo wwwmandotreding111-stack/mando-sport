@@ -8,10 +8,57 @@
 <style>
 :root{--bg:#090b10;--panel:#121720;--panel2:#1a2230;--gold:#d8ad55;--muted:#9ba5b5;--line:#293241;--white:#f4f6fa;--red:#e16b6b;--green:#70c99a}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.7}.wrap{width:min(1000px,94%);margin:auto}header{border-bottom:1px solid var(--line);padding:16px 0;background:#0c1018}.brand{font-weight:900;font-size:23px}.brand b{color:var(--gold)}.sub{font-size:12px;color:var(--muted)}main{padding:24px 0}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0}.login{max-width:430px;margin:8vh auto}.field{display:grid;gap:6px;margin:12px 0}label{font-size:13px;color:#d8deea}input,textarea,select{width:100%;padding:11px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--white);font:inherit}textarea{min-height:95px;resize:vertical}button{border:0;border-radius:9px;padding:10px 16px;background:var(--gold);color:#17120a;font:inherit;font-weight:800;cursor:pointer}button.secondary{background:#293548;color:var(--white)}button.danger{background:#532a31;color:#ffd9d9}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.hidden{display:none!important}.status{font-size:13px;color:var(--muted);margin-top:10px}.error{color:#ff9b9b}.ok{color:var(--green)}h1{font-size:24px;margin:0}h2{font-size:19px;margin:0 0 12px}.muted{color:var(--muted);font-size:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat strong{display:block;color:var(--gold);font-size:26px}.item{border-top:1px solid var(--line);padding:13px 0}.item:first-child{border-top:0}.item h3{font-size:16px;margin:0 0 4px}.pill{font-size:11px;border:1px solid var(--line);padding:2px 8px;border-radius:20px;color:var(--muted)}.item-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.item-actions button{font-size:12px;padding:7px 10px}footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--line)}@media(max-width:650px){.stats{grid-template-columns:1fr}.row>*{flex-basis:100%}.panel{padding:14px}}
+
+/* Approved reference layout: premium black/gold admin dashboard */
+:root{--gold:#f3c64f;--gold-soft:#ffdf82;--panel:#101010;--line:#59451b}
+body{background:radial-gradient(ellipse at 50% 0%,#38250c 0,transparent 42%),#050505;color:#f8f4e9}
+header{height:88px;display:flex;align-items:center;background:linear-gradient(90deg,#080808,#15110a,#080808);border-bottom:2px solid #8f681d;box-shadow:0 5px 24px #000}
+header .wrap{width:100%;max-width:none;padding:0 24px}
+.brand{font-size:24px;color:#f4c54e;text-shadow:0 0 18px #d99a24aa}
+.brand b{color:#ffe28a}.sub{color:#f1d58b}
+.admin-sidebar{position:fixed;z-index:20;top:90px;bottom:0;left:0;width:240px;padding:16px 12px;background:linear-gradient(180deg,#111,#070707);border-right:1px solid #75571c;box-shadow:8px 0 25px #0009;overflow:auto}
+.admin-sidebar .side-brand{font-size:19px;font-weight:950;color:#f4c64e;text-align:center;padding:8px 4px 18px;border-bottom:1px solid #5b451b;margin-bottom:12px}
+.admin-sidebar a{display:flex;align-items:center;gap:12px;padding:11px 13px;margin:4px 0;border-radius:8px;color:#f3eee1;text-decoration:none;font-weight:700;font-size:14px;border:1px solid transparent}
+.admin-sidebar a span{font-size:19px;color:#f4c64e;width:26px;text-align:center}
+.admin-sidebar a:hover,.admin-sidebar a.active{background:linear-gradient(90deg,#f8d45b,#c68a13);color:#171006;border-color:#ffe28a;box-shadow:0 0 16px #e3aa2b55}
+.admin-sidebar a:hover span,.admin-sidebar a.active span{color:#171006}
+main.wrap{width:auto;max-width:none;margin:0 16px 0 256px;padding:24px 4px}
+#dashboard>.row{padding:12px 16px;background:linear-gradient(100deg,#15120b,#090909);border:1px solid #574117;border-radius:12px;margin-bottom:16px}
+#dashboard h1,#dashboard h2{color:#f4c64e;text-shadow:0 0 12px #d49b2c44}
+.panel{background:linear-gradient(145deg,#151515,#090909);border:1px solid #71551c;border-radius:12px;box-shadow:0 0 0 1px #f4c64e12,inset 0 0 24px #e0a52a08,0 8px 22px #0009;padding:17px;margin:12px 0}
+.stats{gap:12px}
+.stat{background:linear-gradient(145deg,#17130a,#0b0b0b);border-color:#80601d}
+.stat strong{color:#f8cb4f;text-shadow:0 0 12px #e2a72c55}
+input,textarea,select{background:#111;border-color:#51401e;color:#fff}
+button{background:linear-gradient(135deg,#ffe27c,#c88d16);color:#1b1304;box-shadow:0 3px 12px #d69c2c22}
+button.secondary{background:#28231a;color:#f5d77e;border:1px solid #75571c}
+.item{border-color:#45371d}
+.pill{border-color:#75571c;color:#f3d27d}
+footer{border-color:#4c3917;color:#bda66d}
+@media(min-width:900px){
+#dashboard{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:7px}
+#dashboard>.row{grid-column:1/-1}
+#dashboard>.panel:nth-of-type(1){grid-column:1/-1}
+#dashboard>.stats{grid-column:1/-1;grid-template-columns:repeat(3,1fr)}
+#dashboard>section.panel:nth-of-type(3){grid-column:1/-1}
+#dashboard>section.panel:nth-of-type(4){grid-column:1/7}
+#dashboard>section.panel:nth-of-type(5){grid-column:7/-1}
+#dashboard>section.panel:nth-of-type(6),#dashboard>section.panel:nth-of-type(7){grid-column:1/-1}
+#dashboard>section.panel:nth-of-type(8){grid-column:1/-1}
+}
+@media(max-width:850px){
+header{height:auto;min-height:76px}
+.admin-sidebar{position:sticky;top:0;bottom:auto;width:100%;height:auto;display:flex;gap:4px;padding:7px;overflow-x:auto;border-right:0;border-bottom:1px solid #75571c}
+.admin-sidebar .side-brand{display:none}
+.admin-sidebar a{flex:0 0 auto;padding:8px 10px;font-size:12px;margin:0}
+main.wrap{margin:0 auto;width:94%;padding:14px 0}
+}
+
 </style>
 </head>
 <body>
 <header><div class="wrap"><div class="brand">MANDO <b>SPORT</b> <span class="sub">| لوحة الإدارة</span></div></div></header>
+<aside class="admin-sidebar" aria-label="القائمة الجانبية للإدارة"><div class="side-brand">♛ MANDO SPORT</div><a class="active" href="#dashboard"><span>⌂</span>الرئيسية</a><a href="#admin-alerts"><span>♢</span>الزوار والإحصائيات</a><a href="#community-pending"><span>♟</span>الأعضاء</a><a href="#articles-list"><span>▤</span>الأخبار</a><a href="#weekly-chart"><span>⚽</span>المباريات</a><a href="#ads-list"><span>▣</span>الإعلانات</a><a href="#highlights-admin"><span>▶</span>اللقطات المميزة</a><a href="#admin-settings"><span>⚙</span>الإعدادات</a></aside>
 <main class="wrap">
 <section id="login-panel" class="panel login">
 <h1>تسجيل دخول المدير</h1><p class="muted">هذه الصفحة مخصصة لحساب الإدارة المعتمد فقط.</p>
@@ -45,7 +92,7 @@
 </div>
 <p class="muted">الأرقام مبنية على السجلات الموجودة فعلياً في قاعدة البيانات، وليست تقديرات للزيارات أو الأرباح.</p>
 </section>
-<section class="panel">
+<section class="panel" id="weekly-chart-panel">
 <h2>حركة الزيارات خلال آخر 7 أيام</h2>
 <div id="weekly-chart" class="stats" style="align-items:end;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;min-height:150px">
 <div class="muted">جارٍ تحميل الرسم…</div>
@@ -65,7 +112,7 @@
 <div class="row" style="margin-top:12px"><button id="article-submit" type="submit">حفظ الخبر</button><button id="article-cancel-edit" class="secondary hidden" type="button">إلغاء التعديل</button></div>
 </form><div id="article-status" class="status"></div>
 </section>
-<section class="panel"><h2>الأخبار المنشورة والمسودات</h2><div id="articles-list" class="muted">جارٍ التحميل…</div></section>
+<section class="panel" id="articles-list-panel"><h2>الأخبار المنشورة والمسودات</h2><div id="articles-list" class="muted">جارٍ التحميل…</div></section>
 <section class="panel">
 <h2 id="ad-form-heading">إضافة إعلان</h2>
 <form id="ad-form">
@@ -84,8 +131,8 @@
 <div class="row" style="margin-top:12px"><button id="ad-submit" type="submit">حفظ الإعلان</button><button id="ad-cancel-edit" class="secondary hidden" type="button">إلغاء التعديل</button></div>
 </form><div id="ad-status" class="status"></div>
 </section>
-<section class="panel"><h2>الإعلانات</h2><div id="ads-list" class="muted">جارٍ التحميل…</div></section>
-<section class="panel">
+<section class="panel" id="ads-list-panel"><h2>الإعلانات</h2><div id="ads-list" class="muted">جارٍ التحميل…</div></section>
+<section class="panel" id="community-admin">
 <h2>إدارة مجتمع الأعضاء</h2>
 <p class="muted">راجع التعليقات قبل نشرها، وتابع البلاغات المرسلة من الأعضاء.</p>
 <h3>تعليقات بانتظار الموافقة <span id="community-pending-count" class="pill">0</span></h3>
@@ -93,7 +140,7 @@
 <h3 style="margin-top:22px">بلاغات التعليقات المفتوحة <span id="community-reports-count" class="pill">0</span></h3>
 <div id="community-reports" class="muted">جارٍ التحميل…</div>
 </section>
-<section class="panel"><h2>آخر الزيارات المسجلة</h2><div class="muted">يعرض النظام الصفحات وأوقات زيارتها، ولا يجمع أسماء الزوار أو بياناتهم الشخصية.</div><div id="views-list">جارٍ التحميل…</div></section>
+<section class="panel" id="visits-admin"><h2>آخر الزيارات المسجلة</h2><div class="muted">يعرض النظام الصفحات وأوقات زيارتها، ولا يجمع أسماء الزوار أو بياناتهم الشخصية.</div><div id="views-list">جارٍ التحميل…</div></section>
 </section>
 </main>
 <footer>MANDO SPORT — لوحة إدارة خاصة</footer>
