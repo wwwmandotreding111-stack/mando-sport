@@ -72,7 +72,7 @@ async function checkCountryAvailability(videoId, country) {
       'uploader has not made this video available in your country',
       'this video is not available in your country'
     ].some(phrase => lowerHtml.includes(phrase));
-    return regionalBlock ? 'blocked' : 'unknown';
+    return player.status === 'UNPLAYABLE' && regionalBlock ? 'blocked' : 'unknown';
   } catch {
     return 'unknown';
   } finally {
@@ -146,9 +146,13 @@ export default async function handler(req, res) {
     availability: await checkCountryAvailability(video.id, country)
   })));
   const visibleVideos = checked.filter(video => video.availability !== 'blocked');
+  // Never leave the highlights section empty solely because the regional check
+  // could not confidently classify the videos.
+  const safeFallbackVideos = visibleVideos.length ? visibleVideos : candidates;
 
   res.status(200).json({
-    videos: visibleVideos.slice(0, 12),
+    videos: safeFallbackVideos.slice(0, 12),
+    availabilityFallback: visibleVideos.length === 0 && candidates.length > 0,
     country: country || null,
     availabilityCheck: country ? 'country-aware-best-effort' : 'not-available',
     updatedAt: new Date().toISOString(),
