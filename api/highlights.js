@@ -10,7 +10,7 @@ function decodeXml(value = '') {
     .replace(/&quot;/g, '"')
     .replace(/&#39;|&apos;/g, "'")
     .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, ' ')
+    .replace(/&gt;/g, '>')
     .trim();
 }
 
