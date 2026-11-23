@@ -378,18 +378,12 @@ const SUPABASE_URL='https://ibgvfjuqcolcyjzdzcde.supabase.co',SUPABASE_KEY='sb_p
 async function loadPortalContent(){
  const latest=document.getElementById('latest-news'),featured=document.getElementById('featured-story'),popular=document.getElementById('popular-news'),categoryHost=document.getElementById('category-news'),newsStatus=document.getElementById('news-status');
  let manual=[],automatic=[],manualError=false,automaticError=false;
- try{
-  const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-  const manualResult=await supabase.from('articles').select('id,title,excerpt,body,image_url,category,featured,created_at').eq('published',true).order('featured',{ascending:false}).order('created_at',{ascending:false}).limit(30);
-  if(manualResult.error)throw manualResult.error;
-  manual=manualResult.data||[];
- }catch(error){manualError=true;}
- try{
-  const response=await fetch('/api/news',{cache:'no-store'});
-  const data=await response.json();
-  if(!response.ok)throw new Error(data.error||'تعذر جلب الأخبار');
-  automatic=Array.isArray(data.articles)?data.articles:[];
- }catch(error){automaticError=true;}
+ const contentTasks=await Promise.allSettled([
+  (async()=>{const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const result=await supabase.from('articles').select('id,title,excerpt,body,image_url,category,featured,created_at').eq('published',true).order('featured',{ascending:false}).order('created_at',{ascending:false}).limit(30);if(result.error)throw result.error;return result.data||[];})(),
+  (async()=>{const response=await fetch('/api/news');const data=await response.json();if(!response.ok)throw new Error(data.error||'تعذر جلب الأخبار');return Array.isArray(data.articles)?data.articles:[];})()
+ ]);
+ if(contentTasks[0].status==='fulfilled')manual=contentTasks[0].value;else manualError=true;
+ if(contentTasks[1].status==='fulfilled')automatic=contentTasks[1].value;else automaticError=true;
  newsStatus.textContent=manual.length&&automatic.length?'أخبار إدارة MANDO SPORT + مصادر رياضية عالمية':automatic.length?'آخر الأخبار الرياضية من Google News وESPN':manual.length?'الأخبار المنشورة من إدارة MANDO SPORT':manualError&&automaticError?'تعذر الاتصال بمصادر الأخبار حالياً':'لا توجد أخبار منشورة حالياً';
  const articleUrl=a=>'/article.html?id='+encodeURIComponent(a.id);
  const manualCard=a=>'<a class="portal-news-card" href="'+articleUrl(a)+'">'+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="" loading="lazy">':'<div class="news-no-image">📰</div>')+'<div class="news-copy"><small>'+esc(a.category||'أخبار كرة القدم')+(a.featured?' · خبر رئيسي':'')+'</small><h3>'+esc(a.title)+'</h3><p>'+esc(a.excerpt||'تابع تفاصيل الخبر عبر MANDO SPORT.')+'</p></div><div class="news-meta">MANDO SPORT · '+(a.created_at?new Date(a.created_at).toLocaleDateString('ar'):'')+'</div></a>';
