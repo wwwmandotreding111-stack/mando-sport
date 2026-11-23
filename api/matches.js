@@ -70,7 +70,7 @@ module.exports = async function handler(req, res) {
     else errors.push(String(outcome.reason?.message || outcome.reason));
   });
   matches.sort((a,b) => String(a.utcDate || "").localeCompare(String(b.utcDate || "")));
-  res.setHeader("Cache-Control", req.query.push === "1" ? "no-store" : "s-maxage=120, stale-while-revalidate=300");
+  res.setHeader("Cache-Control", req.query.push === "1" ? "no-store" : "s-maxage=60, stale-while-revalidate=120");
   if (!matches.length && errors.length === selected.length) {
     return res.status(502).json({ error: "تعذر الاتصال بمصدر المباريات حالياً.", details: errors[0] });
   }
