@@ -13,7 +13,8 @@ module.exports = async function handler(req, res) {
       if (Array.isArray(node)) { node.forEach(item => visit(item, depth + 1)); return; }
       if (typeof node !== "object") return;
       const title = node.displayName || node.fullName || node.name || node.headline;
-      const linkList = Array.isArray(node.links) ? node.links : [];\n      const href = node.links?.web?.href || node.links?.mobile?.href || linkList.find(link => (link.rel || []).includes("web"))?.href || linkList.find(link => (link.rel || []).includes("mobile"))?.href || node.href || node.link;
+      const linkList = Array.isArray(node.links) ? node.links : [];
+      const href = node.links?.web?.href || node.links?.mobile?.href || linkList.find(link => (link.rel || []).includes("web"))?.href || linkList.find(link => (link.rel || []).includes("mobile"))?.href || node.href || node.link;
       if (title && href && /^https?:\/\//i.test(href)) {
         const kind = String(node.type?.type || node.type || node.contentType || "").toLowerCase();
         const isPlayer = kind.includes("athlete") || kind.includes("player");
