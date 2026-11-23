@@ -2,7 +2,40 @@
 <html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#172433"><title>البحث الرياضي | MANDO SPORT</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f1f3f5;color:#253344;font-family:Tahoma,Arial,sans-serif;line-height:1.8}a{color:inherit;text-decoration:none}.top{background:#fff;border-bottom:1px solid #e1e5ea;padding:14px 4%;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:950;font-size:21px;color:#1d2b3a}.brand b{color:#b98937}.top a:last-child{font-size:12px;color:#8d6829;font-weight:800}.container{width:min(1100px,94%);margin:25px auto}.searchbar{display:flex;gap:8px;background:#fff;padding:15px;border:1px solid #e0e5ea;border-radius:9px}.searchbar input{flex:1;min-width:0;border:1px solid #dfe4e9;border-radius:6px;padding:11px;font:inherit}.searchbar button{background:#27394b;color:#fff;border:0;border-radius:6px;padding:10px 18px;font-weight:800}.section{background:#fff;border:1px solid #e0e5ea;border-radius:9px;padding:17px;margin-top:15px}.section h2{font-size:17px;margin:0 0 12px}.results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.result{border:1px solid #e6e9ed;border-radius:7px;padding:12px;display:flex;gap:10px;align-items:center;min-width:0}.result img{width:48px;height:48px;object-fit:contain;background:#f4f6f8;border-radius:7px;padding:4px}.result strong{display:block;font-size:13px}.result small{font-size:10px;color:#87919d}.state{padding:20px;text-align:center;color:#8994a1;font-size:12px}@media(max-width:650px){.results{grid-template-columns:1fr}.searchbar{padding:10px}.result{padding:9px}}
-</style></head><body><header class="top"><a class="brand" href="/">MANDO <b>SPORT</b></a><a href="/">العودة للرئيسية ←</a></header>
+</style><style id="mando-subpage-premium">
+:root{color-scheme:dark;--bg:#07111b;--surface:#0d1a27;--surface2:#122334;--line:#294054;--text:#edf3f8;--muted:#9aabba;--gold:#d9ad5b;--gold2:#f2d18b}
+body{background:radial-gradient(ellipse at 50% -18%,#263d5355,transparent 44%),var(--bg)!important;color:var(--text)!important;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif!important}
+.top{position:sticky;top:0;z-index:50;background:#07111bf2!important;border-bottom:1px solid #d9ad5b45!important;box-shadow:0 8px 28px #0003;backdrop-filter:blur(18px);padding:14px max(3%,calc((100% - 1200px)/2))!important}
+.brand{color:#fff!important;font-weight:1000!important;letter-spacing:.5px}
+.brand b{color:var(--gold2)!important}
+.top a:last-child{color:var(--gold2)!important}
+.container{margin:28px auto!important}
+.searchbar,.section,.article{background:linear-gradient(155deg,#102030,#0c1925)!important;border:1px solid #294054!important;border-radius:13px!important;box-shadow:0 8px 26px #0002!important}
+.searchbar{padding:17px!important}
+.searchbar input{background:#081622!important;border:1px solid #344b60!important;color:#fff!important;border-radius:8px!important;padding:12px!important}
+.searchbar button{background:linear-gradient(145deg,#f0d18d,#c29142)!important;color:#172432!important;border:0!important;border-radius:8px!important;font-weight:950!important;cursor:pointer}
+.section{padding:18px!important}
+.section h2{color:#f1f5f8!important}
+.result{background:#0b1925!important;border:1px solid #293f53!important;border-radius:9px!important;color:#edf3f8!important;transition:.18s}
+.result:hover{border-color:#c69a4e!important;transform:translateY(-2px)}
+.result img{background:#172a3c!important;border-radius:8px!important}
+.result strong{color:#f1f5f8!important}
+.result small,.state{color:#91a4b6!important}
+.state{padding:25px!important}
+.article{overflow:hidden!important}
+.article-body{padding:clamp(18px,4vw,40px)!important}
+.category{color:var(--gold2)!important}
+.article h1{color:#fff!important;line-height:1.55!important}
+.meta{color:#91a4b6!important;border-color:#ffffff18!important}
+.excerpt{color:#c4d1dc!important}
+.body{color:#d5dfe8!important}
+.source{background:#142536!important;color:#a9bac9!important}
+.crumb{color:#91a4b6!important}
+.back{color:var(--gold2)!important}
+footer{color:#8296a9!important}
+@media(max-width:650px){.container{margin:15px auto!important}.searchbar{padding:11px!important}.section{padding:13px!important}.top{gap:8px}.results{grid-template-columns:1fr}}
+</style>
+</head><body><header class="top"><a class="brand" href="/">MANDO <b>SPORT</b></a><a href="/">العودة للرئيسية ←</a></header>
 <main class="container"><form class="searchbar" id="search-form"><input id="q" type="search" placeholder="ابحث عن لاعب أو فريق أو بطولة..." aria-label="كلمة البحث" required><button>بحث</button></form>
 <section class="section"><h2>نتائج البحث الرياضي</h2><div id="sports-results" class="results"><div class="state">اكتب اسم لاعب أو فريق للبدء.</div></div></section>
 <section class="section"><h2>أخبار مرتبطة بالبحث</h2><div id="article-results" class="results"><div class="state">تظهر هنا الأخبار المنشورة في MANDO SPORT.</div></div></section></main>
