@@ -17,9 +17,15 @@ function tag(xml, name) {
 }
 async function fetchFeed(feed) {
   const url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + encodeURIComponent(feed.channelId);
-  const response = await fetch(url, {
-    headers: { Accept: "application/atom+xml, application/xml, text/xml", "User-Agent": "Mozilla/5.0 MANDO-SPORT" }
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 6000);
+  let response;
+  try {
+    response = await fetch(url, {
+      signal: controller.signal,
+      headers: { Accept: "application/atom+xml, application/xml, text/xml", "User-Agent": "Mozilla/5.0 MANDO-SPORT" }
+    });
+  } finally { clearTimeout(timer); }
   if (!response.ok) throw new Error(feed.channelName + " feed HTTP " + response.status);
   const xml = await response.text();
   const entries = xml.match(/<entry>[\s\S]*?<\/entry>/g) || [];
