@@ -21,9 +21,13 @@ function tag(xml, name) {
   return match ? decode(match[1]) : "";
 }
 async function googleFeed(feed) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 6000);
   const q = encodeURIComponent(feed.query);
   const url = "https://news.google.com/rss/search?q=" + q + "&hl=ar&gl=SY&ceid=SY:ar";
-  const response = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 MANDO-SPORT/2.0", "Accept": "application/rss+xml, application/xml, text/xml" } });
+  let response;
+  try { response = await fetch(url, { signal: controller.signal, headers: { "User-Agent": "Mozilla/5.0 MANDO-SPORT/2.0", "Accept": "application/rss+xml, application/xml, text/xml" } }); }
+  finally { clearTimeout(timer); }
   if (!response.ok) throw new Error("Google News HTTP " + response.status);
   const xml = await response.text();
   return [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].map(match => {
@@ -44,7 +48,11 @@ async function googleFeed(feed) {
 }
 async function espnFeed(league) {
   const url = "https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/news?limit=12";
-  const response = await fetch(url, { headers: { "User-Agent": "MANDO-SPORT/2.0", "Accept": "application/json" } });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 6000);
+  let response;
+  try { response = await fetch(url, { signal: controller.signal, headers: { "User-Agent": "MANDO-SPORT/2.0", "Accept": "application/json" } }); }
+  finally { clearTimeout(timer); }
   if (!response.ok) throw new Error("ESPN HTTP " + response.status);
   const data = await response.json();
   return (data.articles || []).map(item => {
