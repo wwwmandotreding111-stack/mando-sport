@@ -238,7 +238,7 @@ footer .wrap{max-width:1500px}
   <div class="top">
 <button class="portal-menu-toggle" id="portal-menu-toggle" type="button" aria-label="فتح القائمة الجانبية" aria-controls="portal-sidebar" aria-expanded="false">☰</button>
 <div class="brand-wrap"><div class="brand-mark">M</div><div><div class="brand">MANDO <b>SPORT</b></div><div class="tag">نبض الملاعب لحظة بلحظة</div></div></div><div class="header-status"><span class="pulse"></span> تغطية رياضية مستمرة</div></div>
-  <nav aria-label="التنقل الرئيسي"><a href="#matches">مباشر</a><a href="#matches">مباريات اليوم</a><a href="#news">أخبار</a><a href="#leagues">مسابقات</a><a href="#leagues">ترتيب</a><a href="#news">الأكثر رواجاً</a><a href="/customers.html">حسابي والإشعارات</a></nav>
+  <nav aria-label="التنقل الرئيسي"><a href="#matches">مباشر</a><a href="#matches">مباريات اليوم</a><a href="#highlights">لقطات مميزة</a><a href="#news">أخبار</a><a href="#leagues">مسابقات</a><a href="#leagues">ترتيب</a><a href="#news">الأكثر رواجاً</a><a href="/customers.html">حسابي والإشعارات</a></nav>
 </div></header>
 
 <aside class="portal-sidebar" id="portal-sidebar" aria-label="القائمة الجانبية">
@@ -247,6 +247,7 @@ footer .wrap{max-width:1500px}
  <a class="side-featured" href="#matches"><span class="side-ico">🔴</span>مباشر الآن</a>
  <a href="#matches"><span class="side-ico">📅</span>مباريات اليوم</a>
  <a href="#results"><span class="side-ico">⚽</span>النتائج</a>
+ <a href="#highlights"><span class="side-ico">🎬</span>لقطات مميزة</a>
  <a href="#standings-container"><span class="side-ico">🏆</span>ترتيب الدوريات</a>
  <a href="#news"><span class="side-ico">📰</span>آخر الأخبار</a>
  <a href="#leagues"><span class="side-ico">🌍</span>المسابقات والبطولات</a>
@@ -285,16 +286,17 @@ footer .wrap{max-width:1500px}
  <div class="portal-layout">
   <div class="portal-main">
    <section class="portal-panel featured-story" id="featured-story"><div class="feature-copy"><span class="feature-kicker">الخبر الرئيسي</span><h2>أهلاً بك في MANDO SPORT</h2><p>تابع آخر أخبار كرة القدم والمباريات والبطولات من خلال بوابتنا الرياضية.</p><a href="#news">اكتشف آخر الأخبار ←</a></div><div class="feature-placeholder">⚽</div></section>
+   <section class="portal-panel" id="highlights">
+    <div class="portal-heading"><h2>لقطات مميزة</h2><small id="highlights-status">أجمل لحظات كرة القدم</small></div>
+    <div id="highlights-list" class="portal-news-grid"><div class="match-empty">يتم تحميل اللقطات...</div></div>
+   </section>
    <section class="portal-panel" id="matches"><div class="portal-heading"><h2>مركز المباريات</h2><small id="matches-status">تحديث تلقائي من ESPN</small></div>
     <div id="match-days" aria-label="اختيار يوم المباريات"></div>
     <div id="match-filter"><select id="match-competition" aria-label="تصفية حسب البطولة"><option value="">كل البطولات</option><option value="PL">الدوري الإنجليزي</option><option value="PD">الدوري الإسباني</option><option value="SA">الدوري الإيطالي</option><option value="BL1">الدوري الألماني</option><option value="FL1">الدوري الفرنسي</option><option value="CL">دوري أبطال أوروبا</option><option value="SPL">الدوري السعودي</option><option value="MLS">الدوري الأمريكي</option></select></div>
     <div id="matches-list"><div class="match-empty">يتم تحميل المباريات...</div></div>
    </section>
    <section class="portal-panel" id="results"><div class="portal-heading"><h2>النتائج المباشرة والنهائية</h2><small id="results-status">النتائج حسب اليوم المحدد</small></div><div id="results-list"><div class="match-empty">يتم تحميل النتائج...</div></div></section>
-   <section class="portal-panel" id="highlights">
-    <div class="portal-heading"><h2>لقطات مميزة</h2><small id="highlights-status">أجمل لحظات كرة القدم</small></div>
-    <div id="highlights-list" class="portal-news-grid"><div class="match-empty">يتم تحميل اللقطات...</div></div>
-   </section>
+   
    <section class="portal-panel" id="news"><div class="portal-heading"><h2>آخر الأخبار الرياضية</h2><small id="news-status">أخبار من ESPN ومحرري MANDO SPORT</small></div>
     <div id="latest-news" class="portal-news-grid"><div class="match-empty">يتم تحميل الأخبار...</div></div>
     <div id="category-news"></div>
