@@ -1,12 +1,11 @@
-// MANDO SPORT — verified football highlights from official YouTube channels.
+// MANDO SPORT — recent uploads from verified official football channels.
 const FEEDS = [
-  { query: "Premier League official highlights", league: "الدوري الإنجليزي" },
-  { query: "UEFA Champions League official highlights", league: "دوري أبطال أوروبا" },
-  { query: "LALIGA official highlights", league: "الدوري الإسباني" },
-  { query: "FIFA official football highlights", league: "كرة القدم العالمية" },
-  { query: "Saudi Pro League official highlights", league: "الدوري السعودي" }
+  { channelId: "UCG5qGWdu8nIRZqJ_GgDwQ-w", league: "الدوري الإنجليزي", channelName: "Premier League" },
+  { channelId: "UCyGa1YEx9ST66rYrJTGIKOw", league: "دوري أبطال أوروبا", channelName: "UEFA" },
+  { channelId: "UCTv-XvfzLX3i4IGWAm4sbmA", league: "الدوري الإسباني", channelName: "LALIGA" },
+  { channelId: "UCpcTrCXblq78GZrTUTLWeBw", league: "كرة القدم العالمية", channelName: "FIFA" },
+  { channelId: "UCqXAWrjSgLb0EPa_icPt-pw", league: "الدوري السعودي", channelName: "Saudi Pro League" }
 ];
-const OFFICIAL_CHANNEL = /(premier league|uefa|laliga|la liga|fifa|saudi pro league|roshn)/i;
 function decodeXml(value) {
   return String(value || "")
     .replace(/&amp;/g, "&").replace(/&quot;/g, '"')
@@ -19,19 +18,19 @@ function tag(xml, name) {
   return match ? decodeXml(match[1].replace(/<!\[CDATA\[|\]\]>/g, "").trim()) : "";
 }
 async function fetchFeed(feed) {
-  const url = "https://www.youtube.com/feeds/videos.xml?search_query=" + encodeURIComponent(feed.query);
+  const url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + encodeURIComponent(feed.channelId);
   const response = await fetch(url, {
     headers: { Accept: "application/atom+xml, application/xml, text/xml", "User-Agent": "Mozilla/5.0 MANDO-SPORT" }
   });
-  if (!response.ok) throw new Error("YouTube feed HTTP " + response.status);
+  if (!response.ok) throw new Error(feed.channelName + " feed HTTP " + response.status);
   const xml = await response.text();
   const entries = xml.match(/<entry>[\s\S]*?<\/entry>/g) || [];
   return entries.map(entry => {
     const id = tag(entry, "yt:videoId");
-    const channel = tag(entry, "name");
+    const channel = tag(entry, "name") || feed.channelName;
     const title = tag(entry, "title");
     const publishedAt = tag(entry, "published");
-    if (!id || !title || !OFFICIAL_CHANNEL.test(channel)) return null;
+    if (!id || !title) return null;
     return {
       id, title,
       url: "https://www.youtube.com/watch?v=" + encodeURIComponent(id),
@@ -42,7 +41,7 @@ async function fetchFeed(feed) {
 }
 module.exports = async function handler(req, res) {
   const results = await Promise.allSettled(FEEDS.map(fetchFeed));
-  results.forEach((result, index) => console.info("[highlights-feed]", FEEDS[index].query, result.status === "fulfilled" ? { count: result.value.length, channels: result.value.slice(0, 3).map(video => video.channel) } : { error: String(result.reason) }));
+  results.forEach((result, index) => console.info("[highlights-feed]", FEEDS[index].channelName, result.status === "fulfilled" ? { count: result.value.length } : { error: String(result.reason) }));
   const unique = new Map();
   results.forEach(result => {
     if (result.status !== "fulfilled") return;
