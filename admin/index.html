@@ -361,8 +361,9 @@ body.mando-admin footer{margin-right:252px;border-top:1px solid var(--adm-line);
 <div class="field"><label for="article-title">عنوان الخبر</label><input id="article-title" maxlength="180" required></div>
 <div class="field"><label for="article-excerpt">ملخص قصير</label><textarea id="article-excerpt" maxlength="500"></textarea></div>
 <div class="field"><label for="article-body">نص الخبر</label><textarea id="article-body"></textarea></div>
-<div class="field"><label for="article-image">رابط صورة الخبر (يمكن تركه فارغاً حالياً)</label><input id="article-image" type="url" placeholder="https://..."></div>
-<label><input id="article-published" type="checkbox" style="width:auto"> نشر الخبر مباشرة</label>
+<div class="field"><label for="article-image">رابط صورة الخبر</label><input id="article-image" type="url" placeholder="https://..."></div>
+<div class="field"><label for="article-category">تصنيف الخبر</label><select id="article-category"><option>أخبار كرة القدم</option><option>أخبار عربية</option><option>أخبار عالمية</option><option>انتقالات</option><option>دوري أبطال أوروبا</option><option>الدوري الإنجليزي</option><option>الدوري الإسباني</option><option>الدوري السعودي</option><option>تحليل ومقالات</option><option>منتخبات</option></select></div>
+<div class="row"><label><input id="article-published" type="checkbox" style="width:auto"> نشر الخبر مباشرة</label><label><input id="article-featured" type="checkbox" style="width:auto"> خبر رئيسي مميز</label></div>
 <div class="row" style="margin-top:12px"><button id="article-submit" type="submit">حفظ الخبر</button><button id="article-cancel-edit" class="secondary hidden" type="button">إلغاء التعديل</button></div>
 </form><div id="article-status" class="status"></div>
 </section><section class="panel">
@@ -645,7 +646,7 @@ async function loadArticles(){
  const {data,error}=await db.from('articles').select('*').order('created_at',{ascending:false});
  if(error){$('articles-list').textContent=error.message;return;}
  $('articles-total').textContent=data.length;
- $('articles-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.published?'منشور':'مسودة')+'</span><div class="muted">'+esc(a.excerpt)+'</div><div class="item-actions"><button class="secondary" data-edit-article="'+a.id+'">تعديل</button><button class="secondary" data-publish="'+a.id+'" data-state="'+(!a.published)+'">'+(a.published?'إلغاء النشر':'نشر')+'</button><button class="danger" data-delete-article="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد أخبار بعد.';
+ $('articles-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.published?'منشور':'مسودة')+'</span> <span class="pill">'+esc(a.category||'أخبار كرة القدم')+'</span> '+(a.featured?'<span class="pill">خبر رئيسي</span>':'')+'<div class="muted">'+esc(a.excerpt)+'</div><div class="item-actions"><button class="secondary" data-edit-article="'+a.id+'">تعديل</button><button class="secondary" data-publish="'+a.id+'" data-state="'+(!a.published)+'">'+(a.published?'إلغاء النشر':'نشر')+'</button><button class="danger" data-delete-article="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد أخبار بعد.';
 }
 function resetArticleEditor(){
  $('article-form').reset();$('article-edit-id').value='';
@@ -657,7 +658,7 @@ $('article-cancel-edit').addEventListener('click',resetArticleEditor);
 $('article-form').addEventListener('submit',async e=>{
  e.preventDefault();message('article-status','جارٍ حفظ الخبر…');
  const editId=$('article-edit-id').value;
- const payload={title:$('article-title').value.trim(),excerpt:$('article-excerpt').value.trim(),body:$('article-body').value.trim(),image_url:$('article-image').value.trim(),published:$('article-published').checked,updated_at:new Date().toISOString()};
+ const payload={title:$('article-title').value.trim(),excerpt:$('article-excerpt').value.trim(),body:$('article-body').value.trim(),image_url:$('article-image').value.trim(),category:$('article-category').value,featured:$('article-featured').checked,published:$('article-published').checked,updated_at:new Date().toISOString()};
  if(!payload.title){message('article-status','اكتب عنوان الخبر أولاً.',true);return;}
  let result;
  if(editId){result=await db.from('articles').update(payload).eq('id',editId);}
@@ -672,7 +673,7 @@ $('articles-list').addEventListener('click',async e=>{
   if(error){message('article-status','تعذر تحميل الخبر للتعديل: '+error.message,true);return;}
   $('article-edit-id').value=data.id;$('article-title').value=data.title||'';
   $('article-excerpt').value=data.excerpt||'';$('article-body').value=data.body||'';
-  $('article-image').value=data.image_url||'';$('article-published').checked=!!data.published;
+  $('article-image').value=data.image_url||'';$('article-category').value=data.category||'أخبار كرة القدم';$('article-featured').checked=!!data.featured;$('article-published').checked=!!data.published;
   $('article-form-heading').textContent='تعديل الخبر';
   $('article-submit').textContent='حفظ التعديلات';
   $('article-cancel-edit').classList.remove('hidden');
