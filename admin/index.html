@@ -527,7 +527,8 @@ $('member-save')?.addEventListener('click',async()=>{
  if(error){message('member-status','تعذر حفظ التعديلات: '+error.message,true);return;}
  message('member-status','تم تحديث ملف العضو.');$('member-edit-panel').classList.add('hidden');await loadMembers();
 });
-\nasync function loadCommunityModeration(){
+
+async function loadCommunityModeration(){
  const pendingHost=$('community-pending'),reportsHost=$('community-reports');
  if(!pendingHost||!reportsHost)return;
  pendingHost.textContent='جارٍ تحميل التعليقات…';reportsHost.textContent='جارٍ تحميل البلاغات…';
