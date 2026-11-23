@@ -62,7 +62,8 @@ footer{text-align:center;color:#788497;font-size:11px;padding:18px 0 25px}
  const KEY='sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_';
  const $=id=>document.getElementById(id);
  const authPanel=$('auth-panel'),accountPanel=$('account-panel'),form=$('auth-form');
- let mode='login',method='email',stage='form',db=null,busy=false,pending={},currentUser=null;\n const PUBLIC_VAPID_KEY='BPpMZNb8fimFjDtrurSJ6XuRkBYbwjnQnD7D_vebaOdQCc7qDyoCBOpokCYSEvgKo0YB7RmVoHbBI46a3l9SS_k';
+ let mode='login',method='email',stage='form',db=null,busy=false,pending={},currentUser=null;
+ const PUBLIC_VAPID_KEY='BPpMZNb8fimFjDtrurSJ6XuRkBYbwjnQnD7D_vebaOdQCc7qDyoCBOpokCYSEvgKo0YB7RmVoHbBI46a3l9SS_k';
  function showStatus(message,error=false,where='status'){const el=$(where);el.textContent=message;el.className='status show '+(error?'error':'ok');}
  function clearStatus(){$('status').className='status';$('account-status').className='status';}
  function contact(){return method==='email'?$('email').value.trim():$('phone').value.trim().replace(/[\\s()-]/g,'');}
@@ -130,7 +131,8 @@ footer{text-align:center;color:#788497;font-size:11px;padding:18px 0 25px}
   }catch(e){showStatus(e.message||'تعذر تفعيل الإشعارات.',true,'push-status');btn.textContent='إعادة محاولة تفعيل الإشعارات';}
   finally{btn.disabled=false;}
  });
-\n $('logout').addEventListener('click',async()=>{try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();if(sub){await db.from('push_subscriptions').update({active:false,updated_at:new Date().toISOString()}).eq('endpoint',sub.endpoint);await sub.unsubscribe();}}catch(e){}const {error}=await db.auth.signOut();if(error){showStatus(error.message,true,'account-status');return;}showAuth();setMode('login');showStatus('تم تسجيل الخروج. يمكنك العودة والدخول بنفس الحساب.');});
+
+ $('logout').addEventListener('click',async()=>{try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();if(sub){await db.from('push_subscriptions').update({active:false,updated_at:new Date().toISOString()}).eq('endpoint',sub.endpoint);await sub.unsubscribe();}}catch(e){}const {error}=await db.auth.signOut();if(error){showStatus(error.message,true,'account-status');return;}showAuth();setMode('login');showStatus('تم تسجيل الخروج. يمكنك العودة والدخول بنفس الحساب.');});
  db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'&&session?.user){showAccount(session.user);updatePushButton();}if(event==='SIGNED_OUT')showAuth();});
  db.auth.getSession().then(({data,error})=>{if(error){showStatus('تعذر استعادة الجلسة: '+error.message,true);return;}if(data.session?.user){showAccount(data.session.user);updatePushButton();}});
  if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(e=>console.warn('SW registration:',e)));}
