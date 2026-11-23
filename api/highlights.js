@@ -42,6 +42,7 @@ async function fetchFeed(feed) {
 }
 module.exports = async function handler(req, res) {
   const results = await Promise.allSettled(FEEDS.map(fetchFeed));
+  results.forEach((result, index) => console.info("[highlights-feed]", FEEDS[index].query, result.status === "fulfilled" ? { count: result.value.length, channels: result.value.slice(0, 3).map(video => video.channel) } : { error: String(result.reason) }));
   const unique = new Map();
   results.forEach(result => {
     if (result.status !== "fulfilled") return;
