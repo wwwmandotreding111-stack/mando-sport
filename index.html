@@ -221,6 +221,17 @@ footer .wrap{max-width:1500px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 </style>
+<style id="mando-highlights-style">
+#highlights-list .highlight-card{display:block;overflow:hidden;border:1px solid rgba(217,173,91,.22);border-radius:16px;background:#101d2d;color:inherit;text-decoration:none;transition:transform .2s,border-color .2s}
+#highlights-list .highlight-card:hover{transform:translateY(-3px);border-color:#d9ad5b}
+#highlights-list .highlight-thumb{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#17283a,#0b1420);overflow:hidden}
+#highlights-list .highlight-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+#highlights-list .highlight-play{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(transparent,rgba(0,0,0,.25))}
+#highlights-list .highlight-play span{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:#d9ad5b;color:#101820;font-size:20px;box-shadow:0 4px 22px #0008}
+#highlights-list .highlight-copy{padding:14px}
+#highlights-list .highlight-copy small{color:#d9ad5b}
+#highlights-list .highlight-copy h3{margin:7px 0 0;font-size:16px;line-height:1.55;color:#f4f6f8}
+</style>
 </head>
 <body>
 <header><div class="wrap">
@@ -280,6 +291,10 @@ footer .wrap{max-width:1500px}
     <div id="matches-list"><div class="match-empty">يتم تحميل المباريات...</div></div>
    </section>
    <section class="portal-panel" id="results"><div class="portal-heading"><h2>النتائج المباشرة والنهائية</h2><small id="results-status">النتائج حسب اليوم المحدد</small></div><div id="results-list"><div class="match-empty">يتم تحميل النتائج...</div></div></section>
+   <section class="portal-panel" id="highlights">
+    <div class="portal-heading"><h2>لقطات مميزة</h2><small id="highlights-status">أجمل لحظات كرة القدم</small></div>
+    <div id="highlights-list" class="portal-news-grid"><div class="match-empty">يتم تحميل اللقطات...</div></div>
+   </section>
    <section class="portal-panel" id="news"><div class="portal-heading"><h2>آخر الأخبار الرياضية</h2><small id="news-status">أخبار من ESPN ومحرري MANDO SPORT</small></div>
     <div id="latest-news" class="portal-news-grid"><div class="match-empty">يتم تحميل الأخبار...</div></div>
     <div id="category-news"></div>
@@ -377,7 +392,21 @@ async function loadPortalContent(){
  categoryHost.innerHTML=categories.map(category=>{const items=[...manual.filter(a=>(a.category||'أخبار كرة القدم')===category).map(a=>({time:new Date(a.created_at||0).getTime(),html:manualCard(a)})),...automatic.filter(a=>(a.category||'أخبار عالمية')===category).map(a=>({time:new Date(a.publishedAt||0).getTime(),html:autoCard(a)}))].sort((a,b)=>b.time-a.time).slice(0,4);return '<section class="portal-category"><div class="portal-heading"><h2>'+esc(category)+'</h2><small>آخر التحديثات</small></div><div class="portal-news-grid">'+items.map(x=>x.html).join('')+'</div></section>';}).join('');
  popular.innerHTML=cards.slice(0,5).map(x=>{const a=automatic.find(n=>n.url===x.url),m=manual.find(n=>n.id===x.id),title=a?.title||m?.title||'',href=a?.url||(m?articleUrl(m):'#'),img=a?.image||m?.image_url||'';return '<a class="rail-story" href="'+esc(href)+'" '+(a?'target="_blank" rel="noopener noreferrer"':'')+'>'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy">':'<img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 68 56%22%3E%3Crect width=%2268%22 height=%2256%22 fill=%22%2317283a%22/%3E%3Ctext x=%2234%22 y=%2238%22 text-anchor=%22middle%22 font-size=%2230%22 fill=%22%23d9ad5b%22%3E⚽%3C/text%3E%3C/svg%3E" alt="">')+'<span><strong>'+esc(title)+'</strong><small>'+esc(a?.source||'MANDO SPORT')+'</small></span></a>';}).join('')||'<div class="portal-status">لا توجد أخبار حالياً.</div>';
 }
-loadPortalContent();setInterval(loadPortalContent,600000);
+
+async function loadHighlights(){
+ const host=document.getElementById('highlights-list'),status=document.getElementById('highlights-status');
+ if(!host)return;
+ try{
+  const response=await fetch('/api/highlights',{cache:'no-store'}),data=await response.json();
+  if(!response.ok)throw new Error(data.error||'تعذر تحميل اللقطات');
+  const clips=Array.isArray(data.highlights)?data.highlights:[];
+  status.textContent=clips.length?'لقطات ومقاطع من مصادر ESPN الرسمية':'لا توجد لقطات متاحة حالياً';
+  host.innerHTML=clips.length?clips.slice(0,8).map(v=>'<a class="highlight-card" href="'+esc(v.url)+'" target="_blank" rel="noopener noreferrer"><div class="highlight-thumb">'+(v.image?'<img src="'+esc(v.image)+'" alt="" loading="lazy">':'')+'<div class="highlight-play"><span>▶</span></div></div><div class="highlight-copy"><small>'+esc(v.league||'كرة القدم')+'</small><h3>'+esc(v.title)+'</h3></div></a>').join(''):'<div class="match-empty">ما في لقطات متاحة حالياً، جرّب لاحقاً.</div>';
+ }catch(error){status.textContent='تعذر تحديث اللقطات حالياً';host.innerHTML='<div class="match-empty">تعذر تحميل اللقطات حالياً.</div>';}
+}
+
+loadPortalContent();
+loadHighlights();setInterval(loadPortalContent,600000);
 (async()=>{try{const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);await db.from('page_views').insert({page_path:location.pathname+location.hash});const {data}=await db.from('advertisements').select('title,image_url,target_url,placement').eq('active',true).order('created_at',{ascending:false});const slots=[...document.querySelectorAll('.portal-ad')];(data||[]).forEach((a,i)=>{const slot=slots[i%Math.max(slots.length,1)];if(!slot)return;slot.innerHTML=(a.target_url?'<a href="'+esc(a.target_url)+'" target="_blank" rel="noopener noreferrer">':'')+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="'+esc(a.title)+'" style="max-width:100%;max-height:180px;object-fit:contain">':'<strong>'+esc(a.title)+'</strong>')+(a.target_url?'</a>':'');});}catch(e){}})();
 document.getElementById('portal-search-form').addEventListener('submit',e=>{e.preventDefault();const q=document.getElementById('portal-search-input').value.trim();if(q)location.href='/search.html?q='+encodeURIComponent(q);});
 </script>
