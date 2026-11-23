@@ -45,7 +45,8 @@ module.exports = async function handler(req, res) {
       const home = competitors.find(team => team.homeAway === "home") || competitors[0] || {};
       const away = competitors.find(team => team.homeAway === "away") || competitors[1] || {};
       const teamName = team => team.team?.shortDisplayName || team.team?.displayName || team.team?.name || "فريق";
-      const scoreValue = team => team.score === undefined || team.score === null || team.score === "" ? null : Number(team.score);
+      const status = STATUS(event);
+      const scoreValue = team => status === "SCHEDULED" || status === "POSTPONED" || team.score === undefined || team.score === null || team.score === "" ? null : Number(team.score);
       const logos = event.league?.logos || [];
       return {
         id: event.id,
@@ -57,7 +58,7 @@ module.exports = async function handler(req, res) {
         homeCrest: home.team?.logo || home.team?.logos?.[0]?.href || "",
         awayCrest: away.team?.logo || away.team?.logos?.[0]?.href || "",
         utcDate: event.date || comp.date || null,
-        status: STATUS(event),
+        status,
         homeScore: scoreValue(home), awayScore: scoreValue(away),
         venue: comp.venue?.fullName || ""
       };
