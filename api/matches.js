@@ -52,7 +52,7 @@ module.exports = async function handler(req, res) {
         competitionCode: key,
         competition: event.league?.name || league.name,
         competitionEmblem: logos[0]?.href || "",
-        home: teamName(home), away: teamName(away),
+        home: teamName(home), away: teamName(away),\n        homeTeamId: home.team?.id || "", awayTeamId: away.team?.id || "",
         homeCrest: home.team?.logo || home.team?.logos?.[0]?.href || "",
         awayCrest: away.team?.logo || away.team?.logos?.[0]?.href || "",
         utcDate: event.date || comp.date || null,
