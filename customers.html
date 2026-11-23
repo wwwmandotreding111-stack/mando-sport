@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090b10">
+<meta name="description" content="بوابة أعضاء MANDO SPORT">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/mando-icon.svg" type="image/svg+xml">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>حسابي | MANDO SPORT</title>
+<style>
+:root{color-scheme:dark;--bg:#080a0f;--panel:#121925;--gold:#e2b85f;--gold2:#f5d995;--muted:#9ba7b8;--line:#2a3546;--white:#f5f6f8;--green:#48d5a0}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -15%,#805a2038,transparent 46%),var(--bg);color:var(--white);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.7;display:flex;flex-direction:column}
+.wrap{width:min(100% - 28px,520px);margin:auto}.top{padding:24px 0 10px;display:flex;justify-content:center}.brand{display:flex;align-items:center;gap:12px}.mark{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#ffe8ac,#bd8732);display:grid;place-items:center;color:#171108;font-weight:1000;font-size:21px;box-shadow:0 8px 30px #d8ad5530}.brand strong{font-size:22px;letter-spacing:.5px}.brand strong span{color:var(--gold)}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:1.8px}
+main{flex:1;display:grid;place-items:center;padding:20px 0 35px}.panel{width:100%;background:linear-gradient(145deg,#171f2c,#10151e);border:1px solid #70572f;border-radius:22px;padding:clamp(20px,5vw,32px);box-shadow:0 25px 80px #0008}.eyebrow{color:var(--gold2);font-size:12px;font-weight:800}.panel h1{font-size:25px;margin:6px 0}.sub{color:var(--muted);font-size:13px;margin:0 0 22px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#090d14;padding:5px;border-radius:12px;margin-bottom:20px}.tabs button{background:transparent;color:#aeb8c7;border:0;border-radius:9px;padding:10px;font:inherit;font-weight:800;cursor:pointer}.tabs button.active{background:linear-gradient(135deg,#f4d58f,#c18b38);color:#171108}
+label{display:block;font-size:12px;color:#d6dce5;margin:13px 0 6px}input{width:100%;padding:13px 14px;border-radius:11px;border:1px solid var(--line);background:#0b1018;color:white;font:inherit;outline:none}input:focus{border-color:var(--gold)}input::placeholder{color:#697588}
+.primary{width:100%;border:0;border-radius:11px;padding:13px;margin-top:20px;background:linear-gradient(135deg,#f4d58f,#c18b38);color:#171108;font:inherit;font-weight:950;cursor:pointer}.primary:disabled{opacity:.6;cursor:wait}.link{background:none;border:0;color:var(--gold2);font:inherit;font-size:12px;cursor:pointer;padding:10px 0 0}
+.status{display:none;margin-top:14px;padding:11px 12px;border-radius:10px;font-size:12px;overflow-wrap:anywhere}.status.show{display:block}.status.error{background:#3a171b;color:#ffb9bc;border:1px solid #7c3439}.status.ok{background:#102b22;color:#a9f0d1;border:1px solid #28674f}
+.account{display:none}.account.show{display:block}.profile-icon{width:58px;height:58px;border-radius:18px;background:#e2b85f1c;border:1px solid #755a2e;display:grid;place-items:center;color:var(--gold2);font-size:25px;margin-bottom:14px}.info{background:#0b111a;border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:15px}.info small{color:var(--muted);display:block}.info strong{overflow-wrap:anywhere}.secondary{width:100%;background:#202a38;color:#e7ebf1;border:1px solid #39475c;border-radius:11px;padding:12px;font:inherit;font-weight:800;margin-top:10px;cursor:pointer}
+footer{text-align:center;color:#788497;font-size:11px;padding:18px 0 25px}
+@media(max-width:420px){.panel{border-radius:18px}.brand strong{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="wrap top"><div class="brand"><div class="mark">M</div><div><strong>MANDO <span>SPORT</span></strong><small>YOUR FOOTBALL WORLD</small></div></div></div>
+<main><div class="wrap">
+<section class="panel" id="auth-panel">
+<div class="eyebrow">بوابة الأعضاء</div><h1 id="heading">أهلاً بعودتك</h1><p class="sub" id="subheading">سجّل دخولك لمتابعة حسابك والعودة إلى ملفك الشخصي.</p>
+<div class="tabs"><button type="button" id="login-tab" class="active">تسجيل الدخول</button><button type="button" id="signup-tab">إنشاء حساب</button></div>
+<form id="auth-form">
+<div id="name-wrap" hidden><label for="display-name">الاسم</label><input id="display-name" autocomplete="name" placeholder="اكتب اسمك"></div>
+<label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="email" required placeholder="name@example.com">
+<label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل">
+<button class="primary" id="submit" type="submit">تسجيل الدخول</button>
+</form>
+<button class="link" id="forgot" type="button">نسيت كلمة المرور؟</button>
+<div class="status" id="status" role="status" aria-live="polite"></div>
+</section>
+<section class="panel account" id="account-panel">
+<div class="profile-icon">⚽</div><div class="eyebrow">حسابك الشخصي</div><h1 id="welcome">أهلاً بك</h1><p class="sub">تم تسجيل دخولك بنجاح. حسابك محفوظ ويمكنك الرجوع إليه لاحقاً بنفس البريد وكلمة المرور.</p>
+<div class="info"><small>البريد الإلكتروني</small><strong id="account-email"></strong></div>
+<div class="info"><small>اسم الحساب</small><strong id="account-name">عضو MANDO SPORT</strong></div>
+<button class="secondary" id="logout" type="button">تسجيل الخروج</button>
+<div class="status" id="account-status" role="status" aria-live="polite"></div>
+</section>
+</div></main>
+<footer>© MANDO SPORT · جميع الحقوق محفوظة</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(()=>{
+ const URL='https://ibgvfjuqcolcyjzdzcde.supabase.co';
+ const KEY='sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_';
+ const $=id=>document.getElementById(id);
+ const authPanel=$('auth-panel'),accountPanel=$('account-panel'),form=$('auth-form');
+ let mode='login',db=null,busy=false;
+ function showStatus(message,error=false,where='status'){const el=$(where);el.textContent=message;el.className='status show '+(error?'error':'ok');}
+ function clearStatus(){$('status').className='status';$('account-status').className='status';}
+ function setMode(next){mode=next;clearStatus();const signup=mode==='signup';$('login-tab').classList.toggle('active',!signup);$('signup-tab').classList.toggle('active',signup);$('name-wrap').hidden=!signup;$('display-name').required=signup;$('heading').textContent=signup?'أنشئ حسابك الآن':'أهلاً بعودتك';$('subheading').textContent=signup?'أنشئ حساباً لتعود إلى ملفك في أي وقت.':'سجّل دخولك لمتابعة حسابك والعودة إلى ملفك الشخصي.';$('submit').textContent=signup?'إنشاء الحساب':'تسجيل الدخول';$('forgot').hidden=signup;$('password').autocomplete=signup?'new-password':'current-password';}
+ function showAccount(user){authPanel.style.display='none';accountPanel.classList.add('show');const meta=user.user_metadata||{};const name=meta.display_name||'عضو MANDO SPORT';$('welcome').textContent='أهلاً، '+name;$('account-email').textContent=user.email||'—';$('account-name').textContent=name;}
+ function showAuth(){accountPanel.classList.remove('show');authPanel.style.display='block';}
+ async function saveProfile(user){const name=(user.user_metadata&&user.user_metadata.display_name)||'';try{const {error}=await db.from('member_profiles').upsert({user_id:user.id,display_name:name||'عضو MANDO SPORT',favorite_team:''},{onConflict:'user_id'});if(error)console.warn('Member profile sync:',error.message);}catch(e){console.warn('Member profile sync unavailable:',e);}}
+ if(!window.supabase){showStatus('تعذر تحميل خدمة الحسابات. تحقق من الإنترنت ثم أعد تحميل الصفحة.',true);return;}
+ db=window.supabase.createClient(URL,KEY);
+ $('login-tab').addEventListener('click',()=>setMode('login'));$('signup-tab').addEventListener('click',()=>setMode('signup'));
+ form.addEventListener('submit',async e=>{
+  e.preventDefault();if(busy)return;busy=true;const btn=$('submit');btn.disabled=true;btn.textContent='لحظة من فضلك…';clearStatus();
+  const email=$('email').value.trim(),password=$('password').value;
+  try{
+   if(mode==='signup'){
+    const name=$('display-name').value.trim();if(name.length<2)throw new Error('اكتب اسمك بشكل صحيح.');
+    const {data,error}=await db.auth.signUp({email,password,options:{data:{display_name:name}}});if(error)throw error;
+    if(data.session&&data.user){await saveProfile(data.user);showAccount(data.user);showStatus('تم إنشاء حسابك بنجاح.');}
+    else{showStatus('تم إنشاء طلب الحساب. افتح بريدك الإلكتروني واضغط رابط التأكيد، ثم ارجع وسجّل دخولك.',false);}
+   }else{
+    const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;if(!data.user)throw new Error('لم يتم العثور على بيانات الحساب.');
+    await saveProfile(data.user);showAccount(data.user);
+   }
+  }catch(err){showAuth();showStatus(err.message||'تعذر إكمال العملية. حاول مجدداً.',true);}
+  finally{busy=false;btn.disabled=false;btn.textContent=mode==='signup'?'إنشاء الحساب':'تسجيل الدخول';}
+ });
+ $('forgot').addEventListener('click',async()=>{const email=$('email').value.trim();if(!email){showStatus('اكتب بريدك الإلكتروني أولاً.',true);return;}try{const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/customers.html'});if(error)throw error;showStatus('إذا كان البريد مسجلاً، سيصلك رابط إعادة تعيين كلمة المرور.');}catch(e){showStatus(e.message,true);}});
+ $('logout').addEventListener('click',async()=>{const {error}=await db.auth.signOut();if(error){showStatus(error.message,true,'account-status');return;}showAuth();setMode('login');showStatus('تم تسجيل الخروج. يمكنك العودة والدخول بنفس الحساب.');});
+ db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'&&session?.user){showAccount(session.user);}if(event==='SIGNED_OUT')showAuth();});
+ db.auth.getSession().then(({data,error})=>{if(error){showStatus('تعذر استعادة الجلسة: '+error.message,true);return;}if(data.session?.user)showAccount(data.session.user);});
+ if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(e=>console.warn('SW registration:',e)));}
+})();
+</script>
+</body></html>
