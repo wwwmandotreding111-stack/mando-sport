@@ -22,7 +22,7 @@ module.exports=async function handler(req,res){
    const players=raw.map(p=>{
     const a=p.athlete||p.player||p;
     const pos=p.position||a.position||{};
-    return {id:a.id||"",name:a.displayName||a.fullName||a.shortName||"",number:p.jersey??p.jerseyNumber??a.jersey??"",position:pos.displayName||pos.name||pos.abbreviation||"",positionCode:pos.abbreviation||pos.name||"",photo:a.headshot?.href||a.photo||"",starter:p.starter===true||p.starter?.displayValue==="Starter"||p.type?.name==="Starter",captain:p.captain===true};
+    return {id:a.id||"",name:a.displayName||a.fullName||a.shortName||"",number:p.jersey??p.jerseyNumber??a.jersey??"",position:pos.displayName||pos.name||pos.abbreviation||"",positionCode:pos.abbreviation||pos.name||"",photo:a.headshot?.href||a.photo||"",starter:p.starter===true||String(p.starter||"").toLowerCase()==="starter"||p.starter?.displayValue==="Starter"||p.type?.name==="Starter",captain:p.captain===true};
    }).filter(p=>p.name);
    return {side,team:team(side).name,formation:item.formation||item.team?.formation||"",starters:players.filter(p=>p.starter),substitutes:players.filter(p=>!p.starter)};
   });
