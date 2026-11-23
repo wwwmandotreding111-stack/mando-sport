@@ -422,12 +422,7 @@ body.mando-admin footer{margin-right:252px;border-top:1px solid var(--adm-line);
 const $ = id => document.getElementById(id);
 const SUPABASE_URL = 'https://ibgvfjuqcolcyjzdzcde.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_';
-if (!window.supabase) {
- const status = $('login-status');
- if (status) { status.textContent='تعذّر تحميل خدمة تسجيل الدخول. حدّث الصفحة أو جرّب بعد قليل.'; status.className='status error'; }
- throw new Error('Supabase SDK failed to load');
-}
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function message(id,text,error=false){$(id).textContent=text;$(id).className='status '+(error?'error':'ok')}
 function showLogin(){ $('login-panel').classList.remove('hidden'); $('dashboard').classList.add('hidden'); }
@@ -462,6 +457,7 @@ $('login-form').addEventListener('submit',async e=>{
  submit.disabled=true;submit.textContent='جارٍ التحقق…';
  message('login-status','جارٍ التحقق من الحساب…');
  try{
+  if(!db) throw new Error('تعذّر تحميل خدمة تسجيل الدخول. تحقق من اتصال الإنترنت ثم أعد تحميل الصفحة.');
   const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
   if(error)throw error;
   if(!data?.user)throw new Error('تم الاتصال دون استلام بيانات الحساب. أعد المحاولة.');
@@ -475,8 +471,9 @@ $('login-form').addEventListener('submit',async e=>{
  }
 });
 $('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
-db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
+if(db) db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
 (async()=>{
+ if(!db) return;
  try{
   const {data,error}=await db.auth.getSession();
   if(error)throw error;
