@@ -40,7 +40,7 @@ module.exports = async function handler(req, res) {
       seen.add(key); return true;
     }).slice(0, 24);
     res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=600");
-    return res.status(200).json({ provider: "ESPN", query, items });
+    return res.status(200).json({ provider: "ESPN", query, items, ...(req.query.debug === "1" ? { debug: { keys: Object.keys(data), sample: JSON.stringify(data).slice(0, 4500) } } : {}) });
   } catch (error) {
     return res.status(502).json({ error: "تعذر تنفيذ البحث الرياضي حالياً." });
   }
