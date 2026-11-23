@@ -1,58 +1,59 @@
-// MANDO SPORT — recent football video highlights from ESPN.
-const LEAGUES = [
-  { slug: "eng.1", name: "الدوري الإنجليزي" },
-  { slug: "esp.1", name: "الدوري الإسباني" },
-  { slug: "ita.1", name: "الدوري الإيطالي" },
-  { slug: "ger.1", name: "الدوري الألماني" },
-  { slug: "fra.1", name: "الدوري الفرنسي" },
-  { slug: "uefa.champions", name: "دوري أبطال أوروبا" },
-  { slug: "ksa.1", name: "الدوري السعودي" }
+// MANDO SPORT — verified football highlights from official YouTube channels.
+const FEEDS = [
+  { query: "Premier League official highlights", league: "الدوري الإنجليزي" },
+  { query: "UEFA Champions League official highlights", league: "دوري أبطال أوروبا" },
+  { query: "LALIGA official highlights", league: "الدوري الإسباني" },
+  { query: "FIFA official football highlights", league: "كرة القدم العالمية" },
+  { query: "Saudi Pro League official highlights", league: "الدوري السعودي" }
 ];
-function href(value) {
-  if (typeof value === "string") return value;
-  if (value && typeof value.href === "string") return value.href;
-  return "";
+const OFFICIAL_CHANNEL = /(premier league|uefa|laliga|la liga|fifa|saudi pro league|roshn)/i;
+function decodeXml(value) {
+  return String(value || "")
+    .replace(/&amp;/g, "&").replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'").replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">").replace(/&#(\\d+);/g, (_, n) => String.fromCodePoint(Number(n)));
 }
-function imageUrl(video) {
-  const first = Array.isArray(video.images) ? video.images[0] : null;
-  return href(video.thumbnail) || href(video.image) || href(first) ||
-    href(video.links?.thumbnail) || href(video.links?.image) || "";
+function tag(xml, name) {
+  const match = xml.match(new RegExp("<" + name + "(?:\\s[^>]*)?>([\\s\\S]*?)</" + name + ">"));
+  return match ? decodeXml(match[1].replace(/<!\\[CDATA\\[|\\]\\]>/g, "").trim()) : "";
 }
-async function leagueVideos(league) {
-  const endpoint = "https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/videos?region=us&lang=en&contentorigin=espn&limit=20";
-  const response = await fetch(endpoint, { headers: { "Accept": "application/json", "User-Agent": "Mozilla/5.0 MANDO-SPORT" } });
-  if (!response.ok) throw new Error("ESPN videos HTTP " + response.status);
-  const data = await response.json();
-  const entries = Array.isArray(data.videos) ? data.videos :
-    Array.isArray(data.items) ? data.items :
-    Array.isArray(data.results) ? data.results : [];
-  return entries.map(video => {
-    const id = video.id || video.guid || "";
-    const links = video.links || {};
-    const link = href(links.web) || href(links.source) || href(links.mobile) ||
-      href(video.link) || (id ? "https://www.espn.com/video/clip/_/id/" + encodeURIComponent(id) : "");
+async function fetchFeed(feed) {
+  const url = "https://www.youtube.com/feeds/videos.xml?search_query=" + encodeURIComponent(feed.query);
+  const response = await fetch(url, { headers: { "Accept": "application/atom+xml, application/xml, text/xml", "User-Agent": "Mozilla/5.0 MANDO-SPORT" } });
+  if (!response.ok) throw new Error("YouTube feed HTTP " + response.status);
+  const xml = await response.text();
+  return [...xml.matchAll(/<entry>([\\s\\S]*?)<\\/entry>/g)].map(match => {
+    const entry = match[1];
+    const id = tag(entry, "yt:videoId");
+    const channel = tag(entry, "name");
+    const title = tag(entry, "title");
+    const publishedAt = tag(entry, "published");
+    if (!id || !title || !OFFICIAL_CHANNEL.test(channel)) return null;
     return {
-      id: id || link,
-      title: video.headline || video.title || video.name || "",
-      description: video.description || "",
-      url: link,
-      image: imageUrl(video),
-      league: league.name,
-      publishedAt: video.published || video.date || video.lastModified || null
+      id, title, url: "https://www.youtube.com/watch?v=" + encodeURIComponent(id),
+      image: "https://i.ytimg.com/vi/" + encodeURIComponent(id) + "/hqdefault.jpg",
+      league: feed.league, channel, publishedAt
     };
-  }).filter(video => video.title && (video.url.startsWith("http://") || video.url.startsWith("https://")));
+  }).filter(Boolean);
 }
 module.exports = async function handler(req, res) {
-  const results = await Promise.allSettled(LEAGUES.map(league => leagueVideos(league)));
+  const results = await Promise.allSettled(FEEDS.map(fetchFeed));
   const unique = new Map();
   results.forEach(result => {
     if (result.status !== "fulfilled") return;
     result.value.forEach(video => {
-      if (!unique.has(video.url)) unique.set(video.url, video);
+      if (!unique.has(video.id)) unique.set(video.id, video);
     });
   });
-  const highlights = [...unique.values()].sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
+  const highlights = [...unique.values()]
+    .sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0))
+    .slice(0, 24);
   res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=1200");
-  if (!highlights.length) return res.status(200).json({ provider: "ESPN", updatedAt: new Date().toISOString(), highlights: [], partial: true, message: "لم يُرجع مصدر الفيديوهات مقاطع قابلة للعرض حالياً." });
-  return res.status(200).json({ provider: "ESPN", updatedAt: new Date().toISOString(), highlights: highlights.slice(0, 24), partial: results.some(result => result.status === "rejected") });
+  return res.status(200).json({
+    provider: "YouTube — official football channels",
+    updatedAt: new Date().toISOString(),
+    highlights,
+    partial: results.some(result => result.status === "rejected"),
+    message: highlights.length ? null : "لم تُرجع القنوات الرسمية مقاطع متاحة حالياً."
+  });
 };
