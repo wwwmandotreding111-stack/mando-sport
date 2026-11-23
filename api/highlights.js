@@ -1,10 +1,8 @@
-// MANDO SPORT — recent uploads from verified official football channels.
+// MANDO SPORT — Arabic football highlights from verified official channels.
 const FEEDS = [
-  { channelId: "UCG5qGWdu8nIRZqJ_GgDwQ-w", league: "الدوري الإنجليزي", channelName: "Premier League" },
-  { channelId: "UCyGa1YEx9ST66rYrJTGIKOw", league: "دوري أبطال أوروبا", channelName: "UEFA" },
-  { channelId: "UCTv-XvfzLX3i4IGWAm4sbmA", league: "الدوري الإسباني", channelName: "LALIGA" },
-  { channelId: "UCpcTrCXblq78GZrTUTLWeBw", league: "كرة القدم العالمية", channelName: "FIFA" },
-  { channelId: "UCqXAWrjSgLb0EPa_icPt-pw", league: "الدوري السعودي", channelName: "Saudi Pro League" }
+  { channelId: "UCJUCcJUeh0Cz2xyKwkw5Q1w", league: "أبرز مباريات كرة القدم", channelName: "beIN SPORTS" },
+  { channelId: "UCS_yHXNb5w5S74KQL_TK8Yw", league: "كرة القدم العربية", channelName: "قنوات الكاس" },
+  { channelId: "UCqXAWrjSgLb0EPa_icPt-pw", league: "الدوري السعودي", channelName: "الدوري السعودي للمحترفين" }
 ];
 function decodeXml(value) {
   return String(value || "")
@@ -54,10 +52,10 @@ module.exports = async function handler(req, res) {
     .slice(0, 24);
   res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=1200");
   return res.status(200).json({
-    provider: "YouTube — official football channels",
+    provider: "YouTube — Arabic official football channels",
     updatedAt: new Date().toISOString(),
     highlights,
     partial: results.some(result => result.status === "rejected"),
-    message: highlights.length ? null : "لم تُرجع القنوات الرسمية مقاطع متاحة حالياً."
+    message: highlights.length ? null : "لا توجد مقاطع عربية متاحة حالياً من القنوات الرسمية."
   });
 };
