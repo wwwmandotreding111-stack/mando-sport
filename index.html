@@ -336,13 +336,16 @@ header .wrap{max-width:1440px}
 .header-status{background:#f0f8f3!important;color:#287a52!important;border-color:#cce7d7!important}
 nav{color:#435061!important}
 nav a:hover,nav a:focus{background:#f7f0e2!important;color:#91651f!important}
-.portal-intro{max-width:1440px!important;width:calc(100% - 40px)!important;margin:16px auto 10px!important;padding:20px 24px!important;background:linear-gradient(110deg,#1b2a39,#30485d)!important;border-radius:10px!important}
+.portal-intro{max-width:1500px!important;width:calc(100% - 306px)!important;margin:16px 20px 10px 286px!important;padding:20px 24px!important;background:linear-gradient(110deg,#1b2a39,#30485d)!important;border-radius:10px!important}
+.portal-intro-mark{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-width:100px;color:#f4d58f}
+.portal-intro-mark span{width:66px;height:66px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#f7dfaa,#bd8732);color:#1b2734;font-size:25px;box-shadow:0 8px 24px #0003}
+.portal-intro-mark small{font-size:10px;letter-spacing:1px;font-weight:900}
 .portal-intro h1{font-size:clamp(22px,3vw,30px)!important}
 .portal-intro p{font-size:13px!important}
 .portal-intro-mark span{font-weight:950!important}
 .competition-strip{max-width:1440px;background:#fff!important;border:1px solid var(--portal-line)!important;border-radius:8px!important;box-shadow:0 1px 4px #17202b08}
 .competition-strip a{background:#f7f8fa!important;color:#405064!important;border:1px solid #e5e8ec!important;border-radius:5px!important}
-#home.portal-home{display:block!important;width:calc(100% - 40px)!important;max-width:1440px!important;margin:0 auto!important;padding:0!important}
+#home.portal-home{display:block!important;width:calc(100% - 306px)!important;max-width:1500px!important;margin:0 20px 0 286px!important;padding:0!important}
 .portal-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px;align-items:start;direction:rtl}
 .portal-main{min-width:0}
 .portal-rail{display:grid;gap:13px;position:sticky;top:116px;min-width:0}
@@ -415,8 +418,8 @@ nav a:hover,nav a:focus{background:#f7f0e2!important;color:#91651f!important}
 footer{background:#fff!important;color:#778391!important;border-top:1px solid #e0e4e9!important}
 @media(max-width:1100px){.portal-layout{grid-template-columns:minmax(0,1fr) 250px}.portal-news-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){
- .portal-intro{width:calc(100% - 20px)!important}
- #home.portal-home{width:calc(100% - 20px)!important}
+ .portal-intro{width:calc(100% - 20px)!important;margin:16px auto 10px!important}
+ #home.portal-home{width:calc(100% - 20px)!important;margin:0 auto!important}
  .portal-layout{display:flex;flex-direction:column}
  .portal-main,.portal-rail{width:100%}
  .portal-rail{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}
