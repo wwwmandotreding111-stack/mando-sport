@@ -447,7 +447,7 @@ footer{background:#fff!important;color:#778391!important;border-top:1px solid #e
  .portal-search{flex-direction:column}
 }
 </style>
-</head>
+<style id="match-detail-links">.match-details{display:block;padding:6px 12px;text-align:center;border-top:1px solid #edf0f3;color:#97702e;font-size:10px;font-weight:800;background:#fff}.match-details:hover{background:#f8f5ed}</style></head>
 <body>
 <header><div class="wrap">
   <div class="top">
@@ -543,7 +543,7 @@ function renderMatchGroups(matches,resultsOnly=false){
  return [...groups.entries()].map(([competition,items])=>'<section class="match-group"><div class="match-group-head"><span>'+esc(competition)+'</span><span>'+items.length+' مباراة</span></div>'+items.map(m=>{
   const homeLogo=m.homeCrest?'<img src="'+esc(m.homeCrest)+'" alt="" loading="lazy">':'⚽',awayLogo=m.awayCrest?'<img src="'+esc(m.awayCrest)+'" alt="" loading="lazy">':'⚽';
   const score=m.homeScore!==null&&m.awayScore!==null?'<div class="score">'+esc(m.homeScore)+' - '+esc(m.awayScore)+'</div>':'<div class="kickoff">'+(m.utcDate?new Date(m.utcDate).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}):'—')+'</div>';
-  return '<div class="match-row"><div class="match-side home"><span class="match-team-name">'+esc(m.home)+'</span><span class="crest">'+homeLogo+'</span></div><div class="match-center">'+score+'<span class="match-state '+matchStatusClass(m.status)+'">'+matchStatusText(m.status)+'</span></div><div class="match-side away"><span class="crest">'+awayLogo+'</span><span class="match-team-name">'+esc(m.away)+'</span></div></div>';
+  return '<div class="match-row"><div class="match-side home"><span class="match-team-name">'+esc(m.home)+'</span><span class="crest">'+homeLogo+'</span></div><div class="match-center">'+score+'<span class="match-state '+matchStatusClass(m.status)+'">'+matchStatusText(m.status)+'</span></div><div class="match-side away"><span class="crest">'+awayLogo+'</span><span class="match-team-name">'+esc(m.away)+'</span></div></div><a class="match-details" href="/match.html?competition='+encodeURIComponent(m.competitionCode)+'&id='+encodeURIComponent(m.id)+'">تفاصيل المباراة ←</a>';
  }).join('')+'</section>').join('');
 }
 function renderMatchDays(){
