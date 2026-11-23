@@ -170,6 +170,35 @@ footer{background:#fff;color:#7b8591;border-color:#e0e4e9}
  .news .card p{font-size:11px}
 }
 
+
+/* MANDO SPORT fixed desktop sidebar and mobile drawer */
+.portal-sidebar{position:fixed;z-index:30;left:16px;top:88px;bottom:16px;width:218px;overflow-y:auto;background:#fff;border:1px solid #dfe3e8;border-radius:10px;box-shadow:0 5px 22px #17202b12;padding:13px;color:#27313d}
+.portal-sidebar .side-brand{display:flex;align-items:center;gap:9px;padding:3px 5px 13px;border-bottom:1px solid #edf0f3;margin-bottom:10px}
+.portal-sidebar .side-mark{width:35px;height:35px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(145deg,#f4d58f,#c18b38);color:#171108;font-weight:1000}
+.portal-sidebar .side-brand strong{font-size:14px;letter-spacing:.3px}.portal-sidebar .side-brand b{color:#a77a2d}
+.portal-sidebar .side-label{font-size:10px;color:#929ba6;font-weight:800;padding:9px 8px 5px}
+.portal-sidebar a{display:flex;align-items:center;gap:10px;padding:9px 10px;margin:2px 0;border-radius:6px;color:#465363;font-size:12px;font-weight:700;transition:.18s}
+.portal-sidebar a:hover,.portal-sidebar a:focus{background:#f7f0e2;color:#8a641d}
+.portal-sidebar a .side-ico{width:19px;text-align:center;font-size:15px}
+.portal-sidebar .side-featured{background:#f8f5ed;color:#8a641d}
+.portal-sidebar .side-foot{border-top:1px solid #edf0f3;margin-top:10px;padding-top:9px;color:#8a939e;font-size:10px;text-align:center}
+.portal-menu-toggle{display:none;border:1px solid #dfe3e8;background:#fff;color:#344050;border-radius:7px;width:38px;height:38px;font-size:20px;cursor:pointer}
+.portal-sidebar-backdrop{display:none}
+@media(min-width:901px){
+ body> .wrap:has(.competition-strip),main#home{width:calc(100% - 270px);max-width:1160px;margin-left:250px;margin-right:20px}
+}
+@media(max-width:900px){
+ .portal-menu-toggle{display:grid;place-items:center}
+ .portal-sidebar{left:auto;right:0;top:0;bottom:0;width:min(290px,86vw);border-radius:0 12px 12px 0;z-index:10002;transform:translateX(110%);transition:transform .24s ease;box-shadow:0 0 35px #0002}
+ body.sidebar-open .portal-sidebar{transform:translateX(0)}
+ .portal-sidebar-backdrop{display:block;position:fixed;inset:0;background:#10172277;z-index:10001;opacity:0;visibility:hidden;transition:.2s}
+ body.sidebar-open .portal-sidebar-backdrop{opacity:1;visibility:visible}
+ body.sidebar-open{overflow:hidden}
+ body> .wrap:has(.competition-strip),main#home{width:calc(100% - 20px);max-width:760px;margin-left:auto;margin-right:auto}
+ .top{gap:10px}
+}
+@media(prefers-reduced-motion:reduce){.portal-sidebar,.portal-sidebar-backdrop{transition:none!important}}
+
 </style>
 
 <style>
@@ -182,9 +211,34 @@ footer{background:#fff;color:#7b8591;border-color:#e0e4e9}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="top"><div class="brand-wrap"><div class="brand-mark">M</div><div><div class="brand">MANDO <b>SPORT</b></div><div class="tag">نبض الملاعب لحظة بلحظة</div></div></div><div class="header-status"><span class="pulse"></span> تغطية رياضية مستمرة</div></div>
+  <div class="top">
+<button class="portal-menu-toggle" id="portal-menu-toggle" type="button" aria-label="فتح القائمة الجانبية" aria-controls="portal-sidebar" aria-expanded="false">☰</button>
+<div class="brand-wrap"><div class="brand-mark">M</div><div><div class="brand">MANDO <b>SPORT</b></div><div class="tag">نبض الملاعب لحظة بلحظة</div></div></div><div class="header-status"><span class="pulse"></span> تغطية رياضية مستمرة</div></div>
   <nav aria-label="التنقل الرئيسي"><a href="#matches">مباشر</a><a href="#matches">مباريات اليوم</a><a href="#news">أخبار</a><a href="#leagues">مسابقات</a><a href="#leagues">ترتيب</a><a href="#news">الأكثر رواجاً</a><a href="/customers.html">حسابي والإشعارات</a></nav>
 </div></header>
+
+<aside class="portal-sidebar" id="portal-sidebar" aria-label="القائمة الجانبية">
+ <div class="side-brand"><div class="side-mark">M</div><div><strong>MANDO <b>SPORT</b></strong><div class="tag">دليلك الرياضي</div></div></div>
+ <div class="side-label">التنقل الرئيسي</div>
+ <a class="side-featured" href="#matches"><span class="side-ico">🔴</span>مباشر الآن</a>
+ <a href="#matches"><span class="side-ico">📅</span>مباريات اليوم</a>
+ <a href="#results"><span class="side-ico">⚽</span>النتائج</a>
+ <a href="#standings"><span class="side-ico">🏆</span>ترتيب الدوريات</a>
+ <a href="#news"><span class="side-ico">📰</span>آخر الأخبار</a>
+ <a href="#leagues"><span class="side-ico">🌍</span>المسابقات والبطولات</a>
+ <div class="side-label">أهم البطولات</div>
+ <a href="#leagues"><span class="side-ico">⭐</span>دوري أبطال أوروبا</a>
+ <a href="#leagues"><span class="side-ico">🏴</span>الدوري الإنجليزي</a>
+ <a href="#leagues"><span class="side-ico">🇪🇸</span>الدوري الإسباني</a>
+ <a href="#leagues"><span class="side-ico">🇮🇹</span>الدوري الإيطالي</a>
+ <a href="#leagues"><span class="side-ico">🇩🇪</span>الدوري الألماني</a>
+ <a href="#leagues"><span class="side-ico">🇫🇷</span>الدوري الفرنسي</a>
+ <div class="side-label">حسابك</div>
+ <a href="/customers.html"><span class="side-ico">👤</span>حسابي والإشعارات</a>
+ <div class="side-foot">MANDO SPORT · عالم كرة القدم</div>
+</aside>
+<div class="portal-sidebar-backdrop" id="portal-sidebar-backdrop"></div>
+
 <div class="wrap"><div class="competition-strip" aria-label="أهم البطولات"><strong>أهم البطولات</strong><a href="#leagues">دوري أبطال أوروبا</a><a href="#leagues">الدوري الإنجليزي</a><a href="#leagues">الدوري الإسباني</a><a href="#leagues">الدوري الإيطالي</a><a href="#leagues">الدوري الألماني</a><a href="#leagues">الدوري الفرنسي</a></div></div>
 <main class="wrap" id="home">
 
@@ -203,6 +257,19 @@ footer{background:#fff;color:#7b8591;border-color:#e0e4e9}
 <footer><div class="wrap">© <span id="year"></span> Mando Sport — موقع رياضي مستقل. مواعيد المباريات حسب توقيت جهازك. لا نوفر بثاً غير مرخص للمباريات.<div style="margin-top:7px;color:var(--gold);font-weight:700">تم تطوير الموقع بواسطة عامر مندو</div></div></footer>
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
+
+const portalMenu=document.getElementById('portal-menu-toggle');
+const portalSidebar=document.getElementById('portal-sidebar');
+const portalBackdrop=document.getElementById('portal-sidebar-backdrop');
+function closePortalSidebar(){document.body.classList.remove('sidebar-open');if(portalMenu){portalMenu.setAttribute('aria-expanded','false');portalMenu.setAttribute('aria-label','فتح القائمة الجانبية');}}
+if(portalMenu&&portalSidebar&&portalBackdrop){
+ portalMenu.addEventListener('click',()=>{const open=document.body.classList.toggle('sidebar-open');portalMenu.setAttribute('aria-expanded',String(open));portalMenu.setAttribute('aria-label',open?'إغلاق القائمة الجانبية':'فتح القائمة الجانبية');});
+ portalBackdrop.addEventListener('click',closePortalSidebar);
+ portalSidebar.querySelectorAll('a').forEach(link=>link.addEventListener('click',closePortalSidebar));
+ document.addEventListener('keydown',event=>{if(event.key==='Escape')closePortalSidebar();});
+ window.addEventListener('resize',()=>{if(window.innerWidth>900)closePortalSidebar();});
+}
+
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const statusAr = (s) => ({'IN_PLAY':'مباشرة الآن','PAUSED':'استراحة','FINISHED':'انتهت','SCHEDULED':'لم تبدأ','TIMED':'لم تبدأ','POSTPONED':'مؤجلة','CANCELLED':'أُلغيت','SUSPENDED':'متوقفة'}[s] || 'موعد المباراة');
 let selectedMatchDate = new Date();
