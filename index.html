@@ -574,13 +574,9 @@ async function loadPortalContent(){
  let manual=[],automatic=[];
  try{
   const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-  const [manualResult,newsResponse]=await Promise.all([
-   supabase.from('articles').select('id,title,excerpt,body,image_url,category,featured,created_at').eq('published',true).order('featured',{ascending:false}).order('created_at',{ascending:false}).limit(30),
-   fetch('/api/news',{cache:'no-store'}).catch(()=>null)
-  ]);
+  const manualResult=await supabase.from('articles').select('id,title,excerpt,body,image_url,category,featured,created_at').eq('published',true).order('featured',{ascending:false}).order('created_at',{ascending:false}).limit(30);
   if(!manualResult.error)manual=manualResult.data||[];
-  if(newsResponse?.ok){const data=await newsResponse.json();automatic=Array.isArray(data.articles)?data.articles:[];newsStatus.textContent='أخبار عربية وعالمية من مصادرها ومحتوى MANDO SPORT';}
-  else newsStatus.textContent='الأخبار المنشورة من إدارة MANDO SPORT';
+  newsStatus.textContent='الأخبار المنشورة من إدارة MANDO SPORT';
  }catch(error){newsStatus.textContent='تعذر تحميل بعض مصادر الأخبار';}
  const articleUrl=a=>'/article.html?id='+encodeURIComponent(a.id);
  const manualCard=a=>'<a class="portal-news-card" href="'+articleUrl(a)+'">'+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="" loading="lazy">':'<div class="news-no-image">📰</div>')+'<div class="news-copy"><small>'+esc(a.category||'أخبار كرة القدم')+(a.featured?' · خبر رئيسي':'')+'</small><h3>'+esc(a.title)+'</h3><p>'+esc(a.excerpt||'تابع تفاصيل الخبر عبر MANDO SPORT.')+'</p></div><div class="news-meta">MANDO SPORT · '+new Date(a.created_at).toLocaleDateString('ar')+'</div></a>';
