@@ -19,13 +19,19 @@ module.exports = async function handler(req, res) {
         const kind = String(node.type?.type || node.type || node.contentType || "").toLowerCase();
         const isPlayer = kind.includes("athlete") || kind.includes("player");
         const isTeam = kind.includes("team");
+        const uid = String(node.uid || "");
+        const entityMatch = uid.match(isPlayer ? /~a:(\d+)/ : /~t:(\d+)/);
+        const entityId = entityMatch?.[1] || String(node.id || "").match(/\d+/)?.[0] || "";
+        const league = node.defaultLeagueSlug || "eng.1";
+        const localUrl = entityId && isPlayer ? "/player.html?league=" + encodeURIComponent(league) + "&id=" + encodeURIComponent(entityId) : entityId && isTeam ? "/team.html?league=" + encodeURIComponent(league) + "&id=" + encodeURIComponent(entityId) : href;
         candidates.push({
           id: node.id || node.uid || href,
           title: String(title).slice(0, 160),
           description: String(node.description || node.subtitle || node.shortName || "").slice(0, 220),
           type: isPlayer ? "لاعب" : isTeam ? "فريق" : "نتيجة",
           image: node.image?.default || node.image?.href || node.image || node.headshot?.href || node.images?.[0]?.url || node.logos?.[0]?.href || "",
-          url: href
+          url: href,
+          localUrl
         });
       }
       Object.entries(node).forEach(([key, value]) => {
