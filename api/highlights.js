@@ -40,7 +40,7 @@ async function leagueVideos(league) {
       league: league.name,
       publishedAt: video.published || video.date || video.lastModified || null
     };
-  }).filter(video => video.title && /^https?:\\/\\//i.test(video.url));
+  }).filter(video => video.title && (video.url.startsWith("http://") || video.url.startsWith("https://")));
 }
 module.exports = async function handler(req, res) {
   const results = await Promise.allSettled(LEAGUES.map(league => leagueVideos(league)));
