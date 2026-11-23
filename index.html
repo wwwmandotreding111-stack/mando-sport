@@ -199,6 +199,125 @@ footer{background:#fff;color:#7b8591;border-color:#e0e4e9}
 }
 @media(prefers-reduced-motion:reduce){.portal-sidebar,.portal-sidebar-backdrop{transition:none!important}}
 
+
+/* Premium editorial football portal refresh */
+:root{--portal-ink:#1c2733;--portal-muted:#788492;--portal-line:#e3e7ec;--portal-gold:#b78a3b}
+body{background:#f4f6f8;color:var(--portal-ink)}
+header{background:#172330;color:#fff;border-bottom:3px solid #c49a4b;box-shadow:0 4px 16px #14202d18}
+header .wrap{max-width:1440px}
+.top{min-height:68px}
+.brand{color:#fff;letter-spacing:.7px}
+.brand .unused{color:#e6c37c}
+.brand b{color:#e6c37c}
+.brand-mark{box-shadow:0 4px 14px #0003}
+.header-status{background:#173b30;border-color:#28634d;color:#b8f0d5}
+nav{padding:0 0 11px;color:#e1e6eb}
+nav a{padding:8px 14px;border-radius:6px;font-weight:700}
+nav a:first-child{background:#263849;color:#f1d28f}
+nav a:hover,nav a:focus{background:#30465a;color:#fff}
+.portal-sidebar{top:94px;left:18px;bottom:18px;width:232px;border-radius:8px;box-shadow:0 3px 16px #17202b12;border-color:#e0e5eb}
+.portal-sidebar .side-brand{padding-bottom:14px}
+.portal-sidebar .side-mark{border-radius:8px}
+.portal-sidebar .side-label{font-size:10px;letter-spacing:.2px;color:#9aa4af}
+.portal-sidebar a{font-size:12px;padding:8px 10px;border-radius:5px}
+.portal-sidebar .side-featured{background:#f8f1e3;color:#8a641d;border-right:3px solid #bd9145}
+.competition-strip{max-width:1440px;background:#fff;border:1px solid #e0e5eb;border-radius:8px;margin:16px auto 12px;padding:12px 14px;box-shadow:0 2px 7px #1d29350a}
+.competition-strip strong{color:#8b672b;font-size:12px}
+.competition-strip a{border-radius:5px;background:#f7f8fa;border-color:#e6e9ed;color:#465361;font-weight:700;padding:7px 13px}
+.competition-strip a:hover{background:#f6efdf;border-color:#d8c08d;color:#805c1d}
+main.wrap{max-width:1440px;padding-top:2px;display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,320px);column-gap:18px;align-items:start}
+#matches{grid-column:1;grid-row:1}
+#results{grid-column:1;grid-row:2}
+#leagues{grid-column:2;grid-row:1 / span 2;position:sticky;top:112px}
+#news{grid-column:1 / -1;grid-row:3}
+main>.section:last-child{grid-column:1 / -1}
+.section{margin:13px 0 20px}
+.section-head{margin-bottom:12px;padding:0 0 10px;border-bottom:1px solid #e0e5eb}
+.section-head h2{font-size:19px;color:#25313d;gap:10px}
+.section-head h2:before{height:20px;width:4px;border-radius:2px;background:#c59b4d}
+.section-head small{font-size:11px;color:#84909d}
+#matches,#results,#leagues,#news{background:#fff;border:1px solid #e1e5ea;border-radius:9px;padding:15px;box-shadow:0 2px 8px #18233108}
+#matches-list,#results-list{gap:8px}
+.match-group{border-radius:7px;border-color:#e4e8ed}
+.match-group-head{background:#f5f7f9;color:#485564;padding:10px 12px;font-size:12px}
+.match-row{padding:13px 12px;min-height:65px}
+.match-row:hover{background:#f8fafc}
+.match-side{font-size:13px}
+.match-center .score{font-size:21px;font-weight:900;color:#243343}
+.match-center .match-state{font-size:10px}
+.match-center .match-state.live{background:#fff0f0;color:#d22e38;padding:2px 8px;border-radius:20px}
+.match-center .match-state.done{background:#edf8f1;color:#21834f;padding:2px 8px;border-radius:20px}
+#match-days{gap:7px;padding:5px 0 13px}
+#match-days button{min-width:67px;padding:8px 10px;border-radius:6px;background:#f7f8fa;color:#536171;border-color:#e3e7ec;font-weight:700}
+#match-days button.active{background:#27394a;border-color:#27394a;color:#fff}
+#match-filter select,#league-select{border-radius:6px!important;border-color:#dce2e8!important;background:#fff!important;color:#344252!important}
+#standings-container{border:1px solid #e4e8ed;box-shadow:none}
+#leagues .card{box-shadow:none;border:1px solid #e4e8ed}
+#leagues label{color:#7d602a!important}
+#leagues .notice{background:#f8fafb;color:#6e7a87;border-color:#d9e0e7}
+table{font-size:12px;min-width:500px}
+th{background:#f3f5f7;color:#8c682b;font-size:11px}
+td{color:#465260;border-color:#edf0f3;padding:10px 8px}
+tbody tr:nth-child(even){background:#fafbfc}
+.news{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.news .card{border:1px solid #e2e6eb;border-radius:8px;padding:10px;box-shadow:none}
+.news .card:hover{border-color:#cfb47e}
+.news .card h3{font-size:14px;color:#263341;line-height:1.55}
+.news .card p{color:#778391}
+.news-photo{height:135px;border-radius:6px}
+.news .card:first-child{grid-column:span 2;grid-row:span 2}
+.news .card:first-child .news-photo,.news .card:first-child .news-icon{height:225px}
+.news .card:first-child h3{font-size:19px}
+.news .card small{color:#a17a37!important;font-weight:800}
+.ad{background:#fafbfc;border:1px dashed #d3dae2;color:#9aa3ad;border-radius:7px}
+footer{background:#172330;color:#c0c9d2;border:0;margin-top:28px}
+footer .wrap{max-width:1440px}
+.portal-menu-toggle{border-color:#ffffff38;background:#263849;color:#fff}
+@media(min-width:901px){
+ body>.wrap:has(.competition-strip),main#home{width:calc(100% - 286px);max-width:1440px;margin-left:266px;margin-right:20px}
+}
+@media(max-width:1100px) and (min-width:901px){
+ main.wrap{grid-template-columns:minmax(0,1fr) 260px;column-gap:12px}
+ .news{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:900px){
+ header{position:sticky}
+ .portal-sidebar{top:0;right:0;left:auto;width:min(310px,88vw);border-radius:0 10px 10px 0}
+ .portal-sidebar-backdrop{z-index:10001}
+ main.wrap{display:flex;flex-direction:column;width:calc(100% - 20px);max-width:720px;gap:0}
+ #matches,#results,#leagues,#news{width:100%;padding:12px;margin:10px 0}
+ #leagues{position:static;order:3}
+ #matches{order:1}
+ #results{order:2}
+ #news{order:4}
+ main>.section:last-child{order:5}
+ .news{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .news .card:first-child{grid-column:span 2;grid-row:auto}
+ .news .card:first-child .news-photo,.news .card:first-child .news-icon{height:170px}
+ .news .card:first-child h3{font-size:16px}
+ .competition-strip{margin:10px;width:calc(100% - 20px)}
+}
+@media(max-width:560px){
+ .top{min-height:58px}
+ .brand{font-size:18px}
+ .header-status{font-size:9px;padding:4px 7px}
+ nav{gap:2px}
+ nav a{font-size:11px;padding:7px 9px}
+ .news{grid-template-columns:1fr}
+ .news .card:first-child{grid-column:auto}
+ .news .card:first-child .news-photo,.news .card:first-child .news-icon{height:150px}
+ .match-row{min-height:58px}
+}
+
+
+.portal-intro{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:16px auto 8px;padding:17px 21px;background:linear-gradient(110deg,#243647,#172330);border-radius:9px;color:#fff;box-shadow:0 5px 18px #1a27341a}
+.portal-intro h1{font-size:clamp(19px,3vw,25px);margin:4px 0 1px;color:#fff}
+.portal-intro p{font-size:12px;color:#c5d0da;margin:0}
+.portal-breadcrumb{font-size:10px;color:#e7c987}.portal-breadcrumb span{padding:0 5px;color:#a9b7c4}
+.portal-intro-mark{display:flex;align-items:center;gap:9px;color:#e8cc91;font-size:11px;font-weight:900}
+.portal-intro-mark span{width:42px;height:42px;border:1px solid #d7b36e;border-radius:50%;display:grid;place-items:center;font-size:15px;background:#ffffff0b}
+@media(max-width:900px){.portal-intro{width:calc(100% - 20px);margin-top:12px;padding:14px 16px}.portal-intro-mark{display:none}}
+
 </style>
 
 <style>
@@ -233,11 +352,28 @@ footer{background:#fff;color:#7b8591;border-color:#e0e4e9}
  <a href="#leagues"><span class="side-ico">🇮🇹</span>الدوري الإيطالي</a>
  <a href="#leagues"><span class="side-ico">🇩🇪</span>الدوري الألماني</a>
  <a href="#leagues"><span class="side-ico">🇫🇷</span>الدوري الفرنسي</a>
+
+ <div class="side-label">الأندية الأوروبية</div>
+ <a href="#matches"><span class="side-ico">🔵</span>برشلونة</a>
+ <a href="#matches"><span class="side-ico">⚪</span>ريال مدريد</a>
+ <a href="#matches"><span class="side-ico">🔴</span>ليفربول</a>
+ <a href="#matches"><span class="side-ico">🔷</span>مانشستر سيتي</a>
+ <a href="#matches"><span class="side-ico">🔴</span>بايرن ميونخ</a>
+ <a href="#matches"><span class="side-ico">🔵</span>باريس سان جيرمان</a>
+ <div class="side-label">أقسام أخرى</div>
+ <a href="#news"><span class="side-ico">🎥</span>فيديوهات رياضية</a>
+ <a href="#news"><span class="side-ico">🔥</span>الأكثر رواجاً</a>
  <div class="side-label">حسابك</div>
  <a href="/customers.html"><span class="side-ico">👤</span>حسابي والإشعارات</a>
  <div class="side-foot">MANDO SPORT · عالم كرة القدم</div>
 </aside>
 <div class="portal-sidebar-backdrop" id="portal-sidebar-backdrop"></div>
+
+
+<div class="portal-intro wrap">
+ <div><span class="portal-breadcrumb">الرئيسية <span>›</span> كرة القدم</span><h1>عالم كرة القدم بين يديك</h1><p>تابع المباريات والنتائج وأهم أخبار البطولات لحظة بلحظة.</p></div>
+ <div class="portal-intro-mark"><span>MS</span><small>MANDO SPORT</small></div>
+</div>
 
 <div class="wrap"><div class="competition-strip" aria-label="أهم البطولات"><strong>أهم البطولات</strong><a href="#leagues">دوري أبطال أوروبا</a><a href="#leagues">الدوري الإنجليزي</a><a href="#leagues">الدوري الإسباني</a><a href="#leagues">الدوري الإيطالي</a><a href="#leagues">الدوري الألماني</a><a href="#leagues">الدوري الفرنسي</a></div></div>
 <main class="wrap" id="home">
