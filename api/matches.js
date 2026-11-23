@@ -28,7 +28,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=600");
+    res.setHeader("Cache-Control", req.query.push === "1" ? "no-store" : "s-maxage=300, stale-while-revalidate=600");
     return res.status(200).json({
       date: requestedDate,
       matches: (data.matches || []).map((m) => ({
