@@ -417,5 +417,328 @@ body.mando-admin footer{margin-right:252px;border-top:1px solid var(--adm-line);
 </main>
 </div>
 <footer>MANDO SPORT — لوحة إدارة خاصة</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;document.getElementById('login-status').textContent='تعذّر تحميل خدمة تسجيل الدخول. حدّث الصفحة أو جرّب بعد قليل.';document.getElementById('login-status').className='status error';"></script>
+<script>
+const SUPABASE_URL = 'https://ibgvfjuqcolcyjzdzcde.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_';
+if (!window.supabase) { $('login-status').textContent='تعذّر تحميل خدمة تسجيل الدخول. حدّث الصفحة أو جرّب بعد قليل.'; $('login-status').className='status error'; throw new Error('Supabase SDK failed to load'); }
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = id => document.getElementById(id);
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function message(id,text,error=false){$(id).textContent=text;$(id).className='status '+(error?'error':'ok')}
+function showLogin(){ $('login-panel').classList.remove('hidden'); $('dashboard').classList.add('hidden'); }
+function showDashboard(user){ $('login-panel').classList.add('hidden'); $('dashboard').classList.remove('hidden'); $('admin-email').textContent=user.email||'حساب المدير'; }
+async function verifyAdmin(user){
+ const {data,error}=await db.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
+ if(error) throw error;
+ if(!data) throw new Error('هذا الحساب غير مضاف كمدير. لا يمكن الدخول إلى لوحة الإدارة.');
+ return true;
+}
+async function enter(user){
+ try{
+  await verifyAdmin(user);
+ }catch(e){
+  showLogin();
+  message('login-status','تعذر التحقق من صلاحية المدير: '+(e.message||'خطأ غير معروف'),true);
+  await db.auth.signOut();
+  return;
+ }
+ showDashboard(user);
+ try{
+  await refreshAll();
+  message('dashboard-status','تم تسجيل الدخول بنجاح.',false);
+ }catch(e){
+  console.error('Dashboard refresh failed:',e);
+  message('dashboard-status','تم تسجيل الدخول، لكن تعذر تحميل بعض بيانات اللوحة: '+(e.message||'خطأ في الاتصال'),true);
+ }
+}
+$('login-form').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const form=e.currentTarget,submit=form.querySelector('button[type="submit"]');
+ submit.disabled=true;submit.textContent='جارٍ التحقق…';
+ message('login-status','جارٍ التحقق من الحساب…');
+ try{
+  const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+  if(error)throw error;
+  if(!data?.user)throw new Error('تم الاتصال دون استلام بيانات الحساب. أعد المحاولة.');
+  await enter(data.user);
+ }catch(error){
+  console.error('Admin login failed:',error);
+  showLogin();
+  message('login-status','تعذر إكمال تسجيل الدخول: '+(error?.message||'تحقق من الاتصال وحاول مجدداً.'),true);
+ }finally{
+  submit.disabled=false;submit.textContent='تسجيل الدخول';
+ }
+});
+$('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
+db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
+(async()=>{
+ try{
+  const {data,error}=await db.auth.getSession();
+  if(error)throw error;
+  if(data?.session?.user)await enter(data.session.user);
+ }catch(error){
+  console.error('Admin session restore failed:',error);
+  showLogin();
+  message('login-status','تعذر استعادة جلسة المدير: '+(error?.message||'تحقق من الاتصال ثم سجّل الدخول مجدداً.'),true);
+ }
+})();
+async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart(),loadCommunityModeration(),loadMembers()]);await loadAdminAlerts();await checkAutomaticFeeds();}
+
+async function checkAutomaticFeeds(){
+ const host=$('auto-feed-results');if(!host)return;
+ host.textContent='جارٍ فحص مصادر المباريات والترتيب…';
+ const date=new Date().toISOString().slice(0,10);
+ const checks=await Promise.all([
+  fetch('/api/matches?date='+encodeURIComponent(date)).then(async r=>({name:'مباريات اليوم',ok:r.ok,data:await r.json().catch(()=>({}))})).catch(e=>({name:'مباريات اليوم',ok:false,data:{error:e.message}})),
+  fetch('/api/standings?competition=PL').then(async r=>({name:'ترتيب الدوري الإنجليزي',ok:r.ok,data:await r.json().catch(()=>({}))})).catch(e=>({name:'ترتيب الدوري الإنجليزي',ok:false,data:{error:e.message}}))
+ ]);
+ host.innerHTML=checks.map(c=>'<div class="item"><strong>'+esc(c.name)+'</strong><div class="'+(c.ok?'ok':'error')+'">'+(c.ok?'متصل':'تعذر الجلب')+'</div><div class="muted">'+(c.ok?(c.data.matches?'عدد المباريات المسترجعة: '+c.data.matches.length:c.data.table?'عدد الفرق في الترتيب: '+c.data.table.length:'تم استلام البيانات'):esc(c.data.error||'خطأ غير معروف'))+'</div></div>').join('');
+ $('feed-checked-at').textContent=new Date().toLocaleString('ar');$('db-status').textContent='تم تحميل بيانات اللوحة';
+}
+$('check-auto-feeds')?.addEventListener('click',checkAutomaticFeeds);
+async function loadMembers(){
+ const host=$('members-list');if(!host)return;
+ host.textContent='جارٍ تحميل ملفات الأعضاء…';
+ const {data,error}=await db.from('member_profiles').select('user_id,display_name,favorite_team,created_at,updated_at').order('created_at',{ascending:false}).limit(500);
+ if(error){host.textContent='تعذر تحميل الأعضاء: '+error.message+' — تحقق من تطبيق صلاحيات إدارة الأعضاء في قاعدة البيانات.';return;}
+ window.mandoMembers=data||[];renderMembers();
+}
+function renderMembers(){
+ const host=$('members-list'),q=($('member-search')?.value||'').trim().toLowerCase(),team=($('member-team-filter')?.value||'').trim().toLowerCase();
+ const rows=(window.mandoMembers||[]).filter(m=>(!q||(m.display_name||'').toLowerCase().includes(q)||(m.favorite_team||'').toLowerCase().includes(q))&&(!team||(m.favorite_team||'').toLowerCase().includes(team)));
+ host.innerHTML='<p class="muted">إجمالي الملفات المعروضة: '+rows.length+'</p><div class="member-grid">'+(rows.length?rows.map(m=>'<div class="member-card"><strong>'+esc(m.display_name||'مشجع')+'</strong><div class="muted">الفريق المفضل: '+esc(m.favorite_team||'غير محدد')+'</div><div class="muted">معرّف العضو: '+esc(m.user_id)+'</div><div class="muted">تاريخ الانضمام: '+(m.created_at?new Date(m.created_at).toLocaleDateString('ar'):'—')+'</div><div class="item-actions"><button class="secondary" data-edit-member="'+esc(m.user_id)+'">تعديل الملف</button></div></div>').join(''):'لا توجد ملفات أعضاء مطابقة.')+'</div>';
+}
+$('member-search')?.addEventListener('input',renderMembers);
+$('member-team-filter')?.addEventListener('input',renderMembers);
+$('members-list')?.addEventListener('click',e=>{
+ const btn=e.target.closest('[data-edit-member]');if(!btn)return;
+ const m=(window.mandoMembers||[]).find(x=>x.user_id===btn.dataset.editMember);if(!m)return;
+ $('member-edit-id').value=m.user_id;$('member-edit-name').value=m.display_name||'';$('member-edit-team').value=m.favorite_team||'';
+ $('member-edit-panel').classList.remove('hidden');$('member-edit-panel').scrollIntoView({behavior:'smooth',block:'center'});
+});
+$('member-cancel')?.addEventListener('click',()=>$('member-edit-panel').classList.add('hidden'));
+$('member-save')?.addEventListener('click',async()=>{
+ const id=$('member-edit-id').value;
+ const payload={display_name:$('member-edit-name').value.trim(),favorite_team:$('member-edit-team').value.trim(),updated_at:new Date().toISOString()};
+ if(payload.display_name.length<2){message('member-status','اسم العرض يجب أن يكون حرفين على الأقل.',true);return;}
+ const {error}=await db.from('member_profiles').update(payload).eq('user_id',id);
+ if(error){message('member-status','تعذر حفظ التعديلات: '+error.message,true);return;}
+ message('member-status','تم تحديث ملف العضو.');$('member-edit-panel').classList.add('hidden');await loadMembers();
+});
+\nasync function loadCommunityModeration(){
+ const pendingHost=$('community-pending'),reportsHost=$('community-reports');
+ if(!pendingHost||!reportsHost)return;
+ pendingHost.textContent='جارٍ تحميل التعليقات…';reportsHost.textContent='جارٍ تحميل البلاغات…';
+ const [commentsResult,reportsResult]=await Promise.all([
+  db.from('member_comments').select('id,user_id,body,created_at').eq('status','pending').order('created_at',{ascending:true}).limit(100),
+  db.from('comment_reports').select('id,comment_id,reporter_id,reason,details,created_at,status').eq('status','open').order('created_at',{ascending:false}).limit(100)
+ ]);
+ if(commentsResult.error){pendingHost.textContent='تعذر تحميل التعليقات: '+commentsResult.error.message;$('community-pending-count').textContent='—';}
+ else{
+  const rows=commentsResult.data||[];$('community-pending-count').textContent=rows.length;
+  pendingHost.innerHTML=rows.length?rows.map(c=>'<div class="item"><strong>تعليق جديد</strong><div class="muted">العضو: '+esc(c.user_id)+' · '+new Date(c.created_at).toLocaleString('ar')+'</div><p>'+esc(c.body)+'</p><div class="item-actions"><button data-community-approve="'+c.id+'">موافقة ونشر</button><button class="danger" data-community-reject="'+c.id+'">رفض</button></div></div>').join(''):'لا توجد تعليقات بانتظار المراجعة.';
+ }
+ if(reportsResult.error){reportsHost.textContent='تعذر تحميل البلاغات: '+reportsResult.error.message;$('community-reports-count').textContent='—';}
+ else{
+  const reports=reportsResult.data||[];$('community-reports-count').textContent=reports.length;
+  reportsHost.innerHTML=reports.length?reports.map(r=>'<div class="item"><strong>بلاغ على تعليق</strong><div class="muted">رقم التعليق: '+esc(r.comment_id)+' · المبلّغ: '+esc(r.reporter_id)+'</div><p>السبب: '+esc(r.reason)+'</p>'+(r.details?'<p>'+esc(r.details)+'</p>':'')+'<div class="item-actions"><button data-report-reviewed="'+r.id+'">تمت المراجعة</button><button class="secondary" data-report-dismiss="'+r.id+'">إغلاق البلاغ</button></div></div>').join(''):'لا توجد بلاغات مفتوحة.';
+ }
+}
+$('community-pending').addEventListener('click',async e=>{
+ const approve=e.target.closest('[data-community-approve]'),reject=e.target.closest('[data-community-reject]');
+ const btn=approve||reject;if(!btn)return;
+ const id=approve?approve.dataset.communityApprove:reject.dataset.communityReject;
+ const status=approve?'approved':'rejected';
+ if(!approve&&!confirm('تأكيد رفض هذا التعليق؟'))return;
+ const {error}=await db.from('member_comments').update({status,updated_at:new Date().toISOString()}).eq('id',id);
+ if(error){alert('تعذر تحديث التعليق: '+error.message);return;}
+ await loadCommunityModeration();
+});
+$('community-reports').addEventListener('click',async e=>{
+ const reviewed=e.target.closest('[data-report-reviewed]'),dismiss=e.target.closest('[data-report-dismiss]');
+ const btn=reviewed||dismiss;if(!btn)return;
+ const id=reviewed?reviewed.dataset.reportReviewed:dismiss.dataset.reportDismiss;
+ const status=reviewed?'reviewed':'dismissed';
+ const {error}=await db.from('comment_reports').update({status,reviewed_at:new Date().toISOString()}).eq('id',id);
+ if(error){alert('تعذر تحديث البلاغ: '+error.message);return;}
+ await loadCommunityModeration();
+});
+async function loadAdminAlerts(){
+ const host=$('admin-alerts');if(!host)return;
+ host.textContent='جارٍ فحص التنبيهات…';
+ try{
+  const [articlesResult,adsResult]=await Promise.all([
+   db.from('articles').select('id,title,created_at').eq('published',false).order('created_at',{ascending:false}).limit(20),
+   db.from('advertisements').select('id,title,active,starts_at,ends_at').order('created_at',{ascending:false}).limit(100)
+  ]);
+  if(articlesResult.error)throw articlesResult.error;
+  if(adsResult.error)throw adsResult.error;
+  const alerts=[];
+  (articlesResult.data||[]).forEach(a=>alerts.push({kind:'مسودة خبر',title:a.title,detail:'خبر بانتظار المراجعة أو النشر.'}));
+  const now=Date.now();
+  (adsResult.data||[]).forEach(a=>{
+   const start=a.starts_at?new Date(a.starts_at).getTime():null;
+   const end=a.ends_at?new Date(a.ends_at).getTime():null;
+   if(a.active&&start&&start>now)alerts.push({kind:'إعلان مجدول',title:a.title,detail:'سيبدأ في '+new Date(a.starts_at).toLocaleString('ar')});
+   else if(a.active&&end&&end<now)alerts.push({kind:'إعلان منتهي',title:a.title,detail:'انتهت مدة الإعلان ويُنصح بمراجعته.'});
+  });
+  $('admin-alert-count').textContent=alerts.length;
+  host.innerHTML=alerts.length?alerts.slice(0,30).map(a=>'<div class="item"><strong>'+esc(a.kind)+': '+esc(a.title)+'</strong><div class="muted">'+esc(a.detail)+'</div></div>').join(''):'لا توجد تنبيهات إدارية حالياً.';
+ }catch(error){host.textContent='تعذر تحميل التنبيهات: '+error.message;}
+}
+async function loadWeeklyChart(){
+ const host=$('weekly-chart');
+ if(!host)return;
+ host.innerHTML='<div class="muted">جارٍ تحميل الرسم…</div>';
+ try{
+  const now=new Date();
+  const days=Array.from({length:7},(_,i)=>{
+   const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()-6+i);
+   const next=new Date(day.getFullYear(),day.getMonth(),day.getDate()+1);
+   return {day,next,label:day.toLocaleDateString('ar',{weekday:'short'}),date:day.toLocaleDateString('ar',{day:'numeric',month:'numeric'})};
+  });
+  const counts=await Promise.all(days.map(async item=>{
+   const {count,error}=await db.from('page_views').select('id',{count:'exact',head:true})
+    .gte('viewed_at',item.day.toISOString()).lt('viewed_at',item.next.toISOString());
+   if(error)throw error;
+   return count??0;
+  }));
+  const max=Math.max(1,...counts);
+  host.innerHTML=days.map((item,i)=>{
+   const height=Math.max(5,Math.round(counts[i]/max*100));
+   return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:end;gap:6px;min-width:0;height:145px">'+
+    '<strong style="font-size:12px;color:var(--gold)">'+counts[i]+'</strong>'+
+    '<div title="'+counts[i]+' زيارة" style="width:min(100%,34px);height:'+height+'%;min-height:5px;background:linear-gradient(180deg,#f0d18a,#a9772d);border-radius:7px 7px 3px 3px"></div>'+
+    '<span class="muted" style="font-size:10px">'+item.label+'</span><span class="muted" style="font-size:9px">'+item.date+'</span></div>';
+  }).join('');
+ }catch(error){host.innerHTML='<div class="muted">تعذر تحميل الرسم حالياً: '+esc(error.message)+'</div>';}
+}
+function localStartOf(period){
+ const now=new Date();
+ if(period==='day') return new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString();
+ if(period==='month') return new Date(now.getFullYear(),now.getMonth(),1).toISOString();
+ return new Date(now.getFullYear(),0,1).toISOString();
+}
+async function countSince(table,field,start){
+ const result=await db.from(table).select('id',{count:'exact',head:true}).gte(field,start);
+ if(result.error) throw result.error;
+ return result.count??0;
+}
+async function loadAnalytics(){
+ const ids=['views-today','views-month','views-year','articles-today','ads-today'];
+ try{
+  const [today,month,year,articles,ads]=await Promise.all([
+   countSince('page_views','viewed_at',localStartOf('day')),
+   countSince('page_views','viewed_at',localStartOf('month')),
+   countSince('page_views','viewed_at',localStartOf('year')),
+   countSince('articles','created_at',localStartOf('day')),
+   countSince('advertisements','created_at',localStartOf('day'))
+  ]);
+  [$('views-today').textContent,$('views-month').textContent,$('views-year').textContent,$('articles-today').textContent,$('ads-today').textContent]=[today,month,year,articles,ads];
+  $('metrics-updated').textContent=new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+ }catch(error){ids.forEach(id=>$(id).textContent='—');$('metrics-updated').textContent='تعذر التحديث';console.error('Analytics:',error);}
+}
+async function loadArticles(){
+ const {data,error}=await db.from('articles').select('*').order('created_at',{ascending:false});
+ if(error){$('articles-list').textContent=error.message;return;}
+ $('articles-total').textContent=data.length;
+ $('articles-list').innerHTML=data.length?data.map(a=>'<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+(a.published?'منشور':'مسودة')+'</span><div class="muted">'+esc(a.excerpt)+'</div><div class="item-actions"><button class="secondary" data-edit-article="'+a.id+'">تعديل</button><button class="secondary" data-publish="'+a.id+'" data-state="'+(!a.published)+'">'+(a.published?'إلغاء النشر':'نشر')+'</button><button class="danger" data-delete-article="'+a.id+'">حذف</button></div></div>').join(''):'لا توجد أخبار بعد.';
+}
+function resetArticleEditor(){
+ $('article-form').reset();$('article-edit-id').value='';
+ $('article-form-heading').textContent='إضافة خبر جديد';
+ $('article-submit').textContent='حفظ الخبر';
+ $('article-cancel-edit').classList.add('hidden');
+}
+$('article-cancel-edit').addEventListener('click',resetArticleEditor);
+$('article-form').addEventListener('submit',async e=>{
+ e.preventDefault();message('article-status','جارٍ حفظ الخبر…');
+ const editId=$('article-edit-id').value;
+ const payload={title:$('article-title').value.trim(),excerpt:$('article-excerpt').value.trim(),body:$('article-body').value.trim(),image_url:$('article-image').value.trim(),published:$('article-published').checked,updated_at:new Date().toISOString()};
+ if(!payload.title){message('article-status','اكتب عنوان الخبر أولاً.',true);return;}
+ let result;
+ if(editId){result=await db.from('articles').update(payload).eq('id',editId);}
+ else{const {data:userData}=await db.auth.getUser();payload.author_id=userData.user.id;result=await db.from('articles').insert(payload);}
+ if(result.error){message('article-status','لم يتم الحفظ: '+result.error.message,true);return;}
+ resetArticleEditor();message('article-status',editId?'تم تحديث الخبر بنجاح.':'تم حفظ الخبر.');await loadArticles();
+});
+$('articles-list').addEventListener('click',async e=>{
+ const edit=e.target.closest('[data-edit-article]');const pub=e.target.closest('[data-publish]');const del=e.target.closest('[data-delete-article]');
+ if(edit){
+  const {data,error}=await db.from('articles').select('*').eq('id',edit.dataset.editArticle).single();
+  if(error){message('article-status','تعذر تحميل الخبر للتعديل: '+error.message,true);return;}
+  $('article-edit-id').value=data.id;$('article-title').value=data.title||'';
+  $('article-excerpt').value=data.excerpt||'';$('article-body').value=data.body||'';
+  $('article-image').value=data.image_url||'';$('article-published').checked=!!data.published;
+  $('article-form-heading').textContent='تعديل الخبر';
+  $('article-submit').textContent='حفظ التعديلات';
+  $('article-cancel-edit').classList.remove('hidden');
+  $('article-form-heading').scrollIntoView({behavior:'smooth',block:'center'});
+ }
+ if(pub){const {error}=await db.from('articles').update({published:pub.dataset.state==='true',updated_at:new Date().toISOString()}).eq('id',pub.dataset.publish);if(error)alert(error.message);await loadArticles();}
+ if(del&&confirm('متأكد من حذف الخبر؟')){const {error}=await db.from('articles').delete().eq('id',del.dataset.deleteArticle);if(error)alert(error.message);await loadArticles();}
+});
+async function loadAds(){
+ const {data,error}=await db.from('advertisements').select('*').order('created_at',{ascending:false});
+ if(error){$('ads-list').textContent=error.message;return;}
+ $('ads-total').textContent=data.length;
+ $('ads-list').innerHTML=data.length?data.map(a=>{
+ const now=Date.now();
+ const starts=a.starts_at?new Date(a.starts_at).getTime():null;
+ const ends=a.ends_at?new Date(a.ends_at).getTime():null;
+ const schedule=starts&&starts>now?'مجدول للمستقبل':ends&&ends<now?'انتهت مدته':a.active?'مفعّل':'متوقف';
+ const range=(a.starts_at?'من '+new Date(a.starts_at).toLocaleString('ar'):'بلا موعد بدء')+' — '+(a.ends_at?'حتى '+new Date(a.ends_at).toLocaleString('ar'):'بلا موعد انتهاء');
+ return '<div class="item"><h3>'+esc(a.title)+'</h3><span class="pill">'+schedule+'</span><div class="muted">المكان: '+esc(a.placement)+'</div><div class="muted">'+esc(range)+'</div><div class="item-actions"><button class="secondary" data-edit-ad="'+a.id+'">تعديل</button><button class="secondary" data-ad-toggle="'+a.id+'" data-state="'+(!a.active)+'">'+(a.active?'إيقاف':'تفعيل')+'</button><button class="danger" data-delete-ad="'+a.id+'">حذف</button></div></div>';
+ }).join(''):'لا توجد إعلانات بعد.';
+}
+function resetAdEditor(){
+ $('ad-form').reset();$('ad-edit-id').value='';
+ $('ad-form-heading').textContent='إضافة إعلان';
+ $('ad-submit').textContent='حفظ الإعلان';
+ $('ad-cancel-edit').classList.add('hidden');
+}
+$('ad-cancel-edit').addEventListener('click',resetAdEditor);
+$('ad-form').addEventListener('submit',async e=>{
+ e.preventDefault();message('ad-status','جارٍ حفظ الإعلان…');
+ const editId=$('ad-edit-id').value;
+ const startValue=$('ad-starts').value,endValue=$('ad-ends').value;
+ const startsAt=startValue?new Date(startValue):null,endsAt=endValue?new Date(endValue):null;
+ if(startsAt&&Number.isNaN(startsAt.getTime())){message('ad-status','موعد بدء الإعلان غير صالح.',true);return;}
+ if(endsAt&&Number.isNaN(endsAt.getTime())){message('ad-status','موعد انتهاء الإعلان غير صالح.',true);return;}
+ if(startsAt&&endsAt&&endsAt<=startsAt){message('ad-status','موعد الانتهاء يجب أن يكون بعد موعد البدء.',true);return;}
+ const payload={title:$('ad-title').value.trim(),image_url:$('ad-image').value.trim(),target_url:$('ad-url').value.trim(),placement:$('ad-placement').value,starts_at:startsAt?startsAt.toISOString():null,ends_at:endsAt?endsAt.toISOString():null,active:$('ad-active').checked,updated_at:new Date().toISOString()};
+ if(!payload.title){message('ad-status','اكتب اسم الإعلان أولاً.',true);return;}
+ const result=editId?await db.from('advertisements').update(payload).eq('id',editId):await db.from('advertisements').insert(payload);
+ if(result.error){message('ad-status','لم يتم الحفظ: '+result.error.message,true);return;}
+ resetAdEditor();message('ad-status',editId?'تم تحديث الإعلان بنجاح.':'تم حفظ الإعلان وجدولته.');await loadAds();
+});
+$('ads-list').addEventListener('click',async e=>{
+ const edit=e.target.closest('[data-edit-ad]');const toggle=e.target.closest('[data-ad-toggle]');const del=e.target.closest('[data-delete-ad]');
+ if(edit){
+  const {data,error}=await db.from('advertisements').select('*').eq('id',edit.dataset.editAd).single();
+  if(error){message('ad-status','تعذر تحميل الإعلان للتعديل: '+error.message,true);return;}
+  const toLocal=value=>{if(!value)return '';const d=new Date(value);return Number.isNaN(d.getTime())?'':new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);};
+  $('ad-edit-id').value=data.id;$('ad-title').value=data.title||'';
+  $('ad-image').value=data.image_url||'';$('ad-url').value=data.target_url||'';
+  $('ad-placement').value=data.placement||'home';$('ad-starts').value=toLocal(data.starts_at);
+  $('ad-ends').value=toLocal(data.ends_at);$('ad-active').checked=!!data.active;
+  $('ad-form-heading').textContent='تعديل الإعلان';$('ad-submit').textContent='حفظ التعديلات';
+  $('ad-cancel-edit').classList.remove('hidden');
+  $('ad-form-heading').scrollIntoView({behavior:'smooth',block:'center'});
+ }
+ if(toggle){const {error}=await db.from('advertisements').update({active:toggle.dataset.state==='true',updated_at:new Date().toISOString()}).eq('id',toggle.dataset.adToggle);if(error)alert(error.message);await loadAds();}
+ if(del&&confirm('متأكد من حذف الإعلان؟')){const {error}=await db.from('advertisements').delete().eq('id',del.dataset.deleteAd);if(error)alert(error.message);await loadAds();}
+});
+async function loadViews(){
+ const {count,error}=await db.from('page_views').select('id',{count:'exact',head:true});
+ if(error){$('views-total').textContent='—';$('views-list').textContent=error.message;return;}
+ $('views-total').textContent=count??0;
+ const {data, error:readError}=await db.from('page_views').select('page_path,viewed_at').order('viewed_at',{ascending:false}).limit(30);
+ if(readError){$('views-list').textContent=readError.message;return;}
+ $('views-list').innerHTML=data.length?data.map(v=>'<div class="item"><strong>'+esc(v.page_path)+'</strong><div class="muted">'+new Date(v.viewed_at).toLocaleString('ar')+'</div></div>').join(''):'لا توجد زيارات مسجلة بعد.';
+}
+
+</script>
 </body>
 </html>
