@@ -579,7 +579,7 @@ async function loadPortalContent(){
    fetch('/api/news',{cache:'no-store'}).catch(()=>null)
   ]);
   if(!manualResult.error)manual=manualResult.data||[];
-  if(newsResponse?.ok){const data=await newsResponse.json();automatic=Array.isArray(data.articles)?data.articles:[];newsStatus.textContent='أخبار من ESPN ومحتوى محرري MANDO SPORT';}
+  if(newsResponse?.ok){const data=await newsResponse.json();automatic=Array.isArray(data.articles)?data.articles:[];newsStatus.textContent='أخبار عربية وعالمية من مصادرها ومحتوى MANDO SPORT';}
   else newsStatus.textContent='الأخبار المنشورة من إدارة MANDO SPORT';
  }catch(error){newsStatus.textContent='تعذر تحميل بعض مصادر الأخبار';}
  const articleUrl=a=>'/article.html?id='+encodeURIComponent(a.id);
