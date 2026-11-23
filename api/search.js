@@ -14,8 +14,8 @@ module.exports = async function handler(req, res) {
       if (typeof node !== "object") return;
       const title = node.displayName || node.fullName || node.name || node.headline;
       const linkList = Array.isArray(node.links) ? node.links : [];
-      const href = node.links?.web?.href || node.links?.mobile?.href || linkList.find(link => (link.rel || []).includes("web"))?.href || linkList.find(link => (link.rel || []).includes("mobile"))?.href || node.href || node.link;
-      if (title && href && /^https?:\/\//i.test(href)) {
+      const href = node.link?.web || node.link?.href || node.links?.web?.href || node.links?.mobile?.href || linkList.find(link => (link.rel || []).includes("web"))?.href || linkList.find(link => (link.rel || []).includes("mobile"))?.href || node.href;
+      if (title && href && /^https?:\/\//i.test(href) && (node.sport === "soccer" || String(node.type || "").toLowerCase().includes("team") || String(node.type || "").toLowerCase().includes("player"))) {
         const kind = String(node.type?.type || node.type || node.contentType || "").toLowerCase();
         const isPlayer = kind.includes("athlete") || kind.includes("player");
         const isTeam = kind.includes("team");
@@ -24,7 +24,7 @@ module.exports = async function handler(req, res) {
           title: String(title).slice(0, 160),
           description: String(node.description || node.subtitle || node.shortName || "").slice(0, 220),
           type: isPlayer ? "لاعب" : isTeam ? "فريق" : "نتيجة",
-          image: node.image?.href || node.image || node.headshot?.href || node.images?.[0]?.url || node.logos?.[0]?.href || "",
+          image: node.image?.default || node.image?.href || node.image || node.headshot?.href || node.images?.[0]?.url || node.logos?.[0]?.href || "",
           url: href
         });
       }
@@ -40,7 +40,7 @@ module.exports = async function handler(req, res) {
       seen.add(key); return true;
     }).slice(0, 24);
     res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=600");
-    return res.status(200).json({ provider: "ESPN", query, items, ...(req.query.debug === "1" ? { debug: { keys: Object.keys(data), sample: JSON.stringify(data).slice(0, 4500) } } : {}) });
+    return res.status(200).json({ provider: "ESPN", query, items });
   } catch (error) {
     return res.status(502).json({ error: "تعذر تنفيذ البحث الرياضي حالياً." });
   }
