@@ -22,7 +22,7 @@ const STATUS = (event) => {
 };
 async function getJson(url) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 9000);
+  const timer = setTimeout(() => controller.abort(), 6000);
   try {
     const response = await fetch(url, { signal: controller.signal, headers: { "User-Agent": "MANDO-SPORT/2.0", "Accept": "application/json" } });
     if (!response.ok) throw new Error("ESPN HTTP " + response.status);
