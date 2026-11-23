@@ -10,7 +10,7 @@ module.exports=async function handler(req,res){
   if(!response.ok)throw new Error("ESPN HTTP "+response.status);
   const data=await response.json();
   const header=data.header||{},competition=(header.competitions||[])[0]||{},competitors=competition.competitors||[];
-  const team=side=>{const item=competitors.find(x=>x.homeAway===side)||{};return {name:item.team?.displayName||item.team?.shortDisplayName||"فريق",logo:item.team?.logo||item.team?.logos?.[0]?.href||"",score:item.score??null,form:item.records?.[0]?.summary||""};};
+  const team=side=>{const item=competitors.find(x=>x.homeAway===side)||{};return {id:item.team?.id||"",name:item.team?.displayName||item.team?.shortDisplayName||"فريق",logo:item.team?.logo||item.team?.logos?.[0]?.href||"",score:item.score??null,form:item.records?.[0]?.summary||""};};
   const status=competition.status?.type||header.competitions?.[0]?.status?.type||{};
   const statistics=(data.boxscore?.teams||[]).map(item=>({team:item.team?.displayName||item.team?.shortDisplayName||"",statistics:(item.statistics||[]).map(stat=>({name:stat.label||stat.name||stat.displayName||"",value:stat.displayValue??stat.value??""}))}));
   const rawPlays=Array.isArray(data.plays)?data.plays:(data.plays?.items||[]);
