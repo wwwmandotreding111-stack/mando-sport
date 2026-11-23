@@ -11,26 +11,30 @@ function decodeXml(value) {
   return String(value || "")
     .replace(/&amp;/g, "&").replace(/&quot;/g, '"')
     .replace(/&#39;|&apos;/g, "'").replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">").replace(/&#(\\d+);/g, (_, n) => String.fromCodePoint(Number(n)));
+    .replace(/&gt;/g, ">")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)));
 }
 function tag(xml, name) {
   const match = xml.match(new RegExp("<" + name + "(?:\\s[^>]*)?>([\\s\\S]*?)</" + name + ">"));
-  return match ? decodeXml(match[1].replace(/<!\\[CDATA\\[|\\]\\]>/g, "").trim()) : "";
+  return match ? decodeXml(match[1].replace(/<!\[CDATA\[|\]\]>/g, "").trim()) : "";
 }
 async function fetchFeed(feed) {
   const url = "https://www.youtube.com/feeds/videos.xml?search_query=" + encodeURIComponent(feed.query);
-  const response = await fetch(url, { headers: { "Accept": "application/atom+xml, application/xml, text/xml", "User-Agent": "Mozilla/5.0 MANDO-SPORT" } });
+  const response = await fetch(url, {
+    headers: { Accept: "application/atom+xml, application/xml, text/xml", "User-Agent": "Mozilla/5.0 MANDO-SPORT" }
+  });
   if (!response.ok) throw new Error("YouTube feed HTTP " + response.status);
   const xml = await response.text();
-  return [...xml.matchAll(/<entry>([\\s\\S]*?)<\\/entry>/g)].map(match => {
-    const entry = match[1];
+  const entries = xml.match(/<entry>[\s\S]*?<\/entry>/g) || [];
+  return entries.map(entry => {
     const id = tag(entry, "yt:videoId");
     const channel = tag(entry, "name");
     const title = tag(entry, "title");
     const publishedAt = tag(entry, "published");
     if (!id || !title || !OFFICIAL_CHANNEL.test(channel)) return null;
     return {
-      id, title, url: "https://www.youtube.com/watch?v=" + encodeURIComponent(id),
+      id, title,
+      url: "https://www.youtube.com/watch?v=" + encodeURIComponent(id),
       image: "https://i.ytimg.com/vi/" + encodeURIComponent(id) + "/hqdefault.jpg",
       league: feed.league, channel, publishedAt
     };
