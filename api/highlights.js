@@ -8,24 +8,39 @@ const LEAGUES = [
   { slug: "uefa.champions", name: "دوري أبطال أوروبا" },
   { slug: "ksa.1", name: "الدوري السعودي" }
 ];
+function href(value) {
+  if (typeof value === "string") return value;
+  if (value && typeof value.href === "string") return value.href;
+  return "";
+}
+function imageUrl(video) {
+  const first = Array.isArray(video.images) ? video.images[0] : null;
+  return href(video.thumbnail) || href(video.image) || href(first) ||
+    href(video.links?.thumbnail) || href(video.links?.image) || "";
+}
 async function leagueVideos(league) {
-  const endpoint = "https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/videos?region=us&lang=en&contentorigin=espn&limit=10";
-  const response = await fetch(endpoint, { headers: { "Accept": "application/json", "User-Agent": "MANDO-SPORT/2.0" } });
+  const endpoint = "https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/videos?region=us&lang=en&contentorigin=espn&limit=20";
+  const response = await fetch(endpoint, { headers: { "Accept": "application/json", "User-Agent": "Mozilla/5.0 MANDO-SPORT" } });
   if (!response.ok) throw new Error("ESPN videos HTTP " + response.status);
   const data = await response.json();
-  return (data.videos || []).map(video => {
-    const link = video.links?.web?.href || video.links?.source?.href || video.links?.mobile?.href || "";
-    const image = video.thumbnail || video.images?.[0]?.url || video.links?.thumbnail?.href || "";
+  const entries = Array.isArray(data.videos) ? data.videos :
+    Array.isArray(data.items) ? data.items :
+    Array.isArray(data.results) ? data.results : [];
+  return entries.map(video => {
+    const id = video.id || video.guid || "";
+    const links = video.links || {};
+    const link = href(links.web) || href(links.source) || href(links.mobile) ||
+      href(video.link) || (id ? "https://www.espn.com/video/clip/_/id/" + encodeURIComponent(id) : "");
     return {
-      id: video.id || link,
-      title: video.headline || video.title || "",
+      id: id || link,
+      title: video.headline || video.title || video.name || "",
       description: video.description || "",
       url: link,
-      image,
+      image: imageUrl(video),
       league: league.name,
-      publishedAt: video.published || video.lastModified || null
+      publishedAt: video.published || video.date || video.lastModified || null
     };
-  }).filter(video => video.title && /^https?:\/\//i.test(video.url));
+  }).filter(video => video.title && /^https?:\\/\\//i.test(video.url));
 }
 module.exports = async function handler(req, res) {
   const results = await Promise.allSettled(LEAGUES.map(league => leagueVideos(league)));
@@ -38,6 +53,6 @@ module.exports = async function handler(req, res) {
   });
   const highlights = [...unique.values()].sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
   res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=1200");
-  if (!highlights.length) return res.status(502).json({ error: "لا تتوفر لقطات فيديو حالياً." });
+  if (!highlights.length) return res.status(200).json({ provider: "ESPN", updatedAt: new Date().toISOString(), highlights: [], partial: true, message: "لم يُرجع مصدر الفيديوهات مقاطع قابلة للعرض حالياً." });
   return res.status(200).json({ provider: "ESPN", updatedAt: new Date().toISOString(), highlights: highlights.slice(0, 24), partial: results.some(result => result.status === "rejected") });
 };
