@@ -20,6 +20,8 @@ label{display:block;font-size:12px;color:#d6dce5;margin:13px 0 6px}input{width:1
 .primary{width:100%;border:0;border-radius:11px;padding:13px;margin-top:20px;background:linear-gradient(135deg,#f4d58f,#c18b38);color:#171108;font:inherit;font-weight:950;cursor:pointer}.primary:disabled{opacity:.6;cursor:wait}.link{background:none;border:0;color:var(--gold2);font:inherit;font-size:12px;cursor:pointer;padding:10px 0 0}
 .status{display:none;margin-top:14px;padding:11px 12px;border-radius:10px;font-size:12px;overflow-wrap:anywhere}.status.show{display:block}.status.error{background:#3a171b;color:#ffb9bc;border:1px solid #7c3439}.status.ok{background:#102b22;color:#a9f0d1;border:1px solid #28674f}
 .account{display:none}.account.show{display:block}.profile-icon{width:58px;height:58px;border-radius:18px;background:#e2b85f1c;border:1px solid #755a2e;display:grid;place-items:center;color:var(--gold2);font-size:25px;margin-bottom:14px}.info{background:#0b111a;border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:15px}.info small{color:var(--muted);display:block}.info strong{overflow-wrap:anywhere}.secondary{width:100%;background:#202a38;color:#e7ebf1;border:1px solid #39475c;border-radius:11px;padding:12px;font:inherit;font-weight:800;margin-top:10px;cursor:pointer}
+.push-box{margin-top:18px;padding:15px;border:1px solid #5f4b2c;border-radius:14px;background:linear-gradient(135deg,#211d16,#111722)}
+.push-box strong{display:block;color:var(--gold2);font-size:14px}.push-box p{font-size:12px;color:var(--muted);margin:5px 0 10px}.push-button{width:100%;border:1px solid #9d7839;border-radius:10px;padding:11px;background:#332817;color:#ffe5a8;font:inherit;font-weight:800;cursor:pointer}.push-button:disabled{opacity:.6}
 footer{text-align:center;color:#788497;font-size:11px;padding:18px 0 25px}
 @media(max-width:420px){.panel{border-radius:18px}.brand strong{font-size:20px}}
 </style>
@@ -47,6 +49,7 @@ footer{text-align:center;color:#788497;font-size:11px;padding:18px 0 25px}
 <div class="profile-icon">⚽</div><div class="eyebrow">حسابك الشخصي</div><h1 id="welcome">أهلاً بك</h1><p class="sub">تم تسجيل دخولك بنجاح. حسابك محفوظ ويمكنك الرجوع إليه لاحقاً بنفس البريد وكلمة المرور.</p>
 <div class="info"><small>البريد الإلكتروني</small><strong id="account-email"></strong></div>
 <div class="info"><small>اسم الحساب</small><strong id="account-name">عضو MANDO SPORT</strong></div>
+<div class="push-box"><strong>🔔 إشعارات المباريات</strong><p>فعّل التنبيهات ليصلك إشعار قبل المباراة بنصف ساعة وعند انطلاقها، حتى لو سكّرت الموقع.</p><button class="push-button" id="enable-push" type="button">تفعيل إشعارات المباريات</button><div class="status" id="push-status" role="status" aria-live="polite"></div></div>
 <button class="secondary" id="logout" type="button">تسجيل الخروج</button>
 <div class="status" id="account-status" role="status" aria-live="polite"></div>
 </section>
@@ -59,7 +62,7 @@ footer{text-align:center;color:#788497;font-size:11px;padding:18px 0 25px}
  const KEY='sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_';
  const $=id=>document.getElementById(id);
  const authPanel=$('auth-panel'),accountPanel=$('account-panel'),form=$('auth-form');
- let mode='login',method='email',stage='form',db=null,busy=false,pending={};
+ let mode='login',method='email',stage='form',db=null,busy=false,pending={},currentUser=null;\n const PUBLIC_VAPID_KEY='BPpMZNb8fimFjDtrurSJ6XuRkBYbwjnQnD7D_vebaOdQCc7qDyoCBOpokCYSEvgKo0YB7RmVoHbBI46a3l9SS_k';
  function showStatus(message,error=false,where='status'){const el=$(where);el.textContent=message;el.className='status show '+(error?'error':'ok');}
  function clearStatus(){$('status').className='status';$('account-status').className='status';}
  function contact(){return method==='email'?$('email').value.trim():$('phone').value.trim().replace(/[\\s()-]/g,'');}
@@ -67,8 +70,8 @@ footer{text-align:center;color:#788497;font-size:11px;padding:18px 0 25px}
  function setMode(next){mode=next;stage='form';form.style.display='block';$('resend').textContent='إعادة إرسال رمز الأمان';clearStatus();const signup=mode==='signup';$('login-tab').classList.toggle('active',!signup);$('signup-tab').classList.toggle('active',signup);$('name-wrap').hidden=!signup;$('display-name').required=signup;$('heading').textContent=signup?'أنشئ حسابك الآن':'أهلاً بعودتك';$('subheading').textContent=signup?'اختر البريد أو الهاتف، وأنشئ كلمة مرور لحسابك.':'سجّل دخولك بالبريد أو رقم الهاتف وكلمة المرور.';$('submit').textContent=signup?'إنشاء الحساب وإرسال الرمز':'تسجيل الدخول';$('forgot').hidden=signup;$('otp-wrap').hidden=true;$('resend').hidden=true;$('email-mode').disabled=false;$('phone-mode').disabled=false;$('password').autocomplete=signup?'new-password':'current-password';}
  function showEmailLink(){stage='email_link';form.style.display='none';$('otp-wrap').hidden=true;$('resend').hidden=false;$('resend').textContent='إعادة إرسال رابط التأكيد';$('email-mode').disabled=true;$('phone-mode').disabled=true;$('subheading').textContent='افتح بريدك الإلكتروني واضغط رابط التأكيد، وبعدها ارجع لهالصفحة. افحص الرسائل غير المرغوبة إذا ما لقيت الرسالة.';}
  function showOtp(){form.style.display='block';$('resend').textContent='إعادة إرسال رمز الأمان';stage='otp';$('otp-wrap').hidden=false;$('resend').hidden=false;$('email-mode').disabled=true;$('phone-mode').disabled=true;$('submit').textContent='تأكيد الرمز وإنشاء الحساب';$('subheading').textContent='أدخل رمز الأمان المرسل إلى '+contact()+'.';$('otp').focus();}
- function showAccount(user){authPanel.style.display='none';accountPanel.classList.add('show');const meta=user.user_metadata||{};const name=meta.display_name||'عضو MANDO SPORT';$('welcome').textContent='أهلاً، '+name;$('account-email').textContent=user.email||user.phone||'—';$('account-email').previousElementSibling.textContent=user.email?'البريد الإلكتروني':'رقم الهاتف';$('account-name').textContent=name;}
- function showAuth(){accountPanel.classList.remove('show');authPanel.style.display='block';}
+ function showAccount(user){currentUser=user;authPanel.style.display='none';accountPanel.classList.add('show');const meta=user.user_metadata||{};const name=meta.display_name||'عضو MANDO SPORT';$('welcome').textContent='أهلاً، '+name;$('account-email').textContent=user.email||user.phone||'—';$('account-email').previousElementSibling.textContent=user.email?'البريد الإلكتروني':'رقم الهاتف';$('account-name').textContent=name;}
+ function showAuth(){currentUser=null;accountPanel.classList.remove('show');authPanel.style.display='block';}
  async function saveProfile(user){const name=(user.user_metadata&&user.user_metadata.display_name)||'';try{const {error}=await db.from('member_profiles').upsert({user_id:user.id,display_name:name||'عضو MANDO SPORT',favorite_team:''},{onConflict:'user_id'});if(error)console.warn('Member profile sync:',error.message);}catch(e){console.warn('Member profile sync unavailable:',e);}}
  if(!window.supabase){showStatus('تعذر تحميل خدمة الحسابات. تحقق من الإنترنت ثم أعد تحميل الصفحة.',true);return;}
  db=window.supabase.createClient(URL,KEY);
@@ -111,9 +114,25 @@ footer{text-align:center;color:#788497;font-size:11px;padding:18px 0 25px}
  });
  $('resend').addEventListener('click',async()=>{if(busy)return;try{const args=method==='email'?{type:'signup',email:pending.value}:{type:'signup',phone:pending.value};const {error}=await db.auth.resend(args);if(error)throw error;showStatus(method==='email'?'تم طلب إعادة إرسال رابط التأكيد إلى بريدك.':'تم طلب إعادة إرسال رمز الأمان.');}catch(e){showStatus(e.message||'تعذرت إعادة الإرسال.',true);}});
  $('forgot').addEventListener('click',async()=>{if(method==='phone'){showStatus('استعادة كلمة المرور عبر الهاتف تحتاج إعداد تدفق استعادة آمن في خدمة الرسائل. تواصل مع الدعم حالياً.',true);return;}const email=$('email').value.trim();if(!email){showStatus('اكتب بريدك الإلكتروني أولاً.',true);return;}try{const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/customers.html'});if(error)throw error;showStatus('إذا كان البريد مسجلاً، سيصلك رابط إعادة تعيين كلمة المرور.');}catch(e){showStatus(e.message,true);}});
- $('logout').addEventListener('click',async()=>{const {error}=await db.auth.signOut();if(error){showStatus(error.message,true,'account-status');return;}showAuth();setMode('login');showStatus('تم تسجيل الخروج. يمكنك العودة والدخول بنفس الحساب.');});
- db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'&&session?.user){showAccount(session.user);}if(event==='SIGNED_OUT')showAuth();});
- db.auth.getSession().then(({data,error})=>{if(error){showStatus('تعذر استعادة الجلسة: '+error.message,true);return;}if(data.session?.user)showAccount(data.session.user);});
+
+ function decodeVapidKey(base64){const padding='='.repeat((4-base64.length%4)%4);const raw=atob((base64+padding).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from([...raw].map(ch=>ch.charCodeAt(0)));}
+ async function updatePushButton(){const btn=$('enable-push');if(!btn||!currentUser)return;try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();btn.textContent=sub?'الإشعارات مفعّلة على هذا الجهاز':'تفعيل إشعارات المباريات';}catch(e){btn.textContent='تفعيل إشعارات المباريات';}}
+ $('enable-push').addEventListener('click',async()=>{
+  const btn=$('enable-push'),status=$('push-status');if(!currentUser){showStatus('سجّل دخولك أولاً لتفعيل الإشعارات.',true,'push-status');return;}
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){showStatus('هذا المتصفح لا يدعم إشعارات المواقع. جرّب Chrome وحدّثه.',true,'push-status');return;}
+  btn.disabled=true;btn.textContent='جارٍ تفعيل الإشعارات…';
+  try{
+   const permission=await Notification.requestPermission();if(permission!=='granted')throw new Error('لم تسمح بإرسال الإشعارات. فعّل الإذن من إعدادات المتصفح.');
+   const reg=await navigator.serviceWorker.register('/sw.js');await navigator.serviceWorker.ready;
+   let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:decodeVapidKey(PUBLIC_VAPID_KEY)});
+   const {error}=await db.from('push_subscriptions').upsert({user_id:currentUser.id,endpoint:sub.endpoint,subscription:sub.toJSON(),active:true,updated_at:new Date().toISOString()},{onConflict:'endpoint'});if(error)throw error;
+   showStatus('تم تفعيل إشعارات المباريات على هذا الجهاز. ستصلك التنبيهات عند توفر بيانات المباريات.',false,'push-status');btn.textContent='الإشعارات مفعّلة على هذا الجهاز';
+  }catch(e){showStatus(e.message||'تعذر تفعيل الإشعارات.',true,'push-status');btn.textContent='إعادة محاولة تفعيل الإشعارات';}
+  finally{btn.disabled=false;}
+ });
+\n $('logout').addEventListener('click',async()=>{try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();if(sub){await db.from('push_subscriptions').update({active:false,updated_at:new Date().toISOString()}).eq('endpoint',sub.endpoint);await sub.unsubscribe();}}catch(e){}const {error}=await db.auth.signOut();if(error){showStatus(error.message,true,'account-status');return;}showAuth();setMode('login');showStatus('تم تسجيل الخروج. يمكنك العودة والدخول بنفس الحساب.');});
+ db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'&&session?.user){showAccount(session.user);updatePushButton();}if(event==='SIGNED_OUT')showAuth();});
+ db.auth.getSession().then(({data,error})=>{if(error){showStatus('تعذر استعادة الجلسة: '+error.message,true);return;}if(data.session?.user){showAccount(data.session.user);updatePushButton();}});
  if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(e=>console.warn('SW registration:',e)));}
 })();
 </script>
