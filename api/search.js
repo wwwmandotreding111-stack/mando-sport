@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
         const entityMatch = uid.match(isPlayer ? /~a:(\d+)/ : /~t:(\d+)/);
         const entityId = entityMatch?.[1] || String(node.id || "").match(/\d+/)?.[0] || "";
         const league = node.defaultLeagueSlug || "eng.1";
-        const localUrl = entityId && isPlayer ? "/player.html?league=" + encodeURIComponent(league) + "&id=" + encodeURIComponent(entityId) : entityId && isTeam ? "/team.html?league=" + encodeURIComponent(league) + "&id=" + encodeURIComponent(entityId) : href;
+        const localUrl = entityId && isPlayer ? "/player.html?league=" + encodeURIComponent(league) + "&id=" + encodeURIComponent(entityId) + "&name=" + encodeURIComponent(title) + "&image=" + encodeURIComponent(node.image?.default || node.image?.href || "") + "&description=" + encodeURIComponent(node.description || node.subtitle || "") + "&source=" + encodeURIComponent(href) : entityId && isTeam ? "/team.html?league=" + encodeURIComponent(league) + "&id=" + encodeURIComponent(entityId) + "&name=" + encodeURIComponent(title) + "&image=" + encodeURIComponent(node.logos?.[0]?.href || "") : href;
         candidates.push({
           id: node.id || node.uid || href,
           title: String(title).slice(0, 160),
