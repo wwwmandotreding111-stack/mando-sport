@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
       const title = node.displayName || node.fullName || node.name || node.headline;
       const linkList = Array.isArray(node.links) ? node.links : [];
       const href = node.link?.web || node.link?.href || node.links?.web?.href || node.links?.mobile?.href || linkList.find(link => (link.rel || []).includes("web"))?.href || linkList.find(link => (link.rel || []).includes("mobile"))?.href || node.href;
-      if (title && href && /^https?:\/\//i.test(href) && (node.sport === "soccer" || String(node.type || "").toLowerCase().includes("team") || String(node.type || "").toLowerCase().includes("player"))) {
+      if (title && href && /^https?:\/\//i.test(href) && node.sport === "soccer") {
         const kind = String(node.type?.type || node.type || node.contentType || "").toLowerCase();
         const isPlayer = kind.includes("athlete") || kind.includes("player");
         const isTeam = kind.includes("team");
