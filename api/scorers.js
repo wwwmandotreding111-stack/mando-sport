@@ -26,7 +26,7 @@ function collectGroups(value, output = [], depth = 0) {
     }
   }
   Object.entries(value).forEach(([key, child]) => {
-    if (key !== "leaders") collectGroups(child, output, depth + 1);
+    collectGroups(child, output, depth + 1);
   });
   return output;
 }
