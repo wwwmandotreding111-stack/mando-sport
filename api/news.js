@@ -1,8 +1,8 @@
 // MANDO SPORT — Arabic football headlines plus international football news.
 const GOOGLE_FEEDS = [
-  { query: '"كرة القدم" OR "الدوري الإنجليزي" OR "الدوري الإسباني"', category: "أخبار عربية" },
-  { query: '"دوري أبطال أوروبا" OR "دوري روشن" OR "انتقالات كرة القدم"', category: "أخبار عربية" },
-  { query: '"football transfers" OR "Premier League" OR "Champions League"', category: "أخبار عالمية" }
+  { query: '("الدوري الإنجليزي" OR "مانشستر سيتي" OR "ليفربول") (site:kooora.com OR site:filgoal.com OR site:yallakora.com OR site:winwin.com OR site:beinsports.com)', category: "أخبار عربية" },
+  { query: '("دوري أبطال أوروبا" OR "ريال مدريد" OR "برشلونة" OR "انتقالات") (site:kooora.com OR site:filgoal.com OR site:yallakora.com OR site:winwin.com OR site:beinsports.com)', category: "أخبار عربية" },
+  { query: '("الدوري السعودي" OR "الهلال" OR "النصر" OR "كريستيانو رونالدو") (site:kooora.com OR site:filgoal.com OR site:yallakora.com OR site:winwin.com OR site:beinsports.com)', category: "أخبار عربية" }
 ];
 const ESPN_LEAGUES = [
   { slug: "eng.1", category: "الدوري الإنجليزي" },
@@ -42,10 +42,10 @@ async function googleFeed(feed) {
       image: media ? media[1] : "",
       source: source ? decode(source[1]) : "Google News",
       category: feed.category,
-      language: feed.category === "أخبار عربية" ? "ar" : "en",
+      language: "ar",
       publishedAt: safeIsoDate(tag(item,"pubDate"))
     };
-  }).filter(item => item.title && /^https?:\/\//i.test(item.url));
+  }).filter(item => item.title && /[\u0600-\u06FF]/.test(item.title) && /^https?:\/\//i.test(item.url));
 }
 async function espnFeed(league) {
   const url = "https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/news?limit=12";
@@ -80,6 +80,7 @@ module.exports = async function handler(req, res) {
   });
   articles.sort((a,b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
   res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=1200");
-  if (!articles.length) { console.error("[news-feed] all providers returned zero usable articles"); return res.status(502).json({ error:"تعذر جلب الأخبار الرياضية حالياً." }); }
-  return res.status(200).json({ provider:"Google News + ESPN", updatedAt:new Date().toISOString(), articles:articles.slice(0,50), partial:results.some(result=>result.status==="rejected") });
+  const arabicArticles = articles.filter(item => item.language === "ar" && /[\u0600-\u06FF]/.test(item.title));
+  if (!arabicArticles.length) { console.error("[news-feed] no Arabic headlines returned by approved Arabic search queries"); return res.status(502).json({ error:"لا تتوفر أخبار عربية موثوقة حالياً. حاول لاحقاً." }); }
+  return res.status(200).json({ provider:"مصادر أخبار عربية عبر Google News", updatedAt:new Date().toISOString(), articles:arabicArticles.slice(0,50), partial:results.some(result=>result.status==="rejected") });
 };
