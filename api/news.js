@@ -4,15 +4,6 @@ const GOOGLE_FEEDS = [
   { query: '("دوري أبطال أوروبا" OR "ريال مدريد" OR "برشلونة" OR "انتقالات") (site:kooora.com OR site:filgoal.com OR site:yallakora.com OR site:winwin.com OR site:beinsports.com)', category: "أخبار عربية" },
   { query: '("الدوري السعودي" OR "الهلال" OR "النصر" OR "كريستيانو رونالدو") (site:kooora.com OR site:filgoal.com OR site:yallakora.com OR site:winwin.com OR site:beinsports.com)', category: "أخبار عربية" }
 ];
-const ESPN_LEAGUES = [
-  { slug: "eng.1", category: "الدوري الإنجليزي" },
-  { slug: "esp.1", category: "الدوري الإسباني" },
-  { slug: "ita.1", category: "الدوري الإيطالي" },
-  { slug: "ger.1", category: "الدوري الألماني" },
-  { slug: "fra.1", category: "الدوري الفرنسي" },
-  { slug: "uefa.champions", category: "دوري أبطال أوروبا" },
-  { slug: "ksa.1", category: "الدوري السعودي" }
-];
 function decode(value) {
   return String(value || "").replace(/<!\[CDATA\[|\]\]>/g,"").replace(/&nbsp;/g," ").replace(/&#160;/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&apos;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
 }
@@ -47,30 +38,12 @@ async function googleFeed(feed) {
     };
   }).filter(item => item.title && /[\u0600-\u06FF]/.test(item.title) && /^https?:\/\//i.test(item.url));
 }
-async function espnFeed(league) {
-  const url = "https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/news?limit=12";
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 6000);
-  let response;
-  try { response = await fetch(url, { signal: controller.signal, headers: { "User-Agent": "MANDO-SPORT/2.0", "Accept": "application/json" } }); }
-  finally { clearTimeout(timer); }
-  if (!response.ok) throw new Error("ESPN HTTP " + response.status);
-  const data = await response.json();
-  return (data.articles || []).map(item => {
-    const image = (item.images || []).find(img => img.url || img.href);
-    const href = item.links?.web?.href || item.links?.api?.news?.href || "";
-    return { id:item.id||href, title:item.headline||item.title||"", excerpt:item.description||item.summary||"", url:href, image:image?.url||image?.href||"", source:"ESPN", category:league.category, language:"en", publishedAt:safeIsoDate(item.published||item.lastModified) };
-  }).filter(item => item.title && /^https?:\/\//i.test(item.url));
-}
 module.exports = async function handler(req, res) {
-  const tasks = [
-    ...GOOGLE_FEEDS.map(feed => googleFeed(feed)),
-    ...ESPN_LEAGUES.map(league => espnFeed(league))
-  ];
+  const tasks = GOOGLE_FEEDS.map(feed => googleFeed(feed));
   const results = await Promise.allSettled(tasks);
   const seen = new Set(), articles = [];
   results.forEach((result, index) => {
-    const sourceName = index < GOOGLE_FEEDS.length ? "Google News " + (index + 1) : "ESPN " + ESPN_LEAGUES[index - GOOGLE_FEEDS.length].slug;
+    const sourceName = "مصدر عربي " + (index + 1);
     if (result.status !== "fulfilled") { console.warn("[news-feed]", sourceName, String(result.reason?.message || result.reason)); return; }
     console.info("[news-feed]", sourceName, "articles:", result.value.length);
     result.value.forEach(item => {
