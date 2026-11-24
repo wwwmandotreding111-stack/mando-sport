@@ -144,6 +144,11 @@ nav a:first-child,nav a:hover,nav a:focus{background:#d9ad5b18;color:var(--gold-
 .home-top-ad a{display:block;text-align:center}
 .home-top-ad img{display:block;width:100%;max-height:210px;object-fit:contain;border-radius:7px}
 .home-top-ad strong{display:block;padding:16px;color:var(--gold-bright);text-align:center}
+.home-top-ad-slide{display:none;animation:homeAdFade .45s ease}
+.home-top-ad-slide.active{display:block}
+@keyframes homeAdFade{from{opacity:.25;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.home-top-ad img{max-height:190px}
+@media(max-width:600px){.home-top-ad img{max-height:145px}}
 @media(max-width:900px){.home-top-ad-wrap{width:calc(100% - 24px);max-width:760px;margin:12px auto 0}}
 @media(max-width:600px){.home-top-ad-wrap{padding:7px;margin-top:10px}.home-top-ad img{max-height:150px}}
 .portal-status{font-size:10px;color:#899bad}
@@ -431,7 +436,20 @@ loadHighlights();setInterval(loadPortalContent,600000);
  const renderAd=a=>(a.target_url?'<a href="'+esc(a.target_url)+'" target="_blank" rel="noopener noreferrer">':'<div>')+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="'+esc(a.title)+'" loading="lazy">':'<strong>'+esc(a.title)+'</strong>')+(a.target_url?'</a>':'</div>');
  const homeAds=liveAds.filter(a=>a.placement==='home');
  const topWrap=document.getElementById('home-top-ad-wrap'),topHost=document.getElementById('home-top-ad');
- if(homeAds.length&&topWrap&&topHost){topHost.innerHTML=homeAds.map(renderAd).join('');topWrap.hidden=false;}
+ if(homeAds.length&&topWrap&&topHost){
+  topHost.innerHTML=homeAds.map((a,i)=>'<div class="home-top-ad-slide'+(i===0?' active':'')+'" data-ad-slide="'+i+'">'+renderAd(a)+'</div>').join('');
+  topWrap.hidden=false;
+  if(homeAds.length>1){
+   let activeAd=0;
+   window.setInterval(()=>{
+    const slides=topHost.querySelectorAll('.home-top-ad-slide');
+    if(!slides.length)return;
+    slides[activeAd].classList.remove('active');
+    activeAd=(activeAd+1)%slides.length;
+    slides[activeAd].classList.add('active');
+   },5000);
+  }
+ }
  const sideAd=liveAds.find(a=>a.placement!=='home');
  const sideSlot=document.querySelector('.portal-ad');
  if(sideAd&&sideSlot)sideSlot.innerHTML=renderAd(sideAd);
