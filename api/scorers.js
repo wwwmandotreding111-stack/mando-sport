@@ -35,7 +35,7 @@ module.exports = async function handler(req, res) {
   const selected = code ? (LEAGUES[code] ? [[code, LEAGUES[code]]] : null) : Object.entries(LEAGUES);
   if (!selected) return res.status(400).json({ error:"البطولة المطلوبة غير مدعومة." });
   const results = await Promise.allSettled(selected.map(async ([key, league]) => {
-    const response = await fetch("https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/leaders?limit=100", { headers:{ "User-Agent":"MANDO-SPORT/2.0", "Accept":"application/json" } });
+    const response = await fetch("https://sports.core.api.espn.com/v2/sports/soccer/leagues/" + league.slug + "/leaders?limit=100", { headers:{ "User-Agent":"MANDO-SPORT/2.0", "Accept":"application/json" } });
     if (!response.ok) throw new Error("ESPN HTTP " + response.status);
     const data = await response.json();
     const rows = collectGroups(data).map(item => ({ ...item, competition:league.name, competitionCode:key, league:league.slug }));
