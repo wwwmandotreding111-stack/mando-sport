@@ -235,6 +235,19 @@ footer{margin-right:250px;border-color:#293447;color:#8593a7}
  #dashboard>section.panel{padding:15px}.member-grid{grid-template-columns:1fr}
 }
 
+
+/* Live controls: visitors, Google ads and revenue status */
+.admin-live-controls{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 4px}
+.admin-live-card{min-width:0;padding:19px;border:1px solid #665020;border-radius:16px;background:linear-gradient(145deg,#1b1b1b,#101722);box-shadow:0 10px 28px #0004}
+.admin-live-card h2{margin:0 0 8px;color:#f2d18a;font-size:16px}
+.admin-live-card strong{display:block;color:#ffe09a;font-size:30px;line-height:1.35;margin:8px 0}
+.admin-live-card p,.admin-live-card small{display:block;color:#9eacbf;font-size:12px;margin:5px 0}
+.admin-live-card button,.admin-live-card a{display:inline-flex;align-items:center;justify-content:center;margin-top:9px;min-height:40px;padding:8px 14px;border-radius:9px;text-decoration:none;font:inherit;font-size:12px;font-weight:850;cursor:pointer}
+.admin-live-card .live-on{background:#174a37;color:#a9f1cf;border:1px solid #2b9c6d}
+.admin-live-card .live-off{background:#532a31;color:#ffd9d9;border:1px solid #a64b57}
+.admin-live-card a{background:#2a3444;color:#f6d98f;border:1px solid #6b5527}
+@media(max-width:850px){.admin-live-controls{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.admin-live-controls{grid-template-columns:1fr}.admin-live-card strong{font-size:27px}}
 </style>
 
 <style id="mando-admin-rebuild">
@@ -319,6 +332,11 @@ body.mando-admin footer{margin-right:252px;border-top:1px solid var(--adm-line);
 <section id="dashboard" class="hidden admin-dashboard">
 <div class="row" style="justify-content:space-between"><div><h1>لوحة التحكم</h1><div id="admin-email" class="muted"></div></div><button id="logout" class="secondary">تسجيل الخروج</button></div>
 <div id="dashboard-status" class="status" aria-live="polite"></div>
+<div class="admin-live-controls" aria-label="التحكم المباشر">
+<section class="admin-live-card"><h2>الزوار الموجودون الآن</h2><strong id="live-visitors-count">—</strong><small>عدد الجلسات المتصلة حالياً · تحديث مباشر</small></section>
+<section class="admin-live-card"><h2>إعلانات Google AdSense</h2><strong id="adsense-switch-state">جارٍ التحميل…</strong><p id="adsense-switch-note">التحكم بعرض إعلانات Google على الموقع</p><button id="adsense-toggle" type="button" disabled>تحميل الحالة…</button></section>
+<section class="admin-live-card"><h2>أرباح Google بالدولار</h2><strong id="adsense-earnings-value">غير مربوط</strong><p id="adsense-earnings-note">يلزم ربط تقارير AdSense بشكل آمن لعرض الأرباح الحقيقية.</p><a href="https://adsense.google.com/adsense/u/0/" target="_blank" rel="noopener noreferrer">فتح تقارير AdSense</a></section>
+</div>
 <div class="admin-welcome"><div><span class="eyebrow">مركز التحكم الرئيسي</span><h2>نظرة عامة على المنصة</h2><p>تابع أداء MANDO SPORT وأدر محتوى الموقع من مكان واحد.</p></div><div class="welcome-mark">🦅</div></div>
 <div class="stats">
 <div class="panel stat"><span class="muted">إجمالي زيارات الصفحات المسجلة</span><strong id="views-total">—</strong></div>
@@ -485,7 +503,43 @@ if(db) db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showL
   message('login-status','تعذر استعادة جلسة المدير: '+(error?.message||'تحقق من الاتصال ثم سجّل الدخول مجدداً.'),true);
  }
 })();
-async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart(),loadCommunityModeration(),loadMembers()]);await loadAdminAlerts();await checkAutomaticFeeds();}
+async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart(),loadCommunityModeration(),loadMembers(),loadSiteControls()]);watchLiveVisitors();await loadAdminAlerts();await checkAutomaticFeeds();}
+
+let liveVisitorsChannel=null;
+function watchLiveVisitors(){
+ if(liveVisitorsChannel||!db)return;
+ const channel=db.channel('mando-live-visitors');
+ channel.on('presence',{event:'sync'},()=>{
+  const state=channel.presenceState();
+  const count=Object.values(state).reduce((total,sessions)=>total+(Array.isArray(sessions)?sessions.length:0),0);
+  $('live-visitors-count').textContent=String(count);
+ });
+ channel.subscribe(status=>{if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')$('live-visitors-count').textContent='غير متاح';});
+ liveVisitorsChannel=channel;
+}
+async function loadSiteControls(){
+ const {data,error}=await db.from('site_settings').select('value').eq('key','adsense_enabled').maybeSingle();
+ if(error)throw error;
+ const enabled=data?.value!==false;
+ $('adsense-switch-state').textContent=enabled?'مفعّلة':'متوقفة';
+ $('adsense-switch-state').style.color=enabled?'#a9f1cf':'#ffd0d0';
+ $('adsense-toggle').textContent=enabled?'إيقاف إعلانات Google':'تفعيل إعلانات Google';
+ $('adsense-toggle').className=enabled?'live-off':'live-on';
+ $('adsense-toggle').disabled=false;
+ $('adsense-switch-note').textContent=enabled?'إعلانات Google مسموح بعرضها على الموقع.':'تم إيقاف تحميل كود Google الإعلاني للزوار الجدد.';
+}
+$('adsense-toggle')?.addEventListener('click',async()=>{
+ const button=$('adsense-toggle');button.disabled=true;
+ try{
+  const {data,error}=await db.from('site_settings').select('value').eq('key','adsense_enabled').single();
+  if(error)throw error;
+  const next=data.value===false;
+  const result=await db.from('site_settings').update({value:next,updated_at:new Date().toISOString()}).eq('key','adsense_enabled');
+  if(result.error)throw result.error;
+  await loadSiteControls();
+  $('dashboard-status').textContent=next?'تم تفعيل إعلانات Google للزيارات الجديدة.':'تم إيقاف إعلانات Google للزيارات الجديدة.';
+ }catch(error){alert('تعذر تغيير حالة إعلانات Google: '+error.message);button.disabled=false;}
+});
 
 async function checkAutomaticFeeds(){
  const host=$('auto-feed-results');if(!host)return;
