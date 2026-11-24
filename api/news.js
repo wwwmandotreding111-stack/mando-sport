@@ -16,6 +16,7 @@ const ESPN_LEAGUES = [
 function decode(value) {
   return String(value || "").replace(/<!\[CDATA\[|\]\]>/g,"").replace(/&nbsp;/g," ").replace(/&#160;/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&apos;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
 }
+function safeIsoDate(value) { const time = Date.parse(value || ""); return Number.isFinite(time) ? new Date(time).toISOString() : null; }
 function tag(xml, name) {
   const match = xml.match(new RegExp("<" + name + "(?:\\s[^>]*)?>([\\s\\S]*?)</" + name + ">", "i"));
   return match ? decode(match[1]) : "";
@@ -42,7 +43,7 @@ async function googleFeed(feed) {
       source: source ? decode(source[1]) : "Google News",
       category: feed.category,
       language: feed.category === "أخبار عربية" ? "ar" : "en",
-      publishedAt: tag(item,"pubDate") ? new Date(tag(item,"pubDate")).toISOString() : null
+      publishedAt: safeIsoDate(tag(item,"pubDate"))
     };
   }).filter(item => item.title && /^https?:\/\//i.test(item.url));
 }
@@ -58,7 +59,7 @@ async function espnFeed(league) {
   return (data.articles || []).map(item => {
     const image = (item.images || []).find(img => img.url || img.href);
     const href = item.links?.web?.href || item.links?.api?.news?.href || "";
-    return { id:item.id||href, title:item.headline||item.title||"", excerpt:item.description||item.summary||"", url:href, image:image?.url||image?.href||"", source:"ESPN", category:league.category, language:"en", publishedAt:item.published||item.lastModified||null };
+    return { id:item.id||href, title:item.headline||item.title||"", excerpt:item.description||item.summary||"", url:href, image:image?.url||image?.href||"", source:"ESPN", category:league.category, language:"en", publishedAt:safeIsoDate(item.published||item.lastModified) };
   }).filter(item => item.title && /^https?:\/\//i.test(item.url));
 }
 module.exports = async function handler(req, res) {
@@ -68,8 +69,10 @@ module.exports = async function handler(req, res) {
   ];
   const results = await Promise.allSettled(tasks);
   const seen = new Set(), articles = [];
-  results.forEach(result => {
-    if (result.status !== "fulfilled") return;
+  results.forEach((result, index) => {
+    const sourceName = index < GOOGLE_FEEDS.length ? "Google News " + (index + 1) : "ESPN " + ESPN_LEAGUES[index - GOOGLE_FEEDS.length].slug;
+    if (result.status !== "fulfilled") { console.warn("[news-feed]", sourceName, String(result.reason?.message || result.reason)); return; }
+    console.info("[news-feed]", sourceName, "articles:", result.value.length);
     result.value.forEach(item => {
       const key = item.url || item.title;
       if (!seen.has(key)) { seen.add(key); articles.push(item); }
@@ -77,6 +80,6 @@ module.exports = async function handler(req, res) {
   });
   articles.sort((a,b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
   res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=1200");
-  if (!articles.length) return res.status(502).json({ error:"تعذر جلب الأخبار الرياضية حالياً." });
+  if (!articles.length) { console.error("[news-feed] all providers returned zero usable articles"); return res.status(502).json({ error:"تعذر جلب الأخبار الرياضية حالياً." }); }
   return res.status(200).json({ provider:"Google News + ESPN", updatedAt:new Date().toISOString(), articles:articles.slice(0,50), partial:results.some(result=>result.status==="rejected") });
 };
