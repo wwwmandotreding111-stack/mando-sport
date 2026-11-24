@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Mando Sport - مباريات اليوم، النتائج، أخبار كرة القدم وترتيب البطولات">
 <meta name="theme-color" content="#07111b">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://mando-sport-live.vercel.app/">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MANDO SPORT | نبض الملاعب لحظة بلحظة">
+<meta property="og:description" content="تابع مباريات اليوم والنتائج والأخبار الرياضية وترتيب البطولات والهدافين.">
+<meta property="og:url" content="https://mando-sport-live.vercel.app/">
 <title>Mando Sport | عالم كرة القدم</title>
 <style>
 :root{color-scheme:dark;--bg:#07111b;--surface:#0d1a27;--surface-2:#122334;--surface-3:#182b3d;--line:#24394c;--text:#edf3f8;--muted:#9aabba;--gold:#d9ad5b;--gold-bright:#f2d18b;--red:#f05b65;--green:#35c995;--blue:#4e9bd8;--shadow:0 14px 36px #0003}
@@ -251,18 +258,19 @@ footer .wrap{max-width:1500px}
 <header><div class="wrap">
   <div class="top">
 <button class="portal-menu-toggle" id="portal-menu-toggle" type="button" aria-label="فتح القائمة الجانبية" aria-controls="portal-sidebar" aria-expanded="false">☰</button>
-<div class="brand-wrap"><div class="brand-mark">M</div><div><div class="brand">MANDO <b>SPORT</b></div><div class="tag">نبض الملاعب لحظة بلحظة</div></div></div><div class="header-status"><span class="pulse"></span> تغطية رياضية مستمرة</div></div>
-  <nav aria-label="التنقل الرئيسي"><a href="#matches">مباشر</a><a href="#matches">مباريات اليوم</a><a href="#highlights">لقطات مميزة</a><a href="#news">أخبار</a><a href="#leagues">مسابقات</a><a href="#leagues">ترتيب</a><a href="#news">الأكثر رواجاً</a><a href="/customers.html">حسابي والإشعارات</a></nav>
+<div class="brand-wrap"><div class="brand-mark" aria-label="شعار النسر">🦅</div><div><div class="brand">MANDO <b>SPORT</b></div><div class="tag">نبض الملاعب لحظة بلحظة</div></div></div><div class="header-status"><span class="pulse"></span> تغطية رياضية مستمرة</div></div>
+  <nav aria-label="التنقل الرئيسي"><a href="#matches">مباشر</a><a href="#matches">مباريات اليوم</a><a href="#highlights">لقطات مميزة</a><a href="#news">أخبار</a><a href="#leagues">مسابقات</a><a href="#leagues">ترتيب</a><a href="/scorers.html">الهدافون</a><a href="#news">الأكثر رواجاً</a><a href="/customers.html">حسابي والإشعارات</a></nav>
 </div></header>
 
 <aside class="portal-sidebar" id="portal-sidebar" aria-label="القائمة الجانبية">
- <div class="side-brand"><div class="side-mark">M</div><div><strong>MANDO <b>SPORT</b></strong><div class="tag">دليلك الرياضي</div></div></div>
+ <div class="side-brand"><div class="side-mark" aria-label="شعار النسر">🦅</div><div><strong>MANDO <b>SPORT</b></strong><div class="tag">دليلك الرياضي</div></div></div>
  <div class="side-label">التنقل الرئيسي</div>
  <a class="side-featured" href="#matches"><span class="side-ico">🔴</span>مباشر الآن</a>
  <a href="#matches"><span class="side-ico">📅</span>مباريات اليوم</a>
  <a href="#results"><span class="side-ico">⚽</span>النتائج</a>
  <a href="#highlights"><span class="side-ico">🎬</span>لقطات مميزة</a>
  <a href="#standings-container"><span class="side-ico">🏆</span>ترتيب الدوريات</a>
+ <a href="/scorers.html"><span class="side-ico">🥇</span>ترتيب الهدافين</a>
  <a href="#news"><span class="side-ico">📰</span>آخر الأخبار</a>
  <a href="#leagues"><span class="side-ico">🌍</span>المسابقات والبطولات</a>
  <div class="side-label">أهم البطولات</div>
@@ -298,7 +306,7 @@ footer .wrap{max-width:1500px}
  <form class="portal-search" id="portal-search-form"><input id="portal-search-input" type="search" placeholder="ابحث عن فريق أو لاعب أو بطولة..." aria-label="بحث"><button type="submit">بحث</button></form></div>
  <div class="portal-intro-mark"><span>MS</span><small>MANDO SPORT</small></div>
 </div>
-<div class="wrap"><div class="competition-strip" aria-label="أهم البطولات"><strong>البطولات</strong><a href="/competition.html?code=CL">دوري أبطال أوروبا</a><a href="/competition.html?code=PL">الدوري الإنجليزي</a><a href="/competition.html?code=PD">الدوري الإسباني</a><a href="/competition.html?code=SA">الدوري الإيطالي</a><a href="/competition.html?code=BL1">الدوري الألماني</a><a href="/competition.html?code=FL1">الدوري الفرنسي</a><a href="/competition.html?code=SPL">الدوري السعودي</a></div></div>
+<div class="wrap"><div class="competition-strip" aria-label="أهم البطولات"><strong>البطولات</strong><a href="/competition.html?code=CL">دوري أبطال أوروبا</a><a href="/competition.html?code=PL">الدوري الإنجليزي</a><a href="/competition.html?code=PD">الدوري الإسباني</a><a href="/competition.html?code=SA">الدوري الإيطالي</a><a href="/competition.html?code=BL1">الدوري الألماني</a><a href="/competition.html?code=FL1">الدوري الفرنسي</a><a href="/competition.html?code=SPL">الدوري السعودي</a><a href="/scorers.html">ترتيب الهدافين</a></div></div>
 <main class="wrap portal-home" id="home">
  <div class="portal-layout">
   <div class="portal-main">
@@ -389,7 +397,7 @@ async function loadPortalContent(){
  ]);
  if(contentTasks[0].status==='fulfilled')manual=contentTasks[0].value;else manualError=true;
  if(contentTasks[1].status==='fulfilled')automatic=contentTasks[1].value;else automaticError=true;
- newsStatus.textContent=manual.length&&automatic.length?'أخبار إدارة MANDO SPORT + مصادر رياضية عالمية':automatic.length?'آخر الأخبار الرياضية من Google News وESPN':manual.length?'الأخبار المنشورة من إدارة MANDO SPORT':manualError&&automaticError?'تعذر الاتصال بمصادر الأخبار حالياً':'لا توجد أخبار منشورة حالياً';
+ newsStatus.textContent=manual.length&&automatic.length?'أخبار إدارة MANDO SPORT + مصادر عربية':automatic.length?'آخر الأخبار من مصادر رياضية عربية':manual.length?'الأخبار المنشورة من إدارة MANDO SPORT':manualError&&automaticError?'تعذر الاتصال بمصادر الأخبار حالياً':'لا توجد أخبار منشورة حالياً';
  const articleUrl=a=>'/article.html?id='+encodeURIComponent(a.id);
  const manualCard=a=>'<a class="portal-news-card" href="'+articleUrl(a)+'">'+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="" loading="lazy">':'<div class="news-no-image">📰</div>')+'<div class="news-copy"><small>'+esc(a.category||'أخبار كرة القدم')+(a.featured?' · خبر رئيسي':'')+'</small><h3>'+esc(a.title)+'</h3><p>'+esc(a.excerpt||'تابع تفاصيل الخبر عبر MANDO SPORT.')+'</p></div><div class="news-meta">MANDO SPORT · '+(a.created_at?new Date(a.created_at).toLocaleDateString('ar'):'')+'</div></a>';
  const autoCard=a=>'<a class="portal-news-card" href="'+esc(a.url)+'" target="_blank" rel="noopener noreferrer">'+(a.image?'<img src="'+esc(a.image)+'" alt="" loading="lazy">':'<div class="news-no-image">⚽</div>')+'<div class="news-copy"><small>'+esc(a.category||'أخبار عالمية')+'</small><h3>'+esc(a.title)+'</h3><p>'+esc(a.excerpt||'اقرأ تفاصيل الخبر من المصدر الأصلي.')+'</p></div><div class="news-meta">'+esc(a.source||'مصدر رياضي')+'</div></a>';
