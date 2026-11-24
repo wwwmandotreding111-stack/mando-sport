@@ -436,7 +436,7 @@ loadHighlights();setInterval(loadPortalContent,600000);
  await db.from('page_views').insert({page_path:location.pathname+location.hash});
  // Load the AdSense script only when the admin has enabled it.
  const {data:adSetting,error:adSettingError}=await db.from('site_settings').select('value').eq('key','adsense_enabled').maybeSingle();
- if(adSettingError||adSetting?.value!==false){
+ if(!adSettingError&&adSetting?.value!==false){
   if(!document.querySelector('script[data-mando-adsense]')){const ads=document.createElement('script');ads.async=true;ads.dataset.mandoAdsense='true';ads.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8665276251631097';ads.crossOrigin='anonymous';document.head.appendChild(ads);}
  }
  const {data,error}=await db.from('advertisements').select('title,image_url,target_url,placement,starts_at,ends_at').eq('active',true).order('created_at',{ascending:false});
