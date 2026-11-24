@@ -2,15 +2,20 @@
   "id": "/",
   "name": "MANDO SPORT",
   "short_name": "MANDO SPORT",
-  "description": "مباريات كرة القدم والأخبار والنتائج المباشرة",
+  "description": "نبض الملاعب لحظة بلحظة — مباريات وأخبار ونتائج كرة القدم",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#080a0f",
-  "theme_color": "#090b10",
+  "background_color": "#07111b",
+  "theme_color": "#07111b",
   "icons": [
-    {"src": "/mando-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+    {
+      "src": "/mando-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
   ]
 }
