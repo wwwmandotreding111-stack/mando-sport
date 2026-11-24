@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8665276251631097" crossorigin="anonymous"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Mando Sport - مباريات اليوم، النتائج، أخبار كرة القدم وترتيب البطولات">
@@ -429,7 +428,17 @@ loadPortalContent();
 loadHighlights();setInterval(loadPortalContent,600000);
 (async()=>{try{
  const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+ // Live visitor presence for the MANDO SPORT admin dashboard.
+ const visitorKey='visitor-'+Math.random().toString(36).slice(2)+'-'+Date.now();
+ const visitorChannel=db.channel('mando-live-visitors',{config:{presence:{key:visitorKey}}});
+ visitorChannel.subscribe(async status=>{if(status==='SUBSCRIBED'){await visitorChannel.track({path:location.pathname,seen_at:new Date().toISOString()});}});
+ window.addEventListener('pagehide',()=>{visitorChannel.untrack();db.removeChannel(visitorChannel);},{once:true});
  await db.from('page_views').insert({page_path:location.pathname+location.hash});
+ // Load the AdSense script only when the admin has enabled it.
+ const {data:adSetting,error:adSettingError}=await db.from('site_settings').select('value').eq('key','adsense_enabled').maybeSingle();
+ if(adSettingError||adSetting?.value!==false){
+  if(!document.querySelector('script[data-mando-adsense]')){const ads=document.createElement('script');ads.async=true;ads.dataset.mandoAdsense='true';ads.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8665276251631097';ads.crossOrigin='anonymous';document.head.appendChild(ads);}
+ }
  const {data,error}=await db.from('advertisements').select('title,image_url,target_url,placement,starts_at,ends_at').eq('active',true).order('created_at',{ascending:false});
  if(error)throw error;
  const now=Date.now();
