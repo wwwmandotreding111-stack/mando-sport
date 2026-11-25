@@ -355,7 +355,7 @@ function localDateString(d){return [d.getFullYear(),String(d.getMonth()+1).padSt
 function matchStatusText(status){return ({IN_PLAY:'مباشرة الآن',PAUSED:'استراحة',FINISHED:'انتهت',SCHEDULED:'لم تبدأ',POSTPONED:'مؤجلة',CANCELLED:'أُلغيت'})[status]||'موعد المباراة';}
 function matchStatusClass(status){return ['IN_PLAY','PAUSED'].includes(status)?'live':status==='FINISHED'?'done':'';}
 function renderMatchGroups(matches,resultsOnly=false){
- if(!matches.length)return '<div class="match-empty">'+(resultsOnly?'لا توجد مباريات مباشرة أو نتائج نهائية في هذا اليوم.':'لا توجد مباريات مسجلة في البطولات المحددة لهذا اليوم.')+'</div>';
+ if(!matches.length)return '<div class="match-empty">'+(resultsOnly?'لا توجد مباريات مباشرة أو منتهية ضمن الفترة المعروضة (آخر 3 أيام).':'لا توجد مباريات مسجلة في البطولات المحددة لهذا اليوم.')+'</div>';
  const groups=new Map();matches.forEach(m=>{const key=m.competition||'كرة القدم';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(m);});
  return [...groups.entries()].map(([competition,items])=>'<section class="match-group"><div class="match-group-head"><span>'+esc(competition)+'</span><span>'+items.length+' مباراة</span></div>'+items.map(m=>{
   const homeLogo=m.homeCrest?'<img src="'+esc(m.homeCrest)+'" alt="" loading="lazy">':'⚽',awayLogo=m.awayCrest?'<img src="'+esc(m.awayCrest)+'" alt="" loading="lazy">':'⚽';
@@ -398,7 +398,7 @@ async function loadMatches(date=localDateString(selectedMatchDate)){
   const finished=matches.filter(m=>m.status==='FINISHED').sort((a,b)=>String(b.utcDate||'').localeCompare(String(a.utcDate||''))).slice(0,10);
   const resultMatches=[...live,...finished];
   results.innerHTML=renderMatchGroups(resultMatches,true);
-  status.textContent='المصدر: ESPN · آخر تحديث '+new Date(data.updatedAt||Date.now()).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})+(data.partial?' · بعض البطولات غير متاحة':'');
+  status.textContent='المصدر: ESPN · '+matches.length+' مباراة مسترجعة · آخر تحديث '+new Date(data.updatedAt||Date.now()).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})+(data.partial?' · بعض البطولات غير متاحة':'');
   document.getElementById('results-status').textContent='المباريات المباشرة وآخر 10 نتائج خلال 3 أيام';
  }catch(error){
   status.textContent='تعذر تحديث المباريات';
