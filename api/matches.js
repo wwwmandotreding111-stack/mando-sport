@@ -13,13 +13,18 @@ const STATUS = (event) => {
   const type = event?.status?.type || {};
   const state = String(type.state || "").toLowerCase();
   const name = String(type.name || "").toUpperCase();
-  if (state === "in" || name.includes("IN_PROGRESS")) return "IN_PLAY";
   if (name.includes("HALFTIME") || name.includes("PAUSE")) return "PAUSED";
+  if (state === "in" || name.includes("IN_PROGRESS")) return "IN_PLAY";
   if (state === "post" || type.completed || name.includes("FINAL")) return "FINISHED";
   if (name.includes("POSTPONED")) return "POSTPONED";
   if (name.includes("CANCEL")) return "CANCELLED";
   return "SCHEDULED";
 };
+function shiftDate(date, days) {
+  const [year, month, day] = date.split("-").map(Number);
+  const value = new Date(Date.UTC(year, month - 1, day + days));
+  return value.toISOString().slice(0, 10);
+}
 async function getJson(url) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 6000);
@@ -35,9 +40,13 @@ module.exports = async function handler(req, res) {
   const code = typeof req.query.competition === "string" ? req.query.competition.toUpperCase() : "";
   const selected = code && LEAGUES[code] ? [[code, LEAGUES[code]]] : Object.entries(LEAGUES);
   if (code && !LEAGUES[code]) return res.status(400).json({ error: "البطولة المطلوبة غير مدعومة." });
-  const compactDate = date.replace(/-/g, "");
+  // Ask ESPN for a seven-day window around the selected local calendar day.
+  // The browser will group events by the visitor's own timezone.
+  const startDate = shiftDate(date, -3);
+  const endDate = shiftDate(date, 3);
+  const compactRange = startDate.replace(/-/g, "") + "-" + endDate.replace(/-/g, "");
   const outcomes = await Promise.allSettled(selected.map(async ([key, league]) => {
-    const url = "https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/scoreboard?dates=" + compactDate + "&limit=100";
+    const url = "https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/scoreboard?dates=" + compactRange + "&limit=100";
     const data = await getJson(url);
     return (Array.isArray(data.events) ? data.events : []).map(event => {
       const comp = (event.competitions || [])[0] || {};
@@ -51,6 +60,7 @@ module.exports = async function handler(req, res) {
       return {
         id: event.id,
         competitionCode: key,
+        competitionSlug: league.slug,
         competition: event.league?.name || league.name,
         competitionEmblem: logos[0]?.href || "",
         home: teamName(home), away: teamName(away),
@@ -75,5 +85,5 @@ module.exports = async function handler(req, res) {
   if (!matches.length && errors.length === selected.length) {
     return res.status(502).json({ error: "تعذر الاتصال بمصدر المباريات حالياً.", details: errors[0] });
   }
-  return res.status(200).json({ date, provider: "ESPN", updatedAt: new Date().toISOString(), matches, partial: errors.length > 0, unavailableCompetitions: errors.length });
+  return res.status(200).json({ date, startDate, endDate, provider: "ESPN", updatedAt: new Date().toISOString(), matches, partial: errors.length > 0, unavailableCompetitions: errors.length });
 };
