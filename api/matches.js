@@ -40,50 +40,68 @@ module.exports = async function handler(req, res) {
   const code = typeof req.query.competition === "string" ? req.query.competition.toUpperCase() : "";
   const selected = code && LEAGUES[code] ? [[code, LEAGUES[code]]] : Object.entries(LEAGUES);
   if (code && !LEAGUES[code]) return res.status(400).json({ error: "البطولة المطلوبة غير مدعومة." });
-  // Ask ESPN for a seven-day window around the selected local calendar day.
-  // The browser will group events by the visitor's own timezone.
-  const startDate = shiftDate(date, -3);
-  const endDate = shiftDate(date, 3);
-  const compactRange = startDate.replace(/-/g, "") + "-" + endDate.replace(/-/g, "");
+  // ESPN's Site scoreboard rejects date ranges on several leagues.
+  // Fetch each local calendar day separately: yesterday, selected day, tomorrow.
+  const startDate = shiftDate(date, -1);
+  const endDate = shiftDate(date, 1);
+  const requestedDates = [startDate, date, endDate];
   const outcomes = await Promise.allSettled(selected.map(async ([key, league]) => {
-    const url = "https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/scoreboard?dates=" + compactRange + "&limit=100";
-    const data = await getJson(url);
-    return (Array.isArray(data.events) ? data.events : []).map(event => {
-      const comp = (event.competitions || [])[0] || {};
-      const competitors = comp.competitors || [];
-      const home = competitors.find(team => team.homeAway === "home") || competitors[0] || {};
-      const away = competitors.find(team => team.homeAway === "away") || competitors[1] || {};
-      const teamName = team => team.team?.shortDisplayName || team.team?.displayName || team.team?.name || "فريق";
-      const status = STATUS(event);
-      const scoreValue = team => status === "SCHEDULED" || status === "POSTPONED" || team.score === undefined || team.score === null || team.score === "" ? null : Number(team.score);
-      const logos = event.league?.logos || [];
-      return {
-        id: event.id,
-        competitionCode: key,
-        competitionSlug: league.slug,
-        competition: event.league?.name || league.name,
-        competitionEmblem: logos[0]?.href || "",
-        home: teamName(home), away: teamName(away),
-        homeTeamId: home.team?.id || "", awayTeamId: away.team?.id || "",
-        homeCrest: home.team?.logo || home.team?.logos?.[0]?.href || "",
-        awayCrest: away.team?.logo || away.team?.logos?.[0]?.href || "",
-        utcDate: event.date || comp.date || null,
-        status,
-        homeScore: scoreValue(home), awayScore: scoreValue(away),
-        venue: comp.venue?.fullName || ""
-      };
+    const daily = await Promise.allSettled(requestedDates.map(async day => {
+      const compactDate = day.replace(/-/g, "");
+      const url = "https://site.api.espn.com/apis/site/v2/sports/soccer/" + league.slug + "/scoreboard?dates=" + compactDate + "&limit=100";
+      const data = await getJson(url);
+      return Array.isArray(data.events) ? data.events : [];
+    }));
+    const events = [];
+    let failedDays = 0;
+    daily.forEach(result => {
+      if (result.status === "fulfilled") events.push(...result.value);
+      else failedDays++;
     });
+    if (failedDays === requestedDates.length) throw new Error("ESPN " + league.slug + " unavailable for all requested dates");
+    return {
+      matches: events.map(event => {
+        const comp = (event.competitions || [])[0] || {};
+        const competitors = comp.competitors || [];
+        const home = competitors.find(team => team.homeAway === "home") || competitors[0] || {};
+        const away = competitors.find(team => team.homeAway === "away") || competitors[1] || {};
+        const teamName = team => team.team?.shortDisplayName || team.team?.displayName || team.team?.name || "فريق";
+        const status = STATUS(event);
+        const scoreValue = team => status === "SCHEDULED" || status === "POSTPONED" || team.score === undefined || team.score === null || team.score === "" ? null : Number(team.score);
+        const logos = event.league?.logos || [];
+        return {
+          id: event.id,
+          competitionCode: key,
+          competitionSlug: league.slug,
+          competition: event.league?.name || league.name,
+          competitionEmblem: logos[0]?.href || "",
+          home: teamName(home), away: teamName(away),
+          homeTeamId: home.team?.id || "", awayTeamId: away.team?.id || "",
+          homeCrest: home.team?.logo || home.team?.logos?.[0]?.href || "",
+          awayCrest: away.team?.logo || away.team?.logos?.[0]?.href || "",
+          utcDate: event.date || comp.date || null,
+          status,
+          homeScore: scoreValue(home), awayScore: scoreValue(away),
+          venue: comp.venue?.fullName || ""
+        };
+      }),
+      failedDays
+    };
   }));
   const matches = [];
   const errors = [];
-  outcomes.forEach((outcome, index) => {
-    if (outcome.status === "fulfilled") matches.push(...outcome.value);
-    else errors.push(String(outcome.reason?.message || outcome.reason));
+  let unavailableDays = 0;
+  outcomes.forEach(outcome => {
+    if (outcome.status === "fulfilled") {
+      matches.push(...outcome.value.matches);
+      unavailableDays += outcome.value.failedDays;
+    } else errors.push(String(outcome.reason?.message || outcome.reason));
   });
-  matches.sort((a,b) => String(a.utcDate || "").localeCompare(String(b.utcDate || "")));
+  const uniqueMatches = [...new Map(matches.map(match => [String(match.id), match])).values()];
+  uniqueMatches.sort((a,b) => String(a.utcDate || "").localeCompare(String(b.utcDate || "")));
   res.setHeader("Cache-Control", req.query.push === "1" ? "no-store" : "s-maxage=60, stale-while-revalidate=120");
-  if (!matches.length && errors.length === selected.length) {
+  if (!uniqueMatches.length && errors.length === selected.length) {
     return res.status(502).json({ error: "تعذر الاتصال بمصدر المباريات حالياً.", details: errors[0] });
   }
-  return res.status(200).json({ date, startDate, endDate, provider: "ESPN", updatedAt: new Date().toISOString(), matches, partial: errors.length > 0, unavailableCompetitions: errors.length });
+  return res.status(200).json({ date, startDate, endDate, provider: "ESPN", updatedAt: new Date().toISOString(), matches: uniqueMatches, partial: errors.length > 0 || unavailableDays > 0, unavailableCompetitions: errors.length, unavailableDays });
 };
