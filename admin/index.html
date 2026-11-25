@@ -248,6 +248,19 @@ footer{margin-right:250px;border-color:#293447;color:#8593a7}
 .admin-live-card a{background:#2a3444;color:#f6d98f;border:1px solid #6b5527}
 @media(max-width:850px){.admin-live-controls{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.admin-live-controls{grid-template-columns:1fr}.admin-live-card strong{font-size:27px}}
+
+/* Service health monitoring */
+.health-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin:12px 0;border:1px solid #60491c;border-radius:10px;background:#0a0a0a}
+#health-overall{color:#f4c23e;font-size:16px}
+.service-health-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.service-health-item{min-width:0;padding:13px;border:1px solid #49391c;border-radius:10px;background:linear-gradient(145deg,#17130b,#090909)}
+.service-health-item strong{display:block;color:#ffe08a;margin-bottom:4px}
+.service-health-item .health-state{font-weight:850;font-size:13px}
+.service-health-item .health-meta{display:block;color:#a99b78;font-size:11px;overflow-wrap:anywhere}
+.service-health-item .health-ok{color:#70c99a}.service-health-item .health-fail{color:#ff9292}.service-health-item .health-warn{color:#f4c23e}
+@media(max-width:700px){.service-health-grid{grid-template-columns:1fr 1fr}.health-summary{align-items:flex-start;flex-direction:column}}
+@media(max-width:420px){.service-health-grid{grid-template-columns:1fr}}
+
 </style>
 
 <style id="mando-admin-rebuild">
@@ -370,6 +383,19 @@ body.mando-admin footer{margin-right:252px;border-top:1px solid var(--adm-line);
 </div>
 <div id="auto-feed-results" aria-live="polite" class="muted">سيظهر هنا وضع مصادر المباريات والترتيب.</div>
 </section></div>
+
+<section class="panel" id="service-health-panel">
+ <div class="row" style="justify-content:space-between;align-items:center">
+  <div><h2>مركز مراقبة صحة الخدمات</h2><p class="muted">فحص استجابة واجهات الموقع وقاعدة البيانات. الفحص يعمل أثناء فتح لوحة الإدارة فقط.</p></div>
+  <button id="check-system-health" type="button">فحص كل الخدمات الآن</button>
+ </div>
+ <div class="health-summary"><strong id="health-overall">بانتظار الفحص</strong><span id="health-checked-at" class="muted">—</span></div>
+ <div id="service-health-results" class="service-health-grid" aria-live="polite">
+  <div class="service-health-item">سيظهر هنا وضع كل خدمة بعد أول فحص.</div>
+ </div>
+ <p class="muted">تعرض اللوحة حالة HTTP وزمن الاستجابة فقط؛ ولا تعتبر READY في Vercel دليلاً على سلامة البيانات أو كل الخدمات.</p>
+</section>
+
 <div class="admin-section-head"><div><span class="eyebrow">إدارة المحتوى</span><h2>الأخبار والإعلانات</h2></div></div>
 <div class="admin-two-col admin-editors"><section class="panel">
 <h2 id="article-form-heading">إضافة خبر جديد</h2>
@@ -489,7 +515,7 @@ $('login-form').addEventListener('submit',async e=>{
   submit.disabled=false;submit.textContent='تسجيل الدخول';
  }
 });
-$('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
+$('logout').addEventListener('click',async()=>{if(systemHealthTimer){clearInterval(systemHealthTimer);systemHealthTimer=null;}await db.auth.signOut();showLogin();});
 if(db) db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showLogin();});
 (async()=>{
  if(!db) return;
@@ -503,7 +529,14 @@ if(db) db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showL
   message('login-status','تعذر استعادة جلسة المدير: '+(error?.message||'تحقق من الاتصال ثم سجّل الدخول مجدداً.'),true);
  }
 })();
-async function refreshAll(){await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart(),loadCommunityModeration(),loadMembers(),loadSiteControls()]);watchLiveVisitors();await loadAdminAlerts();await checkAutomaticFeeds();}
+let systemHealthTimer=null;
+async function refreshAll(){
+ await Promise.all([loadArticles(),loadAds(),loadViews(),loadAnalytics(),loadWeeklyChart(),loadCommunityModeration(),loadMembers(),loadSiteControls()]);
+ watchLiveVisitors();
+ await Promise.all([loadAdminAlerts(),checkAutomaticFeeds(),checkSystemHealth()]);
+ if(!systemHealthTimer) systemHealthTimer=window.setInterval(()=>{if(!document.hidden&&!$('dashboard').classList.contains('hidden'))checkSystemHealth();},5*60*1000);
+}
+
 
 let liveVisitorsChannel=null;
 function watchLiveVisitors(){
@@ -540,6 +573,48 @@ $('adsense-toggle')?.addEventListener('click',async()=>{
   $('dashboard-status').textContent=next?'تم تفعيل إعلانات Google للزيارات الجديدة.':'تم إيقاف إعلانات Google للزيارات الجديدة.';
  }catch(error){alert('تعذر تغيير حالة إعلانات Google: '+error.message);button.disabled=false;}
 });
+
+async function checkSystemHealth(){
+ const host=$('service-health-results');
+ if(!host)return;
+ const overall=$('health-overall');
+ overall.textContent='جارٍ فحص الخدمات…';
+ host.innerHTML='<div class="service-health-item">جارٍ الفحص…</div>';
+ const checks=[
+  {name:'خدمة المباريات',url:'/api/matches?date='+encodeURIComponent(new Date().toISOString().slice(0,10)),validate:data=>Array.isArray(data.matches)||Array.isArray(data.fixtures)||!!data.error===false},
+  {name:'خدمة الأخبار',url:'/api/news',validate:data=>Array.isArray(data.articles)},
+  {name:'اللقطات المميزة',url:'/api/highlights',validate:data=>Array.isArray(data.highlights)||Array.isArray(data.videos)||Array.isArray(data.items)||!!data.error===false},
+  {name:'ترتيب البطولات',url:'/api/standings?competition=PL',validate:data=>Array.isArray(data.table)||Array.isArray(data.standings)||!!data.error===false}
+ ];
+ const runCheck=async item=>{
+  const controller=new AbortController(),started=performance.now(),timer=setTimeout(()=>controller.abort(),9000);
+  try{
+   const response=await fetch(item.url,{cache:'no-store',signal:controller.signal,headers:{'Accept':'application/json'}});
+   const elapsed=Math.round(performance.now()-started);
+   const data=await response.json().catch(()=>({}));
+   const valid=response.ok&&item.validate(data);
+   return {name:item.name,ok:valid,http:response.status,elapsed,detail:!response.ok?(data.error||'استجابة HTTP غير ناجحة'):!valid?'استجابة وصلت لكن بنية البيانات غير متوقعة':'استجابة وبيانات سليمة'};
+  }catch(error){
+   return {name:item.name,ok:false,http:'—',elapsed:Math.round(performance.now()-started),detail:error.name==='AbortError'?'انتهت مهلة الاتصال':(error.message||'تعذر الاتصال')};
+  }finally{clearTimeout(timer);}
+ };
+ const apiResults=await Promise.all(checks.map(runCheck));
+ let dbResult;
+ const dbStart=performance.now();
+ try{
+  const {count,error}=await db.from('articles').select('id',{count:'exact',head:true});
+  if(error)throw error;
+  dbResult={name:'قاعدة بيانات Supabase',ok:true,http:'متصل',elapsed:Math.round(performance.now()-dbStart),detail:'الاتصال ناجح · '+(count??0)+' خبر مسجل'};
+ }catch(error){
+  dbResult={name:'قاعدة بيانات Supabase',ok:false,http:'—',elapsed:Math.round(performance.now()-dbStart),detail:error.message||'تعذر الاتصال'};
+ }
+ const results=[...apiResults,dbResult],failed=results.filter(x=>!x.ok).length;
+ overall.textContent=failed===0?'كل الخدمات المفحوصة تعمل':failed+' خدمة تحتاج مراجعة';
+ overall.style.color=failed===0?'#70c99a':'#ff9292';
+ host.innerHTML=results.map(item=>'<div class="service-health-item"><strong>'+esc(item.name)+'</strong><span class="health-state '+(item.ok?'health-ok':'health-fail')+'">'+(item.ok?'● تعمل':'● مشكلة')+'</span><span class="health-meta">HTTP: '+esc(item.http)+' · '+item.elapsed+' ms</span><span class="health-meta">'+esc(item.detail)+'</span></div>').join('');
+ $('health-checked-at').textContent='آخر فحص: '+new Date().toLocaleString('ar');
+}
+$('check-system-health')?.addEventListener('click',checkSystemHealth);
 
 async function checkAutomaticFeeds(){
  const host=$('auto-feed-results');if(!host)return;
