@@ -249,6 +249,7 @@ footer{margin-right:250px;border-color:#293447;color:#8593a7}
 @media(max-width:850px){.admin-live-controls{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.admin-live-controls{grid-template-columns:1fr}.admin-live-card strong{font-size:27px}}
 
+.online-visitor-item{padding:12px;border:1px solid #49391c;border-radius:10px;background:#111}.online-visitor-item strong{display:block;color:#ffe08a}.online-visitor-item span{display:block;color:#b9ad91;font-size:12px;margin-top:5px;overflow-wrap:anywhere}
 /* Service health monitoring */
 .health-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin:12px 0;border:1px solid #60491c;border-radius:10px;background:#0a0a0a}
 #health-overall{color:#f4c23e;font-size:16px}
@@ -346,10 +347,11 @@ body.mando-admin footer{margin-right:252px;border-top:1px solid var(--adm-line);
 <div class="row" style="justify-content:space-between"><div><h1>لوحة التحكم</h1><div id="admin-email" class="muted"></div></div><button id="logout" class="secondary">تسجيل الخروج</button></div>
 <div id="dashboard-status" class="status" aria-live="polite"></div>
 <div class="admin-live-controls" aria-label="التحكم المباشر">
-<section class="admin-live-card"><h2>الزوار الموجودون الآن</h2><strong id="live-visitors-count">—</strong><small>عدد الجلسات المتصلة حالياً · تحديث مباشر</small></section>
+<section class="admin-live-card"><h2>الزوار الموجودون الآن</h2><strong id="live-visitors-count">—</strong><small>عدد الجلسات المتصلة حالياً · تحديث مباشر</small><button id="show-online-visitors" type="button" class="secondary" style="margin-top:10px">مين متصل الآن؟</button></section>
 <section class="admin-live-card"><h2>إعلانات Google AdSense</h2><strong id="adsense-switch-state">جارٍ التحميل…</strong><p id="adsense-switch-note">التحكم بعرض إعلانات Google على الموقع</p><button id="adsense-toggle" type="button" disabled>تحميل الحالة…</button></section>
 <section class="admin-live-card"><h2>أرباح Google بالدولار</h2><strong id="adsense-earnings-value">غير مربوط</strong><p id="adsense-earnings-note">يلزم ربط تقارير AdSense بشكل آمن لعرض الأرباح الحقيقية.</p><a href="https://adsense.google.com/adsense/u/0/" target="_blank" rel="noopener noreferrer">فتح تقارير AdSense</a></section>
 </div>
+<section class="panel hidden" id="online-visitors-panel"><div class="row" style="justify-content:space-between;align-items:center"><div><h2>مين متصل الآن؟</h2><p class="muted">الزوار النشطون حالياً حسب جلسات الاتصال المباشر.</p></div><button id="close-online-visitors" type="button" class="secondary">إغلاق</button></div><div id="online-visitors-list" class="service-health-grid" aria-live="polite"><p class="muted">بانتظار بيانات الزوار…</p></div></section>
 <div class="admin-welcome"><div><span class="eyebrow">مركز التحكم الرئيسي</span><h2>نظرة عامة على المنصة</h2><p>تابع أداء MANDO SPORT وأدر محتوى الموقع من مكان واحد.</p></div><div class="welcome-mark">🦅</div></div>
 <div class="stats">
 <div class="panel stat"><span class="muted">إجمالي زيارات الصفحات المسجلة</span><strong id="views-total">—</strong></div>
@@ -539,13 +541,22 @@ async function refreshAll(){
 
 
 let liveVisitorsChannel=null;
+let onlineVisitorsSnapshot=[];
+function renderOnlineVisitors(){
+ const host=$('online-visitors-list');if(!host)return;
+ if(!onlineVisitorsSnapshot.length){host.innerHTML='<p class="muted">ما في زوار متصلين حالياً.</p>';return;}
+ host.innerHTML=onlineVisitorsSnapshot.map((visitor,index)=>'<div class="online-visitor-item"><strong>زائر '+(index+1)+'</strong><span>الصفحة: '+esc(visitor.path||'الصفحة الرئيسية')+'</span><span>آخر ظهور: '+esc(visitor.seen_at?new Date(visitor.seen_at).toLocaleTimeString('ar'):'متصل الآن')+'</span></div>').join('');
+}
+$('show-online-visitors')?.addEventListener('click',()=>{$('online-visitors-panel').classList.remove('hidden');renderOnlineVisitors();});
+$('close-online-visitors')?.addEventListener('click',()=>{$('online-visitors-panel').classList.add('hidden');});
 function watchLiveVisitors(){
  if(liveVisitorsChannel||!db)return;
  const channel=db.channel('mando-live-visitors');
  channel.on('presence',{event:'sync'},()=>{
   const state=channel.presenceState();
-  const count=Object.values(state).reduce((total,sessions)=>total+(Array.isArray(sessions)?sessions.length:0),0);
-  $('live-visitors-count').textContent=String(count);
+  onlineVisitorsSnapshot=Object.values(state).flatMap(sessions=>(Array.isArray(sessions)?sessions:[]).map(session=>({path:session.path,seen_at:session.seen_at})));
+  $('live-visitors-count').textContent=String(onlineVisitorsSnapshot.length);
+  if(!$('online-visitors-panel').classList.contains('hidden'))renderOnlineVisitors();
  });
  channel.subscribe(status=>{if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')$('live-visitors-count').textContent='غير متاح';});
  liveVisitorsChannel=channel;
