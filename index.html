@@ -104,7 +104,11 @@ nav a:first-child,nav a:hover,nav a:focus{background:#d9ad5b18;color:var(--gold-
 .match-side.away{justify-content:flex-start}
 .match-side .crest{width:31px;height:31px;flex:0 0 31px;display:grid;place-items:center}
 .match-side .crest img{width:100%;height:100%;object-fit:contain}
-.match-team-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.match-team-name{min-width:0;min-height:44px;display:inline-flex;align-items:center;padding:4px 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#matches-list{min-height:300px}#results-list{min-height:180px}#standings-container{min-height:230px}#standings-container td img{width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-inline:0 6px}
+#home-top-ad-wrap[hidden]{display:block!important;visibility:hidden;min-height:110px}
+.home-top-ad{min-height:90px;display:grid;align-content:center}.home-top-ad img{width:100%;height:auto;max-height:190px;object-fit:contain}
+@media(max-width:600px){#matches-list{min-height:250px}#results-list{min-height:150px}#standings-container{min-height:190px}#home-top-ad-wrap[hidden]{min-height:90px}}
 .match-team-name:hover{color:var(--gold-bright)}
 .match-center{text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
 .match-center .score{font-size:21px;line-height:1.25;font-weight:1000;color:#fff;direction:ltr}
@@ -439,7 +443,7 @@ function renderMatchGroups(matches,resultsOnly=false){
  if(!matches.length)return '<div class="match-empty">'+(resultsOnly?'لا توجد مباريات مباشرة أو منتهية ضمن الفترة المعروضة (آخر 3 أيام).':'لا توجد مباريات مسجلة في البطولات المحددة لهذا اليوم.')+'</div>';
  const groups=new Map();matches.forEach(m=>{const key=m.competition||'كرة القدم';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(m);});
  return [...groups.entries()].map(([competition,items])=>'<section class="match-group"><div class="match-group-head"><span>'+esc(competition)+'</span><span>'+items.length+' مباراة</span></div>'+items.map(m=>{
-  const homeLogo=m.homeCrest?'<img src="'+esc(m.homeCrest)+'" alt="" loading="lazy">':'⚽',awayLogo=m.awayCrest?'<img src="'+esc(m.awayCrest)+'" alt="" loading="lazy">':'⚽';
+  const homeLogo=m.homeCrest?'<img src="'+esc(teamLogoSrc(m.homeCrest))+'" alt="" width="31" height="31" loading="lazy" decoding="async">':'⚽',awayLogo=m.awayCrest?'<img src="'+esc(teamLogoSrc(m.awayCrest))+'" alt="" width="31" height="31" loading="lazy" decoding="async">':'⚽';
   const score=m.homeScore!==null&&m.awayScore!==null?'<div class="score">'+esc(m.homeScore)+' - '+esc(m.awayScore)+'</div>':'<div class="kickoff">'+(m.utcDate?new Date(m.utcDate).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}):'—')+'</div>';
   return '<div class="match-row" role="link" tabindex="0" data-match-url="/match.html?competition='+encodeURIComponent(m.competitionCode)+'&id='+encodeURIComponent(m.id)+'"><div class="match-side home"><a class="match-team-name" href="/team.html?league='+encodeURIComponent(m.competitionSlug||"eng.1")+'&id='+encodeURIComponent(m.homeTeamId||"") +'">'+esc(m.home)+'</a><span class="crest">'+homeLogo+'</span></div><div class="match-center">'+score+'<span class="match-state '+matchStatusClass(m.status)+'">'+matchStatusText(m.status)+'</span></div><div class="match-side away"><span class="crest">'+awayLogo+'</span><a class="match-team-name" href="/team.html?league='+encodeURIComponent(m.competitionSlug||"eng.1")+'&id='+encodeURIComponent(m.awayTeamId||"") +'">'+esc(m.away)+'</a></div></div><a class="match-details" href="/match.html?competition='+encodeURIComponent(m.competitionCode)+'&id='+encodeURIComponent(m.id)+'">تفاصيل المباراة ←</a>';
  }).join('')+'</section>').join('');
@@ -456,6 +460,7 @@ function renderMatchDays(){
 }
 function renderMatchTabButtons(){document.querySelectorAll('[data-match-tab]').forEach(button=>{button.classList.toggle('active',button.dataset.matchTab===activeMatchTab);});}
 document.querySelectorAll('[data-match-tab]').forEach(button=>button.addEventListener('click',()=>{activeMatchTab=button.dataset.matchTab;renderMatchTabButtons();if(lastMatchesPayload)renderMatchPayload(lastMatchesPayload,localDateString(selectedMatchDate));}));
+function teamLogoSrc(url){if(!url)return '';try{const parsed=new URL(url,location.href);if(parsed.hostname==='a.espncdn.com')parsed.pathname=parsed.pathname.replace('/soccer/500/','/soccer/64/');return parsed.href;}catch{return url;}}
 function renderMatchPayload(data,date){
  const list=document.getElementById('matches-list'),results=document.getElementById('results-list'),status=document.getElementById('matches-status');
  const matches=Array.isArray(data.matches)?data.matches:[];
@@ -494,7 +499,7 @@ async function loadMatches(date=localDateString(selectedMatchDate)){
 async function loadStandings(code){
  const box=document.getElementById('standings-container'),label=document.getElementById('standings-status');label.textContent='جارٍ تحميل الترتيب...';box.innerHTML='<div class="match-empty">يتم جلب جدول البطولة...</div>';
  try{const response=await fetch('/api/standings?competition='+encodeURIComponent(code),{cache:'no-store'});const data=await response.json();if(!response.ok)throw new Error(data.error||'تعذر تحميل الترتيب');label.textContent=data.season?'الموسم '+esc(data.season)+' · ESPN':'ترتيب البطولة · ESPN';if(!data.table?.length){box.innerHTML='<div class="match-empty">لا تتوفر بيانات ترتيب لهذه البطولة حالياً.</div>';return;}
- box.innerHTML='<table><thead><tr><th>#</th><th>الفريق</th><th>لعب</th><th>فاز</th><th>تعادل</th><th>خسر</th><th>له</th><th>عليه</th><th>الفرق</th><th>نقاط</th></tr></thead><tbody>'+data.table.map(row=>'<tr><td>'+esc(row.position)+'</td><td>'+(row.crest?'<img src="'+esc(row.crest)+'" alt="">':'')+'<strong>'+esc(row.team)+'</strong></td><td>'+esc(row.played??'—')+'</td><td>'+esc(row.won??'—')+'</td><td>'+esc(row.drawn??'—')+'</td><td>'+esc(row.lost??'—')+'</td><td>'+esc(row.goalsFor??'—')+'</td><td>'+esc(row.goalsAgainst??'—')+'</td><td>'+esc(row.goalDifference??'—')+'</td><td><strong>'+esc(row.points??'—')+'</strong></td></tr>').join('')+'</tbody></table>';
+ box.innerHTML='<table><thead><tr><th>#</th><th>الفريق</th><th>لعب</th><th>فاز</th><th>تعادل</th><th>خسر</th><th>له</th><th>عليه</th><th>الفرق</th><th>نقاط</th></tr></thead><tbody>'+data.table.map(row=>'<tr><td>'+esc(row.position)+'</td><td>'+(row.crest?'<img src="'+esc(teamLogoSrc(row.crest))+'" alt="" width="24" height="24" loading="lazy" decoding="async">':'')+'<strong>'+esc(row.team)+'</strong></td><td>'+esc(row.played??'—')+'</td><td>'+esc(row.won??'—')+'</td><td>'+esc(row.drawn??'—')+'</td><td>'+esc(row.lost??'—')+'</td><td>'+esc(row.goalsFor??'—')+'</td><td>'+esc(row.goalsAgainst??'—')+'</td><td>'+esc(row.goalDifference??'—')+'</td><td><strong>'+esc(row.points??'—')+'</strong></td></tr>').join('')+'</tbody></table>';
  }catch(error){label.textContent='تعذر التحديث';box.innerHTML='<div class="match-empty">'+esc(error.message)+'</div>';}
 }
 document.getElementById('league-select').addEventListener('change',e=>loadStandings(e.target.value));
