@@ -107,9 +107,10 @@ module.exports = async function handler(req, res) {
   // Safety net: some ESPN league scoreboards can omit fixtures that are present
   // in the global soccer scoreboard. Use it only when the league feeds returned
   // no usable events, then map known competitions back to our supported codes.
-  if (matches.length === 0) {
+  const needsChampionsFallback = selected.some(([key]) => key === "CL") && !matches.some(match => match.competitionCode === "CL");
+  if (matches.length === 0 || needsChampionsFallback) {
     const aliases = [
-      ["CL", ["uefa champions", "champions league"]],
+      ["CL", ["uefa champions", "uefa.champions", "champions league"]],
       ["PL", ["premier league", "english premier league"]],
       ["PD", ["laliga", "la liga", "spanish primera"]],
       ["SA", ["serie a", "italian serie"]],
