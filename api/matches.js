@@ -83,7 +83,10 @@ module.exports = async function handler(req, res) {
           utcDate: event.date || comp.date || null,
           status,
           homeScore: scoreValue(home), awayScore: scoreValue(away),
-          venue: comp.venue?.fullName || ""
+          venue: comp.venue?.fullName || "",
+          freeWatch: false,
+          watchUrl: null,
+          watchNote: "تحقق من الناقل الرسمي في بلدك؛ حقوق المشاهدة تختلف حسب البطولة والمنطقة."
         };
       }),
       failedDays
@@ -160,7 +163,10 @@ module.exports = async function handler(req, res) {
         awayCrest: away.team?.logo || away.team?.logos?.[0]?.href || "",
         utcDate: event.date || comp.date || null, status,
         homeScore: scoreValue(home), awayScore: scoreValue(away),
-        venue: comp.venue?.fullName || ""
+        venue: comp.venue?.fullName || "",
+        freeWatch: false,
+        watchUrl: null,
+        watchNote: "تحقق من الناقل الرسمي في بلدك؛ حقوق المشاهدة تختلف حسب البطولة والمنطقة."
       });
     }
     console.log("[matches-feed] global fallback", {
