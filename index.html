@@ -399,7 +399,7 @@ async function loadMatches(date=localDateString(selectedMatchDate)){
   const resultMatches=[...live,...finished];
   results.innerHTML=renderMatchGroups(resultMatches,true);
   status.textContent='المصدر: ESPN · آخر تحديث '+new Date(data.updatedAt||Date.now()).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})+(data.partial?' · بعض البطولات غير متاحة':'');
-  document.getElementById('results-status').textContent='المباريات المباشرة وآخر 10 نتائج خلال 7 أيام';
+  document.getElementById('results-status').textContent='المباريات المباشرة وآخر 10 نتائج خلال 3 أيام';
  }catch(error){
   status.textContent='تعذر تحديث المباريات';
   list.innerHTML='<div class="match-empty">حدث خطأ أثناء جلب المباريات: '+esc(error.message)+' — حاول تحديث الصفحة.</div>';
