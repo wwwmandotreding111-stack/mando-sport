@@ -90,7 +90,7 @@ nav a:first-child,nav a:hover,nav a:focus{background:#d9ad5b18;color:var(--gold-
 #match-days{display:flex;gap:6px;overflow:auto;padding:2px 0 12px;scrollbar-width:none}
 #match-days button{flex:0 0 auto;min-width:68px;border:1px solid #2b4155;background:#142536;color:#b9c7d4;border-radius:7px;padding:8px 11px;font-size:10px;font-weight:800;cursor:pointer;transition:.18s}
 #match-days button.active,#match-days button:hover{background:#d9ad5b;color:#152331;border-color:#d9ad5b}
-#match-filter{display:flex;gap:8px;margin-bottom:11px}
+#match-tabs{display:flex;gap:7px;margin:0 0 10px}#match-tabs button{flex:1;border:1px solid #30475b;background:#142536;color:#c4d0dc;border-radius:8px;padding:9px 8px;font-size:11px;font-weight:900;cursor:pointer}#match-tabs button.active,#match-tabs button:hover{background:#d9ad5b;color:#152331;border-color:#d9ad5b}#match-filter{display:flex;gap:8px;margin-bottom:11px}
 #match-filter select,#league-select{max-width:100%;padding:9px 12px;border:1px solid #30475b;border-radius:7px;background:#0b1926;color:#dce5ed;font-size:11px}
 #matches-list,#results-list{display:flex;flex-direction:column;gap:9px}
 .match-group{border:1px solid #2a4054;border-radius:9px;overflow:hidden;background:#0b1824}
@@ -317,6 +317,7 @@ footer .wrap{max-width:1500px}
    </section>
    <section class="portal-panel" id="matches"><div class="portal-heading"><h2>مركز المباريات</h2><small id="matches-status">تحديث تلقائي من ESPN</small></div>
     <div id="match-days" aria-label="اختيار يوم المباريات"></div>
+    <div id="match-tabs" role="tablist" aria-label="تصفية المباريات"><button type="button" data-match-tab="live">مباشر</button><button type="button" data-match-tab="today" class="active">اليوم</button><button type="button" data-match-tab="upcoming">قادمة</button></div>
     <div id="match-filter"><select id="match-competition" aria-label="تصفية حسب البطولة"><option value="">كل البطولات</option><option value="PL">الدوري الإنجليزي</option><option value="PD">الدوري الإسباني</option><option value="SA">الدوري الإيطالي</option><option value="BL1">الدوري الألماني</option><option value="FL1">الدوري الفرنسي</option><option value="CL">دوري أبطال أوروبا</option><option value="SPL">الدوري السعودي</option><option value="MLS">الدوري الأمريكي</option></select></div>
     <div id="matches-list"><div class="match-empty">يتم تحميل المباريات...</div></div>
    </section>
@@ -350,7 +351,7 @@ function closePortalSidebar(){document.body.classList.remove('sidebar-open');if(
 if(portalMenu&&portalSidebar&&portalBackdrop){portalMenu.addEventListener('click',()=>{const open=document.body.classList.toggle('sidebar-open');portalMenu.setAttribute('aria-expanded',String(open));portalMenu.setAttribute('aria-label',open?'إغلاق القائمة الجانبية':'فتح القائمة الجانبية');});portalBackdrop.addEventListener('click',closePortalSidebar);portalSidebar.querySelectorAll('a').forEach(link=>link.addEventListener('click',closePortalSidebar));document.addEventListener('keydown',event=>{if(event.key==='Escape')closePortalSidebar();});window.addEventListener('resize',()=>{if(window.innerWidth>900)closePortalSidebar();});}
 const esc = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ARTICLE_CATEGORIES=['أخبار كرة القدم','أخبار عربية','أخبار عالمية','انتقالات','دوري أبطال أوروبا','الدوري الإنجليزي','الدوري الإسباني','الدوري السعودي','تحليل ومقالات','منتخبات'];
-let selectedMatchDate=new Date(),selectedCompetition='';
+let selectedMatchDate=new Date(),selectedCompetition='',activeMatchTab='today',lastMatchesPayload=null;
 function localDateString(d){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
 function matchStatusText(status){return ({IN_PLAY:'مباشرة الآن',PAUSED:'استراحة',FINISHED:'انتهت',SCHEDULED:'لم تبدأ',POSTPONED:'مؤجلة',CANCELLED:'أُلغيت'})[status]||'موعد المباراة';}
 function matchStatusClass(status){return ['IN_PLAY','PAUSED'].includes(status)?'live':status==='FINISHED'?'done':'';}
@@ -373,6 +374,26 @@ function renderMatchDays(){
  const host=document.getElementById('match-days'),names=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];host.innerHTML='';
  [-2,-1,0,1,2,3,4].forEach(offset=>{const d=new Date();d.setDate(d.getDate()+offset);const b=document.createElement('button');b.type='button';b.dataset.date=localDateString(d);b.textContent=offset===-1?'أمس':offset===0?'اليوم':offset===1?'غداً':names[d.getDay()]+' '+d.getDate();if(offset===0)b.className='active';b.addEventListener('click',()=>{selectedMatchDate=d;host.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));loadMatches(localDateString(d));});host.appendChild(b);});
 }
+function renderMatchTabButtons(){document.querySelectorAll('[data-match-tab]').forEach(button=>{button.classList.toggle('active',button.dataset.matchTab===activeMatchTab);});}
+document.querySelectorAll('[data-match-tab]').forEach(button=>button.addEventListener('click',()=>{activeMatchTab=button.dataset.matchTab;renderMatchTabButtons();if(lastMatchesPayload)renderMatchPayload(lastMatchesPayload,localDateString(selectedMatchDate));}));
+function renderMatchPayload(data,date){
+ const list=document.getElementById('matches-list'),results=document.getElementById('results-list'),status=document.getElementById('matches-status');
+ const matches=Array.isArray(data.matches)?data.matches:[];
+ const statusOf=m=>String(m.status||'').trim().toUpperCase();
+ const dateOf=m=>m.utcDate?localDateString(new Date(m.utcDate)):'';
+ const dayMatches=matches.filter(m=>dateOf(m)===date);
+ const live=matches.filter(m=>['IN_PLAY','PAUSED'].includes(statusOf(m)));
+ const upcoming=matches.filter(m=>statusOf(m)==='SCHEDULED'&&dateOf(m)>=date).sort((a,b)=>String(a.utcDate||'').localeCompare(String(b.utcDate||'')));
+ let visible=activeMatchTab==='live'?live:activeMatchTab==='upcoming'?upcoming:dayMatches;
+ if(!visible.length){
+  const label=activeMatchTab==='live'?'لا توجد مباريات مباشرة حالياً.':activeMatchTab==='upcoming'?'لا توجد مباريات قادمة ضمن الأيام الثلاثة المعروضة.':'لا توجد مباريات مسجلة لهذا اليوم.';
+  list.innerHTML='<div class="match-empty">'+label+'</div>';
+ }else list.innerHTML=renderMatchGroups(visible);
+ const finished=matches.filter(m=>statusOf(m)==='FINISHED').sort((a,b)=>String(b.utcDate||'').localeCompare(String(a.utcDate||''))).slice(0,10);
+ results.innerHTML=renderMatchGroups([...live,...finished],true);
+ status.textContent='المصدر: ESPN · '+matches.length+' مباراة مسترجعة · نتائج نهائية: '+finished.length+' · مباشرة: '+live.length+' · آخر تحديث '+new Date(data.updatedAt||Date.now()).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})+(data.partial?' · بعض البطولات غير متاحة':'');
+ document.getElementById('results-status').textContent='المباريات المباشرة وآخر 10 نتائج خلال 3 أيام';
+}
 async function loadMatches(date=localDateString(selectedMatchDate)){
  const list=document.getElementById('matches-list'),results=document.getElementById('results-list'),status=document.getElementById('matches-status');
  bindMatchNavigation(list);bindMatchNavigation(results);
@@ -383,28 +404,11 @@ async function loadMatches(date=localDateString(selectedMatchDate)){
   const response=await fetch('/api/matches'+query,{cache:'no-store'});
   const data=await response.json();
   if(!response.ok)throw new Error(data.error||'تعذر جلب المباريات');
-  const matches=Array.isArray(data.matches)?data.matches:[];
-  const dateOf=m=>m.utcDate?localDateString(new Date(m.utcDate)):'';
-  const dayMatches=matches.filter(m=>dateOf(m)===date);
-  const nearbyUpcoming=matches.filter(m=>dateOf(m)>=date&&m.status==='SCHEDULED').sort((a,b)=>String(a.utcDate).localeCompare(String(b.utcDate))).slice(0,6);
-  if(dayMatches.length){
-   list.innerHTML=renderMatchGroups(dayMatches);
-  }else if(nearbyUpcoming.length){
-   list.innerHTML='<div class="match-empty">لا توجد مباريات في هذا اليوم. إليك أقرب المباريات القادمة خلال الأيام التالية:</div>'+renderMatchGroups(nearbyUpcoming);
-  }else{
-   list.innerHTML='<div class="match-empty">لا توجد مباريات مسجلة في هذا اليوم أو في الأيام القريبة. شاهد آخر النتائج بالأسفل.</div>';
-  }
-  const statusOf=m=>String(m.status||'').trim().toUpperCase();
-  const live=matches.filter(m=>['IN_PLAY','PAUSED'].includes(statusOf(m)));
-  const finished=matches.filter(m=>statusOf(m)==='FINISHED').sort((a,b)=>String(b.utcDate||'').localeCompare(String(a.utcDate||''))).slice(0,10);
-  const resultMatches=[...live,...finished];
-  results.innerHTML=renderMatchGroups(resultMatches,true);
-  status.textContent='المصدر: ESPN · '+matches.length+' مباراة مسترجعة · نتائج نهائية: '+finished.length+' · مباشرة: '+live.length+' · آخر تحديث '+new Date(data.updatedAt||Date.now()).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})+(data.partial?' · بعض البطولات غير متاحة':'');
-  document.getElementById('results-status').textContent='المباريات المباشرة وآخر 10 نتائج خلال 3 أيام';
+  lastMatchesPayload=data;renderMatchPayload(data,date);
  }catch(error){
   status.textContent='تعذر تحديث المباريات';
   list.innerHTML='<div class="match-empty">حدث خطأ أثناء جلب المباريات: '+esc(error.message)+' — حاول تحديث الصفحة.</div>';
-  results.innerHTML='<div class="match-empty">تعذر تحميل النتائج حالياً بسبب مشكلة في مصدر البيانات أو الاتصال.</div>';
+  results.innerHTML='<div class="match-empty">تعذر تحميل النتائج حالياً بسبب مشكلة في مصدر البيانات أو الاتصال.</div>';list.innerHTML='<div class="match-empty">تعذر تحميل المباريات. تحقق من الاتصال ثم أعد المحاولة.<br><button type="button" id="retry-matches" style="margin-top:10px;padding:9px 16px;border:0;border-radius:8px;background:#d9ad5b;color:#152331;font-weight:900">إعادة المحاولة</button></div>';document.getElementById('retry-matches')?.addEventListener('click',()=>loadMatches(date));
  }
 }
 async function loadStandings(code){
@@ -415,7 +419,7 @@ async function loadStandings(code){
 }
 document.getElementById('league-select').addEventListener('change',e=>loadStandings(e.target.value));
 document.getElementById('match-competition').addEventListener('change',e=>{selectedCompetition=e.target.value;loadMatches(localDateString(selectedMatchDate));});
-renderMatchDays();loadMatches();loadStandings(document.getElementById('league-select').value);setInterval(()=>loadMatches(localDateString(selectedMatchDate)),60000);setInterval(()=>loadStandings(document.getElementById('league-select').value),1800000);
+renderMatchDays();renderMatchTabButtons();loadMatches();loadStandings(document.getElementById('league-select').value);setInterval(()=>loadMatches(localDateString(selectedMatchDate)),60000);setInterval(()=>loadStandings(document.getElementById('league-select').value),1800000);
 const SUPABASE_URL='https://ibgvfjuqcolcyjzdzcde.supabase.co',SUPABASE_KEY='sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_';
 async function loadPortalContent(){
  const latest=document.getElementById('latest-news'),featured=document.getElementById('featured-story'),popular=document.getElementById('popular-news'),categoryHost=document.getElementById('category-news'),newsStatus=document.getElementById('news-status');
