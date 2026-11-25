@@ -460,7 +460,7 @@ function renderMatchDays(){
 }
 function renderMatchTabButtons(){document.querySelectorAll('[data-match-tab]').forEach(button=>{button.classList.toggle('active',button.dataset.matchTab===activeMatchTab);});}
 document.querySelectorAll('[data-match-tab]').forEach(button=>button.addEventListener('click',()=>{activeMatchTab=button.dataset.matchTab;renderMatchTabButtons();if(lastMatchesPayload)renderMatchPayload(lastMatchesPayload,localDateString(selectedMatchDate));}));
-function teamLogoSrc(url){if(!url)return '';try{const parsed=new URL(url,location.href);if(parsed.hostname==='a.espncdn.com')parsed.pathname=parsed.pathname.replace('/soccer/500/','/soccer/64/');return parsed.href;}catch{return url;}}
+function teamLogoSrc(url){return url||'';}
 function renderMatchPayload(data,date){
  const list=document.getElementById('matches-list'),results=document.getElementById('results-list'),status=document.getElementById('matches-status');
  const matches=Array.isArray(data.matches)?data.matches:[];
