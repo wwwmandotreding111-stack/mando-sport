@@ -130,11 +130,16 @@ module.exports = async function handler(req, res) {
       if (result.status === "fulfilled") globalEvents.push(...result.value);
     });
     for (const event of globalEvents) {
-      const leagueText = [
+      const eventCompetition = (event.competitions || [])[0] || {};
+      // ESPN's global scoreboard does not consistently include event.league.
+      // Its competition note (altGameNote) carries the actual tournament name.
+      const noteText = [
+        event.altGameNote,
+        ...(eventCompetition.notes || []).map(note => typeof note === "string" ? note : (note?.headline || note?.text || note?.type?.text || "")),
         event.league?.name, event.league?.abbreviation, event.league?.slug,
         event.season?.name, event.season?.slug
       ].filter(Boolean).join(" ").toLowerCase();
-      const found = aliases.find(([, terms]) => terms.some(term => leagueText.includes(term)));
+      const found = aliases.find(([, terms]) => terms.some(term => noteText.includes(term)));
       if (!found) continue;
       const [key, league] = found;
       if (code && key !== code) continue;
@@ -161,7 +166,7 @@ module.exports = async function handler(req, res) {
     console.log("[matches-feed] global fallback", {
       requestedDates, globalEvents: globalEvents.length,
       mappedMatches: matches.length,
-      leagueNames: [...new Set(globalEvents.map(e => e.league?.name).filter(Boolean))].slice(0, 20)
+      leagueNames: [...new Set(globalEvents.map(e => e.altGameNote || e.league?.name).filter(Boolean))].slice(0, 20)
     });
   }
   console.log("[matches-feed] league results", diagnostics, "total:", matches.length);
