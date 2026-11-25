@@ -394,11 +394,12 @@ async function loadMatches(date=localDateString(selectedMatchDate)){
   }else{
    list.innerHTML='<div class="match-empty">لا توجد مباريات مسجلة في هذا اليوم أو في الأيام القريبة. شاهد آخر النتائج بالأسفل.</div>';
   }
-  const live=matches.filter(m=>['IN_PLAY','PAUSED'].includes(m.status));
-  const finished=matches.filter(m=>m.status==='FINISHED').sort((a,b)=>String(b.utcDate||'').localeCompare(String(a.utcDate||''))).slice(0,10);
+  const statusOf=m=>String(m.status||'').trim().toUpperCase();
+  const live=matches.filter(m=>['IN_PLAY','PAUSED'].includes(statusOf(m)));
+  const finished=matches.filter(m=>statusOf(m)==='FINISHED').sort((a,b)=>String(b.utcDate||'').localeCompare(String(a.utcDate||''))).slice(0,10);
   const resultMatches=[...live,...finished];
   results.innerHTML=renderMatchGroups(resultMatches,true);
-  status.textContent='المصدر: ESPN · '+matches.length+' مباراة مسترجعة · آخر تحديث '+new Date(data.updatedAt||Date.now()).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})+(data.partial?' · بعض البطولات غير متاحة':'');
+  status.textContent='المصدر: ESPN · '+matches.length+' مباراة مسترجعة · نتائج نهائية: '+finished.length+' · مباشرة: '+live.length+' · آخر تحديث '+new Date(data.updatedAt||Date.now()).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})+(data.partial?' · بعض البطولات غير متاحة':'');
   document.getElementById('results-status').textContent='المباريات المباشرة وآخر 10 نتائج خلال 3 أيام';
  }catch(error){
   status.textContent='تعذر تحديث المباريات';
