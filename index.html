@@ -241,6 +241,25 @@ footer .wrap{max-width:1500px}
  footer{padding-bottom:65px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+/* MANDO SPORT fan zone */
+.fan-zone-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fan-card{min-width:0;padding:14px;border:1px solid #30475b;border-radius:10px;background:linear-gradient(145deg,#14283a,#0b1925)}
+.fan-card h3{margin:0 0 9px;color:var(--gold-bright);font-size:13px}
+.fan-card p,.fan-muted{font-size:10px;color:#9aabba;margin:0 0 10px}
+.fan-form{display:grid;gap:8px}
+.fan-form select,.fan-form input{width:100%;min-width:0;padding:9px 10px;border:1px solid #354d61;border-radius:7px;background:#091724;color:#edf3f8;font-size:11px}
+.fan-actions{display:flex;gap:7px;flex-wrap:wrap}
+.fan-btn{border:1px solid #d9ad5b;background:linear-gradient(135deg,#f0d18d,#c29142);color:#152331;border-radius:7px;padding:8px 12px;font-size:10px;font-weight:900;cursor:pointer}
+.fan-btn.secondary{background:#142536;color:#e3c27e;border-color:#465a6d}
+.fan-list{display:grid;gap:7px}
+.fan-item{padding:8px 9px;border:1px solid #263d50;border-radius:7px;background:#0a1723;font-size:10px;color:#d6e0e8}
+.fan-item strong{color:#fff}
+.fan-links{display:flex;gap:7px;flex-wrap:wrap}
+.fan-links a{padding:7px 9px;border:1px solid #354b60;border-radius:7px;color:#e8ca8d;font-size:10px}
+.fan-links a:hover{background:#d9ad5b18}
+.fan-note{margin-top:8px;padding:8px;border-right:2px solid #d9ad5b;background:#d9ad5b0d;color:#aebdca;font-size:9px;line-height:1.7}
+@media(max-width:600px){.fan-zone-grid{grid-template-columns:1fr}}
 </style>
 <style id="mando-highlights-style">
 #highlights-list .highlight-card{display:block;overflow:hidden;border:1px solid rgba(217,173,91,.22);border-radius:16px;background:#101d2d;color:inherit;text-decoration:none;transition:transform .2s,border-color .2s}
@@ -289,6 +308,7 @@ footer .wrap{max-width:1500px}
  <a href="#matches"><span class="side-ico">🔴</span>بايرن ميونخ</a>
  <a href="#matches"><span class="side-ico">🔵</span>باريس سان جيرمان</a>
  <div class="side-label">أقسام أخرى</div>
+ <a href="#fan-zone"><span class="side-ico">🎯</span>منطقة المشجعين</a>
  <a href="#news"><span class="side-ico">🎥</span>فيديوهات رياضية</a>
  <a href="#news"><span class="side-ico">🔥</span>الأكثر رواجاً</a>
  <div class="side-label">حسابك</div>
@@ -330,6 +350,68 @@ footer .wrap{max-width:1500px}
    <section class="portal-panel" id="leagues"><div class="portal-heading"><h2>ترتيب البطولات</h2><small id="standings-status">اختر البطولة</small></div>
     <select id="league-select" aria-label="اختيار بطولة"><option value="PL">الدوري الإنجليزي الممتاز</option><option value="PD">الدوري الإسباني</option><option value="SA">الدوري الإيطالي</option><option value="BL1">الدوري الألماني</option><option value="FL1">الدوري الفرنسي</option><option value="CL">دوري أبطال أوروبا</option><option value="SPL">الدوري السعودي</option><option value="MLS">الدوري الأمريكي</option></select>
     <div id="standings-container" style="margin-top:12px"><div class="match-empty">يتم تحميل ترتيب البطولة...</div></div>
+   </section>
+
+   <section class="portal-panel" id="fan-zone">
+    <div class="portal-heading"><h2>منطقة المشجعين</h2><small>توقعاتك · فريقك المفضل · أخبار الانتقالات</small></div>
+    <div class="fan-zone-grid">
+     <div class="fan-card">
+      <h3>🎯 توقّع نتيجة المباراة</h3>
+      <p>اختر مباراة قادمة وسجّل توقعك.</p>
+      <form class="fan-form" id="fan-prediction-form">
+       <select id="fan-match-select" required><option value="">جارٍ تحميل المباريات القادمة...</option></select>
+       <select id="fan-prediction-choice" required><option value="">اختر توقعك</option><option value="home">فوز الفريق الأول</option><option value="draw">تعادل</option><option value="away">فوز الفريق الثاني</option></select>
+       <button class="fan-btn" type="submit">حفظ توقعي</button>
+      </form>
+      <div class="fan-note">التوقعات محفوظة على هذا الجهاز حالياً. ترتيب جماهيري موحّد سيُفعّل بعد ربط نظام النقاط بقاعدة البيانات.</div>
+      <div id="fan-my-predictions" class="fan-list" style="margin-top:9px"></div>
+     </div>
+     <div class="fan-card">
+      <h3>⭐ فريقي المفضل</h3>
+      <p>احفظ اسم ناديك لتصل بسرعة إلى صفحته وأخباره.</p>
+      <form class="fan-form" id="fan-favorite-form">
+       <input id="fan-favorite-team" list="fan-team-options" placeholder="اكتب اسم فريقك المفضل" maxlength="60" required>
+       <datalist id="fan-team-options"><option value="برشلونة"><option value="ريال مدريد"><option value="ليفربول"><option value="مانشستر سيتي"><option value="مانشستر يونايتد"><option value="آرسنال"><option value="بايرن ميونخ"><option value="باريس سان جيرمان"><option value="الهلال"><option value="النصر"><option value="الاتحاد"><option value="الأهلي"><option value="المنتخب السوري"></datalist>
+       <button class="fan-btn" type="submit">حفظ الفريق</button>
+      </form>
+      <div id="fan-favorite-status" class="fan-item" style="margin-top:9px">لم يتم اختيار فريق بعد.</div>
+      <div class="fan-links" style="margin-top:8px"><a href="/search.html">ابحث عن فريقك ولاعبيه ←</a></div>
+     </div>
+     <div class="fan-card">
+      <h3>🔥 TOP 10 — لقطات مميزة</h3>
+      <p>أحدث المقاطع المتاحة من المصادر الرسمية.</p>
+      <div id="fan-top-ten" class="fan-list"><div class="fan-item">جارٍ تحميل اللقطات...</div></div>
+     </div>
+     <div class="fan-card">
+      <h3>🔄 أخبار سوق الانتقالات</h3>
+      <p>آخر الأخبار التي يصنّفها المصدر ضمن الانتقالات.</p>
+      <div id="fan-transfers" class="fan-list"><div class="fan-item">جارٍ تحميل الأخبار...</div></div>
+     </div>
+     <div class="fan-card">
+      <h3>📊 مقارنة الفرق واللاعبين</h3>
+      <p>انتقل إلى ملفات الفرق واللاعبين المتاحة حالياً، ومنها يمكنك استعراض بيانات كل طرف.</p>
+      <div class="fan-links"><a href="/search.html?q=برشلونة">البحث عن الفرق ←</a><a href="/search.html?q=لاعب">البحث عن اللاعبين ←</a><a href="/scorers.html">إحصائيات الهدافين ←</a></div>
+      <div class="fan-note">المقارنة الرقمية المباشرة بين طرفين تحتاج ربط بيانات موحّدة للاعبين والفرق؛ لن نعرض أرقاماً تخمينية.</div>
+     </div>
+     <div class="fan-card">
+      <h3>💬 مجتمع MANDO SPORT</h3>
+      <p>تابع حساب المشجع والإشعارات والمشاركة في مجتمع الموقع.</p>
+      <div class="fan-links"><a href="/customers.html">حساب المشجع والمجتمع ←</a><a href="#matches">ناقش مباراة من مركز المباريات ←</a></div>
+      <div class="fan-note">التعليقات والمشاركات تتطلب تسجيل الدخول وتخضع للإشراف.</div>
+     </div>
+     <div class="fan-card">
+      <h3>🤖 المساعد الرياضي</h3>
+      <p>ابحث بسرعة عن فريق أو لاعب أو بطولة من قاعدة بيانات الموقع.</p>
+      <form class="fan-form" id="fan-assistant-form"><input id="fan-assistant-query" placeholder="مثلاً: ريال مدريد أو محمد صلاح" maxlength="100" required><button class="fan-btn secondary" type="submit">ابحث الآن</button></form>
+      <div class="fan-note">هذه نسخة بحث ذكي داخل الموقع وليست محادثة ذكاء اصطناعي توليدي؛ المساعد الحواري الكامل يحتاج مزوّد AI ومفتاح API آمن على الخادم.</div>
+     </div>
+     <div class="fan-card">
+      <h3>🇸🇾 ركن الكرة السورية</h3>
+      <p>قسم مخصص لمتابعة الأندية والمنتخب والبطولات السورية.</p>
+      <div class="fan-links"><a href="/search.html?q=المنتخب%20السوري">أخبار المنتخب السوري ←</a><a href="/search.html?q=الدوري%20السوري">الدوري السوري ←</a></div>
+      <div class="fan-note">سنضيف النتائج والترتيب والتشكيلات تلقائياً عند توفر مصدر موثوق يغطي المسابقات السورية.</div>
+     </div>
+    </div>
    </section>
   </div>
   <aside class="portal-rail">
@@ -506,6 +588,45 @@ loadHighlights();setInterval(loadPortalContent,600000);
  if(sideAd&&sideSlot)sideSlot.innerHTML=renderAd(sideAd);
  }catch(e){console.warn('Ads could not be loaded:',e.message);}})();
 document.getElementById('portal-search-form').addEventListener('submit',e=>{e.preventDefault();const q=document.getElementById('portal-search-input').value.trim();if(q)location.href='/search.html?q='+encodeURIComponent(q);});
+
+/* MANDO SPORT fan zone interactions */
+(()=>{
+ const $=id=>document.getElementById(id);
+ const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));}catch{return fallback;}};
+ const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));return true;}catch{return false;}};
+ const fav=read('mando_favorite_team','');
+ const favStatus=$('fan-favorite-status');
+ if(fav&&favStatus)favStatus.innerHTML='فريقك المفضل: <strong>'+safe(fav)+'</strong>';
+ $('fan-favorite-form')?.addEventListener('submit',e=>{e.preventDefault();const name=$('fan-favorite-team').value.trim();if(!name)return;if(write('mando_favorite_team',name))favStatus.innerHTML='تم حفظ فريقك المفضل: <strong>'+safe(name)+'</strong>';else favStatus.textContent='تعذر الحفظ على هذا الجهاز.';});
+ const renderPicks=()=>{const host=$('fan-my-predictions');if(!host)return;const picks=read('mando_match_predictions',[]);host.innerHTML=picks.length?picks.slice(0,4).map(p=>'<div class="fan-item"><strong>'+safe(p.match)+'</strong><br>توقعك: '+safe(p.choice)+' <span style="color:#879bad">· '+safe(p.date)+'</span></div>').join(''):'<div class="fan-item">لم تسجل أي توقعات بعد.</div>';};
+ const choiceLabel={home:'فوز الفريق الأول',draw:'تعادل',away:'فوز الفريق الثاني'};
+ const matchSelect=$('fan-match-select');
+ const date=new Date(),dateKey=[date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');
+ fetch('/api/matches?date='+dateKey,{cache:'no-store'}).then(r=>r.json()).then(data=>{
+  const games=(data.matches||[]).filter(m=>['SCHEDULED','TIMED','IN_PLAY','PAUSED'].includes(m.status));
+  matchSelect.innerHTML=games.length?'<option value="">اختر المباراة</option>'+games.map(m=>'<option value="'+safe(m.id)+'" data-home="'+safe(m.home)+'" data-away="'+safe(m.away)+'">'+safe(m.home)+' × '+safe(m.away)+'</option>').join(''):'<option value="">لا توجد مباريات قادمة متاحة اليوم</option>';
+ }).catch(()=>{matchSelect.innerHTML='<option value="">تعذر تحميل المباريات حالياً</option>';});
+ $('fan-prediction-form')?.addEventListener('submit',e=>{
+  e.preventDefault();const option=matchSelect.selectedOptions[0],choice=$('fan-prediction-choice').value;
+  if(!option?.value||!choice)return;
+  const picks=read('mando_match_predictions',[]),id=option.value;
+  const match=option.textContent.trim(),entry={id,match,choice:choiceLabel[choice],date:new Date().toLocaleDateString('ar')};
+  const next=[entry,...picks.filter(p=>p.id!==id)].slice(0,20);
+  if(write('mando_match_predictions',next)){renderPicks();$('fan-prediction-choice').value='';}else alert('تعذر حفظ التوقع على هذا الجهاز.');
+ });
+ renderPicks();
+ fetch('/api/highlights',{cache:'no-store'}).then(r=>r.json()).then(data=>{
+  const clips=(data.highlights||[]).slice(0,10),host=$('fan-top-ten');
+  host.innerHTML=clips.length?clips.map((v,i)=>'<a class="fan-item" href="'+safe(v.url)+'" target="_blank" rel="noopener noreferrer"><strong>'+(i+1)+'. '+safe(v.title)+'</strong><br><span class="fan-muted">'+safe(v.league||'كرة القدم')+'</span></a>').join(''):'<div class="fan-item">لا تتوفر لقطات حالياً من المصدر.</div>';
+ }).catch(()=>{$('fan-top-ten').innerHTML='<div class="fan-item">تعذر تحميل اللقطات حالياً.</div>';});
+ fetch('/api/news',{cache:'no-store'}).then(r=>r.json()).then(data=>{
+  const items=(data.articles||[]).filter(a=>/انتقال|صفق|ضمّ|ضم |تعاقد|مفاوضات/i.test((a.category||'')+' '+(a.title||''))).slice(0,5);
+  $('fan-transfers').innerHTML=items.length?items.map(a=>'<a class="fan-item" href="'+safe(a.url||'#')+'" '+(/^https?:/.test(a.url||'')?'target="_blank" rel="noopener noreferrer"':'')+'><strong>'+safe(a.title)+'</strong><br><span class="fan-muted">'+safe(a.source||'مصدر إخباري')+'</span></a>').join(''):'<div class="fan-item">لا توجد أخبار انتقالات مصنفة حالياً.</div>';
+ }).catch(()=>{$('fan-transfers').innerHTML='<div class="fan-item">تعذر تحميل أخبار الانتقالات.</div>';});
+ $('fan-assistant-form')?.addEventListener('submit',e=>{e.preventDefault();const q=$('fan-assistant-query').value.trim();if(q)location.href='/search.html?q='+encodeURIComponent(q);});
+})();
+
 </script>
 
 <a id="mando-whatsapp-contact" href="https://wa.me/963991936353" target="_blank" rel="noopener noreferrer" aria-label="تواصل معنا عبر واتساب">
