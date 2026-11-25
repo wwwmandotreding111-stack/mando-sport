@@ -424,7 +424,6 @@ footer .wrap{max-width:1500px}
  </div>
 </main>
 <footer><div class="wrap">© <span id="year"></span> MANDO SPORT — بوابة رياضية مستقلة. بيانات المباريات والأخبار مرتبطة بمصادرها الأصلية.<div style="margin-top:7px;color:#9b742e;font-weight:700">تم تطوير الموقع بواسطة عامر مندو</div></div></footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 const portalMenu=document.getElementById('portal-menu-toggle'),portalSidebar=document.getElementById('portal-sidebar'),portalBackdrop=document.getElementById('portal-sidebar-backdrop');
@@ -502,11 +501,13 @@ document.getElementById('league-select').addEventListener('change',e=>loadStandi
 document.getElementById('match-competition').addEventListener('change',e=>{selectedCompetition=e.target.value;loadMatches(localDateString(selectedMatchDate));});
 renderMatchDays();renderMatchTabButtons();loadMatches();loadStandings(document.getElementById('league-select').value);setInterval(()=>loadMatches(localDateString(selectedMatchDate)),60000);setInterval(()=>loadStandings(document.getElementById('league-select').value),1800000);
 const SUPABASE_URL='https://ibgvfjuqcolcyjzdzcde.supabase.co',SUPABASE_KEY='sb_publishable_f6rFbm1j-TyGod9sfqyriA_PregMmQ_';
+let supabaseModulePromise;
+function loadSupabaseModule(){if(!supabaseModulePromise)supabaseModulePromise=import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');return supabaseModulePromise;}
 async function loadPortalContent(){
  const latest=document.getElementById('latest-news'),featured=document.getElementById('featured-story'),popular=document.getElementById('popular-news'),categoryHost=document.getElementById('category-news'),newsStatus=document.getElementById('news-status');
  let manual=[],automatic=[],manualError=false,automaticError=false;
  const contentTasks=await Promise.allSettled([
-  (async()=>{const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const result=await supabase.from('articles').select('id,title,excerpt,body,image_url,category,featured,created_at').eq('published',true).order('featured',{ascending:false}).order('created_at',{ascending:false}).limit(30);if(result.error)throw result.error;return result.data||[];})(),
+  (async()=>{const {createClient}=await loadSupabaseModule();const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);const result=await supabase.from('articles').select('id,title,excerpt,body,image_url,category,featured,created_at').eq('published',true).order('featured',{ascending:false}).order('created_at',{ascending:false}).limit(30);if(result.error)throw result.error;return result.data||[];})(),
   (async()=>{const response=await fetch('/api/news');const data=await response.json();if(!response.ok)throw new Error(data.error||'تعذر جلب الأخبار');return Array.isArray(data.articles)?data.articles:[];})()
  ]);
  if(contentTasks[0].status==='fulfilled')manual=contentTasks[0].value;else manualError=true;
@@ -549,7 +550,8 @@ async function loadHighlights(){
 loadPortalContent();
 loadHighlights();setInterval(loadPortalContent,600000);
 (async()=>{try{
- const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+ const {createClient}=await loadSupabaseModule();
+ const db=createClient(SUPABASE_URL,SUPABASE_KEY);
  // Live visitor presence for the MANDO SPORT admin dashboard.
  const visitorKey='visitor-'+Math.random().toString(36).slice(2)+'-'+Date.now();
  const visitorChannel=db.channel('mando-live-visitors',{config:{presence:{key:visitorKey}}});
