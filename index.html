@@ -374,9 +374,37 @@ function renderMatchDays(){
  [-2,-1,0,1,2,3,4].forEach(offset=>{const d=new Date();d.setDate(d.getDate()+offset);const b=document.createElement('button');b.type='button';b.dataset.date=localDateString(d);b.textContent=offset===-1?'أمس':offset===0?'اليوم':offset===1?'غداً':names[d.getDay()]+' '+d.getDate();if(offset===0)b.className='active';b.addEventListener('click',()=>{selectedMatchDate=d;host.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));loadMatches(localDateString(d));});host.appendChild(b);});
 }
 async function loadMatches(date=localDateString(selectedMatchDate)){
- const list=document.getElementById('matches-list'),results=document.getElementById('results-list'),status=document.getElementById('matches-status');bindMatchNavigation(list);bindMatchNavigation(results);list.innerHTML='<div class="match-empty">جارٍ تحديث جدول المباريات...</div>';results.innerHTML='<div class="match-empty">جارٍ تحديث النتائج...</div>';
- try{const query='?date='+encodeURIComponent(date)+(selectedCompetition?'&competition='+encodeURIComponent(selectedCompetition):'');const response=await fetch('/api/matches'+query,{cache:'no-store'});const data=await response.json();if(!response.ok)throw new Error(data.error||'تعذر جلب المباريات');const matches=Array.isArray(data.matches)?data.matches:[];status.textContent='المصدر: ESPN · آخر تحديث '+new Date(data.updatedAt||Date.now()).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});list.innerHTML=renderMatchGroups(matches);results.innerHTML=renderMatchGroups(matches.filter(m=>['IN_PLAY','PAUSED','FINISHED'].includes(m.status)),true);document.getElementById('results-status').textContent='مباشر ونتائج نهائية';}
- catch(error){status.textContent='تعذر تحديث المباريات';list.innerHTML='<div class="match-empty">'+esc(error.message)+' — حاول لاحقاً.</div>';results.innerHTML='<div class="match-empty">'+esc(error.message)+'</div>';}
+ const list=document.getElementById('matches-list'),results=document.getElementById('results-list'),status=document.getElementById('matches-status');
+ bindMatchNavigation(list);bindMatchNavigation(results);
+ list.innerHTML='<div class="match-empty">جارٍ تحديث جدول المباريات...</div>';
+ results.innerHTML='<div class="match-empty">جارٍ تحديث النتائج...</div>';
+ try{
+  const query='?date='+encodeURIComponent(date)+(selectedCompetition?'&competition='+encodeURIComponent(selectedCompetition):'');
+  const response=await fetch('/api/matches'+query,{cache:'no-store'});
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.error||'تعذر جلب المباريات');
+  const matches=Array.isArray(data.matches)?data.matches:[];
+  const dateOf=m=>m.utcDate?localDateString(new Date(m.utcDate)):'';
+  const dayMatches=matches.filter(m=>dateOf(m)===date);
+  const nearbyUpcoming=matches.filter(m=>dateOf(m)>=date&&m.status==='SCHEDULED').sort((a,b)=>String(a.utcDate).localeCompare(String(b.utcDate))).slice(0,6);
+  if(dayMatches.length){
+   list.innerHTML=renderMatchGroups(dayMatches);
+  }else if(nearbyUpcoming.length){
+   list.innerHTML='<div class="match-empty">لا توجد مباريات في هذا اليوم. إليك أقرب المباريات القادمة خلال الأيام التالية:</div>'+renderMatchGroups(nearbyUpcoming);
+  }else{
+   list.innerHTML='<div class="match-empty">لا توجد مباريات مسجلة في هذا اليوم أو في الأيام القريبة. شاهد آخر النتائج بالأسفل.</div>';
+  }
+  const live=matches.filter(m=>['IN_PLAY','PAUSED'].includes(m.status));
+  const finished=matches.filter(m=>m.status==='FINISHED').sort((a,b)=>String(b.utcDate||'').localeCompare(String(a.utcDate||''))).slice(0,10);
+  const resultMatches=[...live,...finished];
+  results.innerHTML=renderMatchGroups(resultMatches,true);
+  status.textContent='المصدر: ESPN · آخر تحديث '+new Date(data.updatedAt||Date.now()).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})+(data.partial?' · بعض البطولات غير متاحة':'');
+  document.getElementById('results-status').textContent='المباريات المباشرة وآخر 10 نتائج خلال 7 أيام';
+ }catch(error){
+  status.textContent='تعذر تحديث المباريات';
+  list.innerHTML='<div class="match-empty">حدث خطأ أثناء جلب المباريات: '+esc(error.message)+' — حاول تحديث الصفحة.</div>';
+  results.innerHTML='<div class="match-empty">تعذر تحميل النتائج حالياً بسبب مشكلة في مصدر البيانات أو الاتصال.</div>';
+ }
 }
 async function loadStandings(code){
  const box=document.getElementById('standings-container'),label=document.getElementById('standings-status');label.textContent='جارٍ تحميل الترتيب...';box.innerHTML='<div class="match-empty">يتم جلب جدول البطولة...</div>';
