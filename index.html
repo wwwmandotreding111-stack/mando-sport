@@ -170,8 +170,8 @@ nav a:first-child,nav a:hover,nav a:focus{background:#d9ad5b18;color:var(--gold-
 #standings-container tbody tr:hover{background:#ffffff08}
 footer{margin-top:30px;padding:22px 0;background:#08131e;border-top:1px solid #263b4e;color:#8ea0b1;font-size:10px;text-align:center}
 footer .wrap{max-width:1500px}
-#mando-whatsapp-contact{position:fixed;left:18px;bottom:18px;z-index:95;display:flex;align-items:center;gap:8px;padding:11px 15px;border-radius:30px;background:#159b60;color:#fff;font-size:12px;font-weight:900;box-shadow:0 8px 24px #0005;border:1px solid #ffffff44;transition:.2s}
-#mando-whatsapp-contact:hover{transform:translateY(-3px);background:#18ad6c}
+#mando-whatsapp-contact{position:fixed;left:18px;bottom:18px;z-index:95;display:flex;align-items:center;gap:8px;padding:11px 15px;border-radius:30px;background:#087343;color:#fff;font-size:12px;font-weight:900;box-shadow:0 8px 24px #0005;border:1px solid #ffffff44;transition:.2s}
+#mando-whatsapp-contact:hover{transform:translateY(-3px);background:#0a8550}
 #mando-whatsapp-contact svg{width:20px;height:20px;fill:currentColor;flex:none}
 @media(max-width:1200px) and (min-width:901px){.portal-layout{grid-template-columns:minmax(0,1fr) 255px;gap:12px}.portal-news-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.portal-intro{padding:22px}}
 @media(max-width:900px){
@@ -333,7 +333,7 @@ footer .wrap{max-width:1500px}
   <div class="portal-main">
 <section class="portal-panel" id="matches"><div class="portal-heading"><h2>جدول المباريات ومركز المتابعة</h2><small id="matches-status">مباشر · اليوم · المباريات القادمة</small></div>
     <div id="match-days" aria-label="اختيار يوم المباريات"></div>
-    <div id="match-tabs" role="tablist" aria-label="تصفية المباريات"><button type="button" data-match-tab="live">مباشر</button><button type="button" data-match-tab="today" class="active">اليوم</button><button type="button" data-match-tab="upcoming">قادمة</button></div>
+    <div id="match-tabs" role="group" aria-label="تصفية المباريات"><button type="button" data-match-tab="live">مباشر</button><button type="button" data-match-tab="today" class="active">اليوم</button><button type="button" data-match-tab="upcoming">قادمة</button></div>
     <div id="match-filter"><select id="match-competition" aria-label="تصفية حسب البطولة"><option value="">كل البطولات</option><option value="PL">الدوري الإنجليزي</option><option value="PD">الدوري الإسباني</option><option value="SA">الدوري الإيطالي</option><option value="BL1">الدوري الألماني</option><option value="FL1">الدوري الفرنسي</option><option value="CL">دوري أبطال أوروبا</option><option value="SPL">الدوري السعودي</option><option value="MLS">الدوري الأمريكي</option></select></div>
     <div id="matches-list"><div class="match-empty">يتم تحميل المباريات...</div></div>
    </section>
@@ -358,8 +358,8 @@ footer .wrap{max-width:1500px}
       <h3>🎯 توقّع نتيجة المباراة</h3>
       <p>اختر مباراة قادمة وسجّل توقعك.</p>
       <form class="fan-form" id="fan-prediction-form">
-       <select id="fan-match-select" required><option value="">جارٍ تحميل المباريات القادمة...</option></select>
-       <select id="fan-prediction-choice" required><option value="">اختر توقعك</option><option value="home">فوز الفريق الأول</option><option value="draw">تعادل</option><option value="away">فوز الفريق الثاني</option></select>
+       <select id="fan-match-select" aria-label="اختر المباراة للتوقع" required><option value="">جارٍ تحميل المباريات القادمة...</option></select>
+       <select id="fan-prediction-choice" aria-label="اختر نتيجة توقعك" required><option value="">اختر توقعك</option><option value="home">فوز الفريق الأول</option><option value="draw">تعادل</option><option value="away">فوز الفريق الثاني</option></select>
        <button class="fan-btn" type="submit">حفظ توقعي</button>
       </form>
       <div class="fan-note">التوقعات محفوظة على هذا الجهاز حالياً. ترتيب جماهيري موحّد سيُفعّل بعد ربط نظام النقاط بقاعدة البيانات.</div>
